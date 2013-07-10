@@ -199,13 +199,13 @@
             b = 2 - a + int(a / 4);
         }
         jd = int(365.25 * (Y + 4716)) + int(30.6001 * (M + 1)) + D + b - 1524.5;
-        if (UTC = 1) jd += JDate.dt(Y);
+        //if (UTC = 1) jd += JDate.dt(Y);
         return jd;
     };
 
     JDate.jd2gd = function (jd) { //儒略日数转公历,UTC=1表示目标公历是UTC
         var gd = {};
-        if (UTC = 1) jd -= JDate.dt2(jd - JDate.J2000);
+        //if (UTC = 1) jd -= JDate.dt2(jd - JDate.J2000);
         jd += 0.5;
         var A = int(jd), F = jd - A, D;  //取得日数的整数部份A及小数部分F
         if (A > 2299161){ D = int((A - 1867216.25) / 36524.25), A += 1 + D - int(D / 4)};
@@ -252,6 +252,10 @@
         return new JDate(jd);
     };
 
+    JDate.utc = function (Y, M, D, h, m, s) {
+        return new JDate(JDate.gd2jd(Y, M, D, h, m, s) + JDate.dt(Y));
+    };
+
     JDate.prototype = {
         toJM: function () {
             return (this.jd - JDate.J2000) / 365250;
@@ -283,6 +287,23 @@
         },
         toStr: function () {//日期转为串
             var d = JDate.jd2gd(this.jd);
+            var Y = "     " + d.Y, M = "0" + d.M, D = "0" + d.D;
+            var h = d.h, m = d.m, s = Math.floor(d.s + .5);
+            if (s >= 60) s -= 60, m++;
+            if (m >= 60) m -= 60, h++;
+            h = "0" + h;
+            m = "0" + m;
+            s = "0" + s;
+            Y = Y.substr(Y.length - 5, 5);
+            M = M.substr(M.length - 2, 2);
+            D = D.substr(D.length - 2, 2);
+            h = h.substr(h.length - 2, 2);
+            m = m.substr(m.length - 2, 2);
+            s = s.substr(s.length - 2, 2);
+            return Y + "-" + M + "-" + D + " " + h + ":" + m + ":" + s;
+        },
+        toUTC: function(){
+            var d = JDate.jd2gd(this.jd - JDate.dt2(this.jd - JDate.J2000));
             var Y = "     " + d.Y, M = "0" + d.M, D = "0" + d.D;
             var h = d.h, m = d.m, s = Math.floor(d.s + .5);
             if (s >= 60) s -= 60, m++;
@@ -706,11 +727,11 @@
         for (i = 0; i < tot; i++) {
             var zm = (i * 2 + 18) % 24, jm = (i * 2 + 17) % 24; //中气名节气名
             j = JDate.jd(jq[i] + JDate.J2000 + 8 / 24, 1);
-            out += jqB[jm] + ":" + j.toStr() + " "; //显示节气
+            out += jqB[jm] + ":" + j.toUTC() + " "; //显示节气
             j = JDate.jd(zq[i] + JDate.J2000 + 8 / 24, 1);
-            out += jqB[zm] + ":" + j.toStr() + " "; //显示中气
+            out += jqB[zm] + ":" + j.toUTC() + " "; //显示中气
             j = JDate.jd(hs[i] + JDate.J2000 + 8 / 24, 1);
-            out += yn[i] + ":" + j.toStr() + "\r\n"; //显示日月合朔
+            out += yn[i] + ":" + j.toUTC() + "\r\n"; //显示日月合朔
         }
         document.getElementById('show1').innerText = out;
     }
