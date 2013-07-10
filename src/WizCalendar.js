@@ -124,7 +124,7 @@
         this.jd = jd;
     };
 
-    JDate.J2000 = 2451545; //2000年前儒略日数(2000-1-1 12:00:00格林威治平时)
+    JDate.J2000 = 2451545.0; //2000年前儒略日数(2000-1-1 12:00:00格林威治平时)
     JDate.DTS = [ // TD - UT1 计算表
         -4000, 108371.7, -13036.80, 392.000, 0.0000,
         -500, 17201.0, -627.82, 16.170, -0.3413,
@@ -146,27 +146,34 @@
         1980, 51.0, 1.29, -0.026, 0.0032,
         2000, 63.87, 0.1, 0, 0,
         2005, 64.7, 0.4, 0, 0, //一次项记为x,则 10x=0.4秒/年*(2015-2005),解得x=0.4
-        2015, 69];
+        2015, 69,0,0,0];
 
-    JDate.dt_ext = function (y, jsd) {
-        var dy = (y - 1820) / 100;
-        return -20 + jsd * dy * dy;
-    }; //二次曲线外推
 
-    JDate.dt = function (y) { //力学时和世界时之间的精确差值 ΔT = TD - UT
-        var y0 = JDate.DTS[JDate.DTS.length - 2]; //表中最后一年
-        var t0 = JDate.DTS[JDate.DTS.length - 1]; //表中最后一年的deltatT
-        if (y >= y0) {
+    JDate.dt = function (year) { //力学时和世界时之间的精确差值 ΔT = TD - UT
+        var dts = JDate.DTS, i,t1,t2,t3,dt = 0;
+        if ((year >= -4000) && (year < 2015)) {
+            for (i = 0; i < dts.length; i += 5){
+                if ( year < dts[i+5]){
+                    t1 = (year - dts[i]) / (dts[i + 5] - dts[i]) * 10;
+                    t2 = t1 * t1;
+                    t3 = t2 * t1;
+                    dt = dts[i + 1] + dts[i + 2] * t1 + dts[i + 3] * t2 + dts[i + 4] * t3;
+                    break;
+                }
+            }
+        }else{
             var jsd = 31; //sjd是y1年之后的加速度估计。瑞士星历表jsd=31,NASA网站jsd=32,skmap的jsd=29
-            if (y > y0 + 100) return JDate.dt_ext(y, jsd);
-            var v = JDate.dt_ext(y, jsd);       //二次曲线外推
-            var dv = JDate.dt_ext(y0, jsd) - t0;  //y0年的二次外推与t0的差
-            return v - dv * (y0 + 100 - y) / 100;
+            var dy = (year - 1820) / 100;
+            if (year > 2015 + 100){
+                dt = -20 + jsd * dy * dy;
+            }else{
+                var v = -20 + jsd * dy * dy;
+                dy = (2015 - 1820) / 100;
+                var dv = -20 + jsd * dy * dy - 69;
+                dt = v - dv * (2015 + 100 - year) / 100;
+            }
         }
-        var i, d = JDate.DTS;
-        for (i = 0; i < d.length; i += 5) if (y < d[i + 5]) break;
-        var t1 = (y - d[i]) / (d[i + 5] - d[i]) * 10, t2 = t1 * t1, t3 = t2 * t1;
-        return d[i + 1] + d[i + 2] * t1 + d[i + 3] * t2 + d[i + 4] * t3;
+        return dt;
     };
 
     JDate.dt2 = function (jd) { //传入儒略日(J2000起算),计算UTC与原子时的差(单位:日)
@@ -192,13 +199,13 @@
             b = 2 - a + int(a / 4);
         }
         jd = int(365.25 * (Y + 4716)) + int(30.6001 * (M + 1)) + D + b - 1524.5;
-        //if (UTC = 1) jd += JDate.dt2(jd - JDate.J2000);
+        if (UTC = 1) jd += JDate.dt(Y);
         return jd;
     };
 
     JDate.jd2gd = function (jd) { //儒略日数转公历,UTC=1表示目标公历是UTC
         var gd = {};
-        //if (UTC = 1) jd -= JDate.dt2(jd - JDate.J2000);
+        if (UTC = 1) jd -= JDate.dt2(jd - JDate.J2000);
         jd += 0.5;
         var A = int(jd), F = jd - A, D;  //取得日数的整数部份A及小数部分F
         if (A > 2299161){ D = int((A - 1867216.25) / 36524.25), A += 1 + D - int(D / 4)};

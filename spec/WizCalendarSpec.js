@@ -53,6 +53,7 @@ describe("JDate", function () {
         expect(WC.JDate.dt(1988)).toBeCloseTo(55.8,0);
         expect(WC.JDate.dt(1902)).toBeCloseTo(0,0);
         expect(WC.JDate.dt(1960)).toBeCloseTo(33.2,0);
+        expect(WC.JDate.dt(2015)).toBeCloseTo(69.0,0);
     });
 
     it("test gd2jd class method", function () {
@@ -89,7 +90,7 @@ describe("Coord", function () {
     });
 
     it("test",function(){
-        WC.JQtest(WC.JDate.gd(2000,1,1,12));
+        //WC.JQtest(WC.JDate.gd(2000,1,1,12));
     });
 
 });
