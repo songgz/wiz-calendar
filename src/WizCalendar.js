@@ -49,6 +49,14 @@
     return rad;
   };
 
+  Angle.normalizeRad = function(rad) {
+    return rad % Angle.PI2;
+  };
+
+  Angle.normalizeDeg = function(deg) {
+    return deg % 360;
+  };
+
   Angle.prototype = {
     valueOf: function () {
       return this.rad;
