@@ -432,14 +432,14 @@ function nutation2(t) {
     }
     return [dL / 100 / rad, dE / 100 / rad];
 }
-function nutationLon2(t) {
-    var i, a, t2 = t * t, dL = 0, B = this.nutB;
-    for (i = 0; i < B.length; i += 5) {
-        if (i == 0)a = -1.742 * t; else a = 0;
-        dL += (B[i + 3] + a) * Math.sin(B[i] + B[i + 1] * t + B[i + 2] * t2);
-    }
-    return dL / 100 / rad;
-}
+//function nutationLon2(t) {
+//    var i, a, t2 = t * t, dL = 0, B = this.nutB;
+//    for (i = 0; i < B.length; i += 5) {
+//        if (i == 0)a = -1.742 * t; else a = 0;
+//        dL += (B[i + 3] + a) * Math.sin(B[i] + B[i + 1] * t + B[i + 2] * t2);
+//    }
+//    return dL / 100 / rad;
+//}
 function MQC(h) {
     return 0.0002967 / Math.tan(h + 0.003138 / (h + 0.08919));
 }
@@ -643,7 +643,8 @@ var XL = {E_Lon: function (t, n) {
 }, MS_aLon: function (t, Mn, Sn) {
     return this.M_Lon(t, Mn) + gxc_moonLon(t) - (this.E_Lon(t, Sn) + gxc_sunLon(t) + Math.PI);
 }, S_aLon: function (t, n) {
-    return this.E_Lon(t, n) + nutationLon2(t) + gxc_sunLon(t) + Math.PI;
+    //return this.E_Lon(t, n) + nutationLon2(t) + gxc_sunLon(t) + Math.PI;
+    return EPHEM.earth.lon(t) + EPHEM.nutation.lon(t) + EPHEM.sun.gxcLon(t) + Math.PI;
 }, E_Lon_t: function (W) {
     var t, v = 628.3319653318;
     t = (W - 1.75347) / v;
@@ -2501,171 +2502,171 @@ var obb = {JNB: '', numCn: new Array('零', '一', '二', '三', '四', '五', '
     return this.so_accurate(Math.floor((jd + 8) / 29.5306) * Math.PI * 2);
 }};
 obb.init();
-var SSQ = {SB: '', QB: '', suoKB: new Array(1457698.231017, 29.53067166, 1546082.512234, 29.53085106, 1640640.735300, 29.53060000, 1642472.151543, 29.53085439, 1683430.509300, 29.53086148, 1752148.041079, 29.53085097, 1807665.420323, 29.53059851, 1883618.114100, 29.53060000, 1907360.704700, 29.53060000, 1936596.224900, 29.53060000, 1939135.675300, 29.53060000, 1947168.00), qiKB: new Array(1640650.479938, 15.21842500, 1642476.703182, 15.21874996, 1683430.515601, 15.218750011, 1752157.640664, 15.218749978, 1807675.003759, 15.218620279, 1883627.765182, 15.218612292, 1907369.128100, 15.218449176, 1936603.140413, 15.218425000, 1939145.524180, 15.218466998, 1947180.798300, 15.218524844, 1964362.041824, 15.218533526, 1987372.340971, 15.218513908, 1999653.819126, 15.218530782, 2007445.469786, 15.218535181, 2021324.917146, 15.218526248, 2047257.232342, 15.218519654, 2070282.898213, 15.218425000, 2073204.872850, 15.218515221, 2080144.500926, 15.218530782, 2086703.688963, 15.218523776, 2110033.182763, 15.218425000, 2111190.300888, 15.218425000, 2113731.271005, 15.218515671, 2120670.840263, 15.218425000, 2123973.309063, 15.218425000, 2125068.997336, 15.218477932, 2136026.312633, 15.218472436, 2156099.495538, 15.218425000, 2159021.324663, 15.218425000, 2162308.575254, 15.218461742, 2178485.706538, 15.218425000, 2178759.662849, 15.218445786, 2185334.020800, 15.218425000, 2187525.481425, 15.218425000, 2188621.191481, 15.218437494, 2322147.76), so_low: function (W) {
-    var v = 7771.37714500204;
-    var t = (W + 1.08472) / v, L;
-    t -= (-0.0000331 * t * t + 0.10976 * Math.cos(0.785 + 8328.6914 * t) + 0.02224 * Math.cos(0.187 + 7214.0629 * t) - 0.03342 * Math.cos(4.669 + 628.3076 * t)) / v + (32 * (t + 1.8) * (t + 1.8) - 20) / 86400 / 36525;
-    return t * 36525 + 8 / 24;
-}, qi_low: function (W) {
-    var t, L, v = 628.3319653318;
-    t = (W - 4.895062166) / v;
-    t -= (53 * t * t + 334116 * Math.cos(4.67 + 628.307585 * t) + 2061 * Math.cos(2.678 + 628.3076 * t) * t) / v / 10000000;
-    L = 48950621.66 + 6283319653.318 * t + 53 * t * t + 334166 * Math.cos(4.669257 + 628.307585 * t) + 3489 * Math.cos(4.6261 + 1256.61517 * t) + 2060.6 * Math.cos(2.67823 + 628.307585 * t) * t - 994 - 834 * Math.sin(2.1824 - 33.75705 * t);
-    t -= (L / 10000000 - W) / 628.332 + (32 * (t + 1.8) * (t + 1.8) - 20) / 86400 / 36525;
-    return t * 36525 + 8 / 24;
-}, qi_high: function (W) {
-    var t = XL.S_aLon_t2(W) * 36525;
-    t = t - dt_T(t) + 8 / 24;
-    var v = ((t + 0.5) % 1) * 86400;
-    if (v < 1200 || v > 86400 - 1200)t = XL.S_aLon_t(W) * 36525 - dt_T(t) + 8 / 24;
-    return t;
-}, so_high: function (W) {
-    var t = XL.MS_aLon_t2(W) * 36525;
-    t = t - dt_T(t) + 8 / 24;
-    var v = ((t + 0.5) % 1) * 86400;
-    if (v < 1800 || v > 86400 - 1800)t = XL.MS_aLon_t(W) * 36525 - dt_T(t) + 8 / 24;
-    return t;
-}, jieya: function (s) {
-    var o = "0000000000", o2 = o + o;
-    s = s.replace(/J/g, '00');
-    s = s.replace(/I/g, '000');
-    s = s.replace(/H/g, '0000');
-    s = s.replace(/G/g, '00000');
-    s = s.replace(/t/g, '02');
-    s = s.replace(/s/g, '002');
-    s = s.replace(/r/g, '0002');
-    s = s.replace(/q/g, '00002');
-    s = s.replace(/p/g, '000002');
-    s = s.replace(/o/g, '0000002');
-    s = s.replace(/n/g, '00000002');
-    s = s.replace(/m/g, '000000002');
-    s = s.replace(/l/g, '0000000002');
-    s = s.replace(/k/g, '01');
-    s = s.replace(/j/g, '0101');
-    s = s.replace(/i/g, '001');
-    s = s.replace(/h/g, '001001');
-    s = s.replace(/g/g, '0001');
-    s = s.replace(/f/g, '00001');
-    s = s.replace(/e/g, '000001');
-    s = s.replace(/d/g, '0000001');
-    s = s.replace(/c/g, '00000001');
-    s = s.replace(/b/g, '000000001');
-    s = s.replace(/a/g, '0000000001');
-    s = s.replace(/A/g, o2 + o2 + o2);
-    s = s.replace(/B/g, o2 + o2 + o);
-    s = s.replace(/C/g, o2 + o2);
-    s = s.replace(/D/g, o2 + o);
-    s = s.replace(/E/g, o2);
-    s = s.replace(/F/g, o);
-    return s;
-}, init: function () {
-    var suoS, qiS;
-    suoS = "EqoFscDcrFpmEsF2DfFideFelFpFfFfFiaipqti1ksttikptikqckstekqttgkqttgkqteksttikptikq2fjstgjqttjkqttgkqt";
-    suoS += "ekstfkptikq2tijstgjiFkirFsAeACoFsiDaDiADc1AFbBfgdfikijFifegF1FhaikgFag1E2btaieeibggiffdeigFfqDfaiBkF";
-    suoS += "1kEaikhkigeidhhdiegcFfakF1ggkidbiaedksaFffckekidhhdhdikcikiakicjF1deedFhFccgicdekgiFbiaikcfi1kbFibef";
-    suoS += "gEgFdcFkFeFkdcfkF1kfkcickEiFkDacFiEfbiaejcFfffkhkdgkaiei1ehigikhdFikfckF1dhhdikcfgjikhfjicjicgiehdik";
-    suoS += "cikggcifgiejF1jkieFhegikggcikFegiegkfjebhigikggcikdgkaFkijcfkcikfkcifikiggkaeeigefkcdfcfkhkdgkegieid";
-    suoS += "hijcFfakhfgeidieidiegikhfkfckfcjbdehdikggikgkfkicjicjF1dbidikFiggcifgiejkiegkigcdiegfggcikdbgfgefjF1";
-    suoS += "kfegikggcikdgFkeeijcfkcikfkekcikdgkabhkFikaffcfkhkdgkegbiaekfkiakicjhfgqdq2fkiakgkfkhfkfcjiekgFebicg";
-    suoS += "gbedF1jikejbbbiakgbgkacgiejkijjgigfiakggfggcibFifjefjF1kfekdgjcibFeFkijcfkfhkfkeaieigekgbhkfikidfcje";
-    suoS += "aibgekgdkiffiffkiakF1jhbakgdki1dj1ikfkicjicjieeFkgdkicggkighdF1jfgkgfgbdkicggfggkidFkiekgijkeigfiski";
-    suoS += "ggfaidheigF1jekijcikickiggkidhhdbgcfkFikikhkigeidieFikggikhkffaffijhidhhakgdkhkijF1kiakF1kfheakgdkif";
-    suoS += "iggkigicjiejkieedikgdfcggkigieeiejfgkgkigbgikicggkiaideeijkefjeijikhkiggkiaidheigcikaikffikijgkiahi1";
-    suoS += "hhdikgjfifaakekighie1hiaikggikhkffakicjhiahaikggikhkijF1kfejfeFhidikggiffiggkigicjiekgieeigikggiffig";
-    suoS += "gkidheigkgfjkeigiegikifiggkidhedeijcfkFikikhkiggkidhh1ehigcikaffkhkiggkidhh1hhigikekfiFkFikcidhh1hit";
-    suoS += "cikggikhkfkicjicghiediaikggikhkijbjfejfeFhaikggifikiggkigiejkikgkgieeigikggiffiggkigieeigekijcijikgg";
-    suoS += "ifikiggkideedeijkefkfckikhkiggkidhh1ehijcikaffkhkiggkidhh1hhigikhkikFikfckcidhh1hiaikgjikhfjicjicgie";
-    suoS += "hdikcikggifikigiejfejkieFhegikggifikiggfghigkfjeijkhigikggifikiggkigieeijcijcikfksikifikiggkidehdeij";
-    suoS += "cfdckikhkiggkhghh1ehijikifffffkhsFngErD1pAfBoDd1BlEtFqA2AqoEpDqElAEsEeB2BmADlDkqBtC1FnEpDqnEmFsFsAFn";
-    suoS += "llBbFmDsDiCtDmAB2BmtCgpEplCpAEiBiEoFqFtEqsDcCnFtADnFlEgdkEgmEtEsCtDmADqFtAFrAtEcCqAE1BoFqC1F1DrFtBmF";
-    suoS += "tAC2ACnFaoCgADcADcCcFfoFtDlAFgmFqBq2bpEoAEmkqnEeCtAE1bAEqgDfFfCrgEcBrACfAAABqAAB1AAClEnFeCtCgAADqDoB";
-    suoS += "mtAAACbFiAAADsEtBqAB2FsDqpFqEmFsCeDtFlCeDtoEpClEqAAFrAFoCgFmFsFqEnAEcCqFeCtFtEnAEeFtAAEkFnErAABbFkAD";
-    suoS += "nAAeCtFeAfBoAEpFtAABtFqAApDcCGJ";
-    qiS = "FrcFs22AFsckF2tsDtFqEtF1posFdFgiFseFtmelpsEfhkF2anmelpFlF1ikrotcnEqEq2FfqmcDsrFor22FgFrcgDscFs22FgEe";
-    qiS += "FtE2sfFs22sCoEsaF2tsD1FpeE2eFsssEciFsFnmelpFcFhkF2tcnEqEpFgkrotcnEqrEtFermcDsrE222FgBmcmr22DaEfnaF22";
-    qiS += "2sD1FpeForeF2tssEfiFpEoeFssD1iFstEqFppDgFstcnEqEpFg11FscnEqrAoAF2ClAEsDmDtCtBaDlAFbAEpAAAAAD2FgBiBqo";
-    qiS += "BbnBaBoAAAAAAAEgDqAdBqAFrBaBoACdAAf1AACgAAAeBbCamDgEifAE2AABa1C1BgFdiAAACoCeE1ADiEifDaAEqAAFe1AcFbcA";
-    qiS += "AAAAF1iFaAAACpACmFmAAAAAAAACrDaAAADG0";
-    this.SB = this.jieya(suoS);
-    this.QB = this.jieya(qiS);
-}, calc: function (jd, qs) {
-    jd += 2451545;
-    var i, D, n;
-    var B = this.suoKB, pc = 14;
-    if (qs == '气')B = this.qiKB, pc = 7;
-    var f1 = B[0] - pc, f2 = B[B.length - 1] - pc, f3 = 2436935;
-    if (jd < f1 || jd >= f3) {
-        if (qs == '气')return Math.floor(this.qi_high(Math.floor((jd + pc - 2451259) / 365.2422 * 24) * Math.PI / 12) + 0.5); else return Math.floor(this.so_high(Math.floor((jd + pc - 2451551) / 29.5306) * Math.PI * 2) + 0.5);
-    }
-    if (jd >= f1 && jd < f2) {
-        for (i = 0; i < B.length; i += 2)if (jd + pc < B[i + 2])break;
-        D = B[i] + B[i + 1] * Math.floor((jd + pc - B[i]) / B[i + 1]);
-        D = Math.floor(D + 0.5);
-        if (D == 1683460)D++;
-        return D - 2451545;
-    }
-    if (jd >= f2 && jd < f3) {
-        if (qs == '气') {
-            D = Math.floor(this.qi_low(Math.floor((jd + pc - 2451259) / 365.2422 * 24) * Math.PI / 12) + 0.5);
-            n = this.QB.substr(Math.floor((jd - f2) / 365.2422 * 24), 1);
-        } else {
-            D = Math.floor(this.so_low(Math.floor((jd + pc - 2451551) / 29.5306) * Math.PI * 2) + 0.5);
-            n = this.SB.substr(Math.floor((jd - f2) / 29.5306), 1);
-        }
-        if (n == "1")return D + 1;
-        if (n == "2")return D - 1;
-        return D;
-    }
-}, leap: 0, ym: new Array(), ZQ: new Array(), HS: new Array(), dx: new Array(), Yn: new Array(), calcY: function (jd) {
-    var A = this.ZQ, B = this.HS;
-    var i, k, W, w;
-    W = int2((jd - 355 + 183) / 365.2422) * 365.2422 + 355;
-    if (this.calc(W, '气') > jd)W -= 365.2422;
-    for (i = 0; i < 25; i++)A[i] = this.calc(W + 15.2184 * i, '气');
-    A.pe1 = this.calc(W - 15.2, '气');
-    A.pe2 = this.calc(W - 30.4, '气');
-    w = this.calc(A[0], '朔');
-    if (w > A[0])w -= 29.53;
-    for (i = 0; i < 15; i++)B[i] = this.calc(w + 29.5306 * i, '朔');
-    this.leap = 0;
-    for (i = 0; i < 14; i++) {
-        this.dx[i] = this.HS[i + 1] - this.HS[i];
-        this.ym[i] = i;
-    }
-    var YY = int2((this.ZQ[0] + 10 + 180) / 365.2422) + 2000;
-    if (YY >= -721 && YY <= -104) {
-        var ns = new Array(), yy;
-        for (i = 0; i < 3; i++) {
-            yy = YY + i - 1;
-            if (yy >= -721)ns[i] = this.calc(1457698 - J2000 + int2(0.342 + (yy + 721) * 12.368422) * 29.5306, '朔'), ns[i + 3] = '十三', ns[i + 6] = 2;
-            if (yy >= -479)ns[i] = this.calc(1546083 - J2000 + int2(0.500 + (yy + 479) * 12.368422) * 29.5306, '朔'), ns[i + 3] = '十三', ns[i + 6] = 2;
-            if (yy >= -220)ns[i] = this.calc(1640641 - J2000 + int2(0.866 + (yy + 220) * 12.369000) * 29.5306, '朔'), ns[i + 3] = '后九', ns[i + 6] = 11;
-        }
-        var nn, f1;
-        for (i = 0; i < 14; i++) {
-            for (nn = 2; nn >= 0; nn--)if (this.HS[i] >= ns[nn])break;
-            f1 = int2((this.HS[i] - ns[nn] + 15) / 29.5306);
-            if (f1 < 12)this.ym[i] = obb.ymc[(f1 + ns[nn + 6]) % 12]; else this.ym[i] = ns[nn + 3];
-        }
-        return;
-    }
-    if (B[13] <= A[24]) {
-        for (i = 1; B[i + 1] > A[2 * i] && i < 13; i++);
-        this.leap = i;
-        for (; i < 14; i++)this.ym[i]--;
-    }
-    for (i = 0; i < 14; i++) {
-        var Dm = this.HS[i] + J2000, v2 = this.ym[i];
-        var mc = obb.ymc[v2 % 12];
-        if (Dm >= 1724360 && Dm <= 1729794)mc = obb.ymc[(v2 + 1) % 12]; else if (Dm >= 1807724 && Dm <= 1808699)mc = obb.ymc[(v2 + 1) % 12]; else if (Dm >= 1999349 && Dm <= 1999467)mc = obb.ymc[(v2 + 2) % 12]; else if (Dm >= 1973067 && Dm <= 1977052) {
-            if (v2 % 12 == 0)mc = "正";
-            if (v2 == 2)mc = '一';
-        }
-        if (Dm == 1729794 || Dm == 1808699)mc = '拾贰';
-        this.ym[i] = mc;
-    }
-}};
-SSQ.init();
+//var SSQ = {SB: '', QB: '', suoKB: new Array(1457698.231017, 29.53067166, 1546082.512234, 29.53085106, 1640640.735300, 29.53060000, 1642472.151543, 29.53085439, 1683430.509300, 29.53086148, 1752148.041079, 29.53085097, 1807665.420323, 29.53059851, 1883618.114100, 29.53060000, 1907360.704700, 29.53060000, 1936596.224900, 29.53060000, 1939135.675300, 29.53060000, 1947168.00), qiKB: new Array(1640650.479938, 15.21842500, 1642476.703182, 15.21874996, 1683430.515601, 15.218750011, 1752157.640664, 15.218749978, 1807675.003759, 15.218620279, 1883627.765182, 15.218612292, 1907369.128100, 15.218449176, 1936603.140413, 15.218425000, 1939145.524180, 15.218466998, 1947180.798300, 15.218524844, 1964362.041824, 15.218533526, 1987372.340971, 15.218513908, 1999653.819126, 15.218530782, 2007445.469786, 15.218535181, 2021324.917146, 15.218526248, 2047257.232342, 15.218519654, 2070282.898213, 15.218425000, 2073204.872850, 15.218515221, 2080144.500926, 15.218530782, 2086703.688963, 15.218523776, 2110033.182763, 15.218425000, 2111190.300888, 15.218425000, 2113731.271005, 15.218515671, 2120670.840263, 15.218425000, 2123973.309063, 15.218425000, 2125068.997336, 15.218477932, 2136026.312633, 15.218472436, 2156099.495538, 15.218425000, 2159021.324663, 15.218425000, 2162308.575254, 15.218461742, 2178485.706538, 15.218425000, 2178759.662849, 15.218445786, 2185334.020800, 15.218425000, 2187525.481425, 15.218425000, 2188621.191481, 15.218437494, 2322147.76), so_low: function (W) {
+//    var v = 7771.37714500204;
+//    var t = (W + 1.08472) / v, L;
+//    t -= (-0.0000331 * t * t + 0.10976 * Math.cos(0.785 + 8328.6914 * t) + 0.02224 * Math.cos(0.187 + 7214.0629 * t) - 0.03342 * Math.cos(4.669 + 628.3076 * t)) / v + (32 * (t + 1.8) * (t + 1.8) - 20) / 86400 / 36525;
+//    return t * 36525 + 8 / 24;
+//}, qi_low: function (W) {
+//    var t, L, v = 628.3319653318;
+//    t = (W - 4.895062166) / v;
+//    t -= (53 * t * t + 334116 * Math.cos(4.67 + 628.307585 * t) + 2061 * Math.cos(2.678 + 628.3076 * t) * t) / v / 10000000;
+//    L = 48950621.66 + 6283319653.318 * t + 53 * t * t + 334166 * Math.cos(4.669257 + 628.307585 * t) + 3489 * Math.cos(4.6261 + 1256.61517 * t) + 2060.6 * Math.cos(2.67823 + 628.307585 * t) * t - 994 - 834 * Math.sin(2.1824 - 33.75705 * t);
+//    t -= (L / 10000000 - W) / 628.332 + (32 * (t + 1.8) * (t + 1.8) - 20) / 86400 / 36525;
+//    return t * 36525 + 8 / 24;
+//}, qi_high: function (W) {
+//    var t = XL.S_aLon_t2(W) * 36525;
+//    t = t - dt_T(t) + 8 / 24;
+//    var v = ((t + 0.5) % 1) * 86400;
+//    if (v < 1200 || v > 86400 - 1200)t = XL.S_aLon_t(W) * 36525 - dt_T(t) + 8 / 24;
+//    return t;
+//}, so_high: function (W) {
+//    var t = XL.MS_aLon_t2(W) * 36525;
+//    t = t - dt_T(t) + 8 / 24;
+//    var v = ((t + 0.5) % 1) * 86400;
+//    if (v < 1800 || v > 86400 - 1800)t = XL.MS_aLon_t(W) * 36525 - dt_T(t) + 8 / 24;
+//    return t;
+//}, jieya: function (s) {
+//    var o = "0000000000", o2 = o + o;
+//    s = s.replace(/J/g, '00');
+//    s = s.replace(/I/g, '000');
+//    s = s.replace(/H/g, '0000');
+//    s = s.replace(/G/g, '00000');
+//    s = s.replace(/t/g, '02');
+//    s = s.replace(/s/g, '002');
+//    s = s.replace(/r/g, '0002');
+//    s = s.replace(/q/g, '00002');
+//    s = s.replace(/p/g, '000002');
+//    s = s.replace(/o/g, '0000002');
+//    s = s.replace(/n/g, '00000002');
+//    s = s.replace(/m/g, '000000002');
+//    s = s.replace(/l/g, '0000000002');
+//    s = s.replace(/k/g, '01');
+//    s = s.replace(/j/g, '0101');
+//    s = s.replace(/i/g, '001');
+//    s = s.replace(/h/g, '001001');
+//    s = s.replace(/g/g, '0001');
+//    s = s.replace(/f/g, '00001');
+//    s = s.replace(/e/g, '000001');
+//    s = s.replace(/d/g, '0000001');
+//    s = s.replace(/c/g, '00000001');
+//    s = s.replace(/b/g, '000000001');
+//    s = s.replace(/a/g, '0000000001');
+//    s = s.replace(/A/g, o2 + o2 + o2);
+//    s = s.replace(/B/g, o2 + o2 + o);
+//    s = s.replace(/C/g, o2 + o2);
+//    s = s.replace(/D/g, o2 + o);
+//    s = s.replace(/E/g, o2);
+//    s = s.replace(/F/g, o);
+//    return s;
+//}, init: function () {
+//    var suoS, qiS;
+//    suoS = "EqoFscDcrFpmEsF2DfFideFelFpFfFfFiaipqti1ksttikptikqckstekqttgkqttgkqteksttikptikq2fjstgjqttjkqttgkqt";
+//    suoS += "ekstfkptikq2tijstgjiFkirFsAeACoFsiDaDiADc1AFbBfgdfikijFifegF1FhaikgFag1E2btaieeibggiffdeigFfqDfaiBkF";
+//    suoS += "1kEaikhkigeidhhdiegcFfakF1ggkidbiaedksaFffckekidhhdhdikcikiakicjF1deedFhFccgicdekgiFbiaikcfi1kbFibef";
+//    suoS += "gEgFdcFkFeFkdcfkF1kfkcickEiFkDacFiEfbiaejcFfffkhkdgkaiei1ehigikhdFikfckF1dhhdikcfgjikhfjicjicgiehdik";
+//    suoS += "cikggcifgiejF1jkieFhegikggcikFegiegkfjebhigikggcikdgkaFkijcfkcikfkcifikiggkaeeigefkcdfcfkhkdgkegieid";
+//    suoS += "hijcFfakhfgeidieidiegikhfkfckfcjbdehdikggikgkfkicjicjF1dbidikFiggcifgiejkiegkigcdiegfggcikdbgfgefjF1";
+//    suoS += "kfegikggcikdgFkeeijcfkcikfkekcikdgkabhkFikaffcfkhkdgkegbiaekfkiakicjhfgqdq2fkiakgkfkhfkfcjiekgFebicg";
+//    suoS += "gbedF1jikejbbbiakgbgkacgiejkijjgigfiakggfggcibFifjefjF1kfekdgjcibFeFkijcfkfhkfkeaieigekgbhkfikidfcje";
+//    suoS += "aibgekgdkiffiffkiakF1jhbakgdki1dj1ikfkicjicjieeFkgdkicggkighdF1jfgkgfgbdkicggfggkidFkiekgijkeigfiski";
+//    suoS += "ggfaidheigF1jekijcikickiggkidhhdbgcfkFikikhkigeidieFikggikhkffaffijhidhhakgdkhkijF1kiakF1kfheakgdkif";
+//    suoS += "iggkigicjiejkieedikgdfcggkigieeiejfgkgkigbgikicggkiaideeijkefjeijikhkiggkiaidheigcikaikffikijgkiahi1";
+//    suoS += "hhdikgjfifaakekighie1hiaikggikhkffakicjhiahaikggikhkijF1kfejfeFhidikggiffiggkigicjiekgieeigikggiffig";
+//    suoS += "gkidheigkgfjkeigiegikifiggkidhedeijcfkFikikhkiggkidhh1ehigcikaffkhkiggkidhh1hhigikekfiFkFikcidhh1hit";
+//    suoS += "cikggikhkfkicjicghiediaikggikhkijbjfejfeFhaikggifikiggkigiejkikgkgieeigikggiffiggkigieeigekijcijikgg";
+//    suoS += "ifikiggkideedeijkefkfckikhkiggkidhh1ehijcikaffkhkiggkidhh1hhigikhkikFikfckcidhh1hiaikgjikhfjicjicgie";
+//    suoS += "hdikcikggifikigiejfejkieFhegikggifikiggfghigkfjeijkhigikggifikiggkigieeijcijcikfksikifikiggkidehdeij";
+//    suoS += "cfdckikhkiggkhghh1ehijikifffffkhsFngErD1pAfBoDd1BlEtFqA2AqoEpDqElAEsEeB2BmADlDkqBtC1FnEpDqnEmFsFsAFn";
+//    suoS += "llBbFmDsDiCtDmAB2BmtCgpEplCpAEiBiEoFqFtEqsDcCnFtADnFlEgdkEgmEtEsCtDmADqFtAFrAtEcCqAE1BoFqC1F1DrFtBmF";
+//    suoS += "tAC2ACnFaoCgADcADcCcFfoFtDlAFgmFqBq2bpEoAEmkqnEeCtAE1bAEqgDfFfCrgEcBrACfAAABqAAB1AAClEnFeCtCgAADqDoB";
+//    suoS += "mtAAACbFiAAADsEtBqAB2FsDqpFqEmFsCeDtFlCeDtoEpClEqAAFrAFoCgFmFsFqEnAEcCqFeCtFtEnAEeFtAAEkFnErAABbFkAD";
+//    suoS += "nAAeCtFeAfBoAEpFtAABtFqAApDcCGJ";
+//    qiS = "FrcFs22AFsckF2tsDtFqEtF1posFdFgiFseFtmelpsEfhkF2anmelpFlF1ikrotcnEqEq2FfqmcDsrFor22FgFrcgDscFs22FgEe";
+//    qiS += "FtE2sfFs22sCoEsaF2tsD1FpeE2eFsssEciFsFnmelpFcFhkF2tcnEqEpFgkrotcnEqrEtFermcDsrE222FgBmcmr22DaEfnaF22";
+//    qiS += "2sD1FpeForeF2tssEfiFpEoeFssD1iFstEqFppDgFstcnEqEpFg11FscnEqrAoAF2ClAEsDmDtCtBaDlAFbAEpAAAAAD2FgBiBqo";
+//    qiS += "BbnBaBoAAAAAAAEgDqAdBqAFrBaBoACdAAf1AACgAAAeBbCamDgEifAE2AABa1C1BgFdiAAACoCeE1ADiEifDaAEqAAFe1AcFbcA";
+//    qiS += "AAAAF1iFaAAACpACmFmAAAAAAAACrDaAAADG0";
+//    this.SB = this.jieya(suoS);
+//    this.QB = this.jieya(qiS);
+//}, calc: function (jd, qs) {
+//    jd += 2451545;
+//    var i, D, n;
+//    var B = this.suoKB, pc = 14;
+//    if (qs == '气')B = this.qiKB, pc = 7;
+//    var f1 = B[0] - pc, f2 = B[B.length - 1] - pc, f3 = 2436935;
+//    if (jd < f1 || jd >= f3) {
+//        if (qs == '气')return Math.floor(this.qi_high(Math.floor((jd + pc - 2451259) / 365.2422 * 24) * Math.PI / 12) + 0.5); else return Math.floor(this.so_high(Math.floor((jd + pc - 2451551) / 29.5306) * Math.PI * 2) + 0.5);
+//    }
+//    if (jd >= f1 && jd < f2) {
+//        for (i = 0; i < B.length; i += 2)if (jd + pc < B[i + 2])break;
+//        D = B[i] + B[i + 1] * Math.floor((jd + pc - B[i]) / B[i + 1]);
+//        D = Math.floor(D + 0.5);
+//        if (D == 1683460)D++;
+//        return D - 2451545;
+//    }
+//    if (jd >= f2 && jd < f3) {
+//        if (qs == '气') {
+//            D = Math.floor(this.qi_low(Math.floor((jd + pc - 2451259) / 365.2422 * 24) * Math.PI / 12) + 0.5);
+//            n = this.QB.substr(Math.floor((jd - f2) / 365.2422 * 24), 1);
+//        } else {
+//            D = Math.floor(this.so_low(Math.floor((jd + pc - 2451551) / 29.5306) * Math.PI * 2) + 0.5);
+//            n = this.SB.substr(Math.floor((jd - f2) / 29.5306), 1);
+//        }
+//        if (n == "1")return D + 1;
+//        if (n == "2")return D - 1;
+//        return D;
+//    }
+//}, leap: 0, ym: new Array(), ZQ: new Array(), HS: new Array(), dx: new Array(), Yn: new Array(), calcY: function (jd) {
+//    var A = this.ZQ, B = this.HS;
+//    var i, k, W, w;
+//    W = int2((jd - 355 + 183) / 365.2422) * 365.2422 + 355;
+//    if (this.calc(W, '气') > jd)W -= 365.2422;
+//    for (i = 0; i < 25; i++)A[i] = this.calc(W + 15.2184 * i, '气');
+//    A.pe1 = this.calc(W - 15.2, '气');
+//    A.pe2 = this.calc(W - 30.4, '气');
+//    w = this.calc(A[0], '朔');
+//    if (w > A[0])w -= 29.53;
+//    for (i = 0; i < 15; i++)B[i] = this.calc(w + 29.5306 * i, '朔');
+//    this.leap = 0;
+//    for (i = 0; i < 14; i++) {
+//        this.dx[i] = this.HS[i + 1] - this.HS[i];
+//        this.ym[i] = i;
+//    }
+//    var YY = int2((this.ZQ[0] + 10 + 180) / 365.2422) + 2000;
+//    if (YY >= -721 && YY <= -104) {
+//        var ns = new Array(), yy;
+//        for (i = 0; i < 3; i++) {
+//            yy = YY + i - 1;
+//            if (yy >= -721)ns[i] = this.calc(1457698 - J2000 + int2(0.342 + (yy + 721) * 12.368422) * 29.5306, '朔'), ns[i + 3] = '十三', ns[i + 6] = 2;
+//            if (yy >= -479)ns[i] = this.calc(1546083 - J2000 + int2(0.500 + (yy + 479) * 12.368422) * 29.5306, '朔'), ns[i + 3] = '十三', ns[i + 6] = 2;
+//            if (yy >= -220)ns[i] = this.calc(1640641 - J2000 + int2(0.866 + (yy + 220) * 12.369000) * 29.5306, '朔'), ns[i + 3] = '后九', ns[i + 6] = 11;
+//        }
+//        var nn, f1;
+//        for (i = 0; i < 14; i++) {
+//            for (nn = 2; nn >= 0; nn--)if (this.HS[i] >= ns[nn])break;
+//            f1 = int2((this.HS[i] - ns[nn] + 15) / 29.5306);
+//            if (f1 < 12)this.ym[i] = obb.ymc[(f1 + ns[nn + 6]) % 12]; else this.ym[i] = ns[nn + 3];
+//        }
+//        return;
+//    }
+//    if (B[13] <= A[24]) {
+//        for (i = 1; B[i + 1] > A[2 * i] && i < 13; i++);
+//        this.leap = i;
+//        for (; i < 14; i++)this.ym[i]--;
+//    }
+//    for (i = 0; i < 14; i++) {
+//        var Dm = this.HS[i] + J2000, v2 = this.ym[i];
+//        var mc = obb.ymc[v2 % 12];
+//        if (Dm >= 1724360 && Dm <= 1729794)mc = obb.ymc[(v2 + 1) % 12]; else if (Dm >= 1807724 && Dm <= 1808699)mc = obb.ymc[(v2 + 1) % 12]; else if (Dm >= 1999349 && Dm <= 1999467)mc = obb.ymc[(v2 + 2) % 12]; else if (Dm >= 1973067 && Dm <= 1977052) {
+//            if (v2 % 12 == 0)mc = "正";
+//            if (v2 == 2)mc = '一';
+//        }
+//        if (Dm == 1729794 || Dm == 1808699)mc = '拾贰';
+//        this.ym[i] = mc;
+//    }
+//}};
+//SSQ.init();
 function Lunar() {
     var i;
     this.lun = new Array();
@@ -2696,6 +2697,7 @@ function Lunar() {
         this.ShX = obb.ShX[c % 12];
         this.nianhao = obb.getNH(By);
         var D, w, ob, ob2;
+        var YSSQ;
         for (i = 0, j = 0; i < Bdn; i++) {
             ob = this.lun[i];
             ob.d0 = Bd0 + i;
@@ -2709,37 +2711,37 @@ function Lunar() {
             ob.weekN = int2((this.w0 + Bdn - 1) / 7) + 1;
             JD.setFromJD(ob.d0 + J2000);
             ob.d = JD.D;
-            if (!SSQ.ZQ.length || ob.d0 < SSQ.ZQ[0] || ob.d0 >= SSQ.ZQ[24])SSQ.calcY(ob.d0);
-            var mk = int2((ob.d0 - SSQ.HS[0]) / 30);
-            if (mk < 13 && SSQ.HS[mk + 1] <= ob.d0)mk++;
-            ob.Ldi = ob.d0 - SSQ.HS[mk];
+            if (!YSSQ || ob.d0 < YSSQ.ZQ[0] || ob.d0 >= YSSQ.ZQ[24]) YSSQ=SSQ.calcY(ob.d0);
+            var mk = int2((ob.d0 - YSSQ.HS[0]) / 30);
+            if (mk < 13 && YSSQ.HS[mk + 1] <= ob.d0)mk++;
+            ob.Ldi = ob.d0 - YSSQ.HS[mk];
             ob.Ldc = obb.rmc[ob.Ldi];
-            ob.cur_dz = ob.d0 - SSQ.ZQ[0];
-            ob.cur_xz = ob.d0 - SSQ.ZQ[12];
-            ob.cur_lq = ob.d0 - SSQ.ZQ[15];
-            ob.cur_mz = ob.d0 - SSQ.ZQ[11];
-            ob.cur_xs = ob.d0 - SSQ.ZQ[13];
-            if (ob.d0 == SSQ.HS[mk] || ob.d0 == Bd0) {
-                ob.Lmc = SSQ.ym[mk];
-                ob.Ldn = SSQ.dx[mk];
-                ob.Lleap = (SSQ.leap && SSQ.leap == mk) ? '闰' : '';
-                ob.Lmc2 = mk < 13 ? SSQ.ym[mk + 1] : "未知";
+            ob.cur_dz = ob.d0 - YSSQ.ZQ[0];
+            ob.cur_xz = ob.d0 - YSSQ.ZQ[12];
+            ob.cur_lq = ob.d0 - YSSQ.ZQ[15];
+            ob.cur_mz = ob.d0 - YSSQ.ZQ[11];
+            ob.cur_xs = ob.d0 - YSSQ.ZQ[13];
+            if (ob.d0 == YSSQ.HS[mk] || ob.d0 == Bd0) {
+                ob.Lmc = YSSQ.ym[mk];
+                ob.Ldn = YSSQ.dx[mk];
+                ob.Lleap = (YSSQ.leap && YSSQ.leap == mk) ? '闰' : '';
+                ob.Lmc2 = mk < 13 ? YSSQ.ym[mk + 1] : "未知";
             } else {
                 ob2 = this.lun[i - 1];
                 ob.Lmc = ob2.Lmc, ob.Ldn = ob2.Ldn;
                 ob.Lleap = ob2.Lleap, ob.Lmc2 = ob2.Lmc2;
             }
-            var qk = int2((ob.d0 - SSQ.ZQ[0] - 7) / 15.2184);
-            if (qk < 23 && ob.d0 >= SSQ.ZQ[qk + 1])qk++;
-            if (ob.d0 == SSQ.ZQ[qk])ob.Ljq = obb.jqmc[qk]; else ob.Ljq = '';
+            var qk = int2((ob.d0 - YSSQ.ZQ[0] - 7) / 15.2184);
+            if (qk < 23 && ob.d0 >= YSSQ.ZQ[qk + 1])qk++;
+            if (ob.d0 == YSSQ.ZQ[qk])ob.Ljq = obb.jqmc[qk]; else ob.Ljq = '';
             ob.yxmc = ob.yxjd = ob.yxsj = '';
             ob.jqmc = ob.jqjd = ob.jqsj = '';
-            D = SSQ.ZQ[3] + (ob.d0 < SSQ.ZQ[3] ? -365 : 0) + 365.25 * 16 - 35;
+            D = YSSQ.ZQ[3] + (ob.d0 < YSSQ.ZQ[3] ? -365 : 0) + 365.25 * 16 - 35;
             ob.Lyear = Math.floor(D / 365.2422 + 0.5);
-            D = SSQ.HS[2];
+            D = YSSQ.HS[2];
             for (j = 0; j < 14; j++) {
-                if (SSQ.ym[j] != '正' || SSQ.leap == j && j)continue;
-                D = SSQ.HS[j];
+                if (YSSQ.ym[j] != '正' || YSSQ.leap == j && j)continue;
+                D = YSSQ.HS[j];
                 if (ob.d0 < D) {
                     D -= 365;
                     break;
@@ -2752,15 +2754,15 @@ function Lunar() {
             D = ob.Lyear0 + 12000;
             ob.Lyear3 = obb.Gan[D % 10] + obb.Zhi[D % 12];
             ob.Lyear4 = ob.Lyear0 + 1984 + 2698;
-            mk = int2((ob.d0 - SSQ.ZQ[0]) / 30.43685);
-            if (mk < 12 && ob.d0 >= SSQ.ZQ[2 * mk + 1])mk++;
-            D = mk + int2((SSQ.ZQ[12] + 390) / 365.2422) * 12 + 900000;
+            mk = int2((ob.d0 - YSSQ.ZQ[0]) / 30.43685);
+            if (mk < 12 && ob.d0 >= YSSQ.ZQ[2 * mk + 1])mk++;
+            D = mk + int2((YSSQ.ZQ[12] + 390) / 365.2422) * 12 + 900000;
             ob.Lmonth = D % 12;
             ob.Lmonth2 = obb.Gan[D % 10] + obb.Zhi[D % 12];
             D = ob.d0 - 6 + 9000000;
             ob.Lday2 = obb.Gan[D % 10] + obb.Zhi[D % 12];
-            mk = int2((ob.d0 - SSQ.ZQ[0] - 15) / 30.43685);
-            if (mk < 11 && ob.d0 >= SSQ.ZQ[2 * mk + 2])mk++;
+            mk = int2((ob.d0 - YSSQ.ZQ[0] - 15) / 30.43685);
+            if (mk < 11 && ob.d0 >= YSSQ.ZQ[2 * mk + 2])mk++;
             ob.XiZ = obb.XiZ[(mk + 12) % 12] + '座';
             oba.getHuiLi(ob.d0, ob);
             ob.A = ob.B = ob.C = '';
@@ -2852,26 +2854,26 @@ function Lunar() {
 }
 function nianLiHTML(y) {
     var i, j, s = '', s1, s2, v, qi;
-    SSQ.calcY(int2((y - 2000) * 365.2422 + 180));
+    YSSQ = SSQ.calcY(int2((y - 2000) * 365.2422 + 180));
     for (i = 0; i < 14; i++) {
-        if (SSQ.HS[i + 1] > SSQ.ZQ[24])break;
-        if (SSQ.leap && i == SSQ.leap)
+        if (YSSQ.HS[i + 1] > YSSQ.ZQ[24])break;
+        if (YSSQ.leap && i == YSSQ.leap)
             s1 = '闰';
         else
             s1 = '·';
-        s1 += SSQ.ym[i];
+        s1 += YSSQ.ym[i];
         if (s1.length < 3)s1 += '月';
-        s1 += SSQ.dx[i] > 29 ? '大' : '小';
-        s1 += ' ' + JD.JD2str(SSQ.HS[i] + J2000).substr(6, 5);
-        v = obb.so_accurate2(SSQ.HS[i]);
+        s1 += YSSQ.dx[i] > 29 ? '大' : '小';
+        s1 += ' ' + JD.JD2str(YSSQ.HS[i] + J2000).substr(6, 5);
+        v = obb.so_accurate2(YSSQ.HS[i]);
         s2 = '(' + JD.JD2str(v + J2000).substr(9, 11) + ')';
-        if (int2(v + 0.5) != SSQ.HS[i])s2 = '<font color=red>' + s2 + '</font>';
+        if (int2(v + 0.5) != YSSQ.HS[i])s2 = '<font color=red>' + s2 + '</font>';
         s1 += s2;
         for (j = -2; j < 24; j++) {
-            if (j >= 0)qi = SSQ.ZQ[j];
-            if (j == -1)qi = SSQ.ZQ.pe1;
-            if (j == -2)qi = SSQ.ZQ.pe2;
-            if (qi < SSQ.HS[i] || qi >= SSQ.HS[i + 1])continue;
+            if (j >= 0)qi = YSSQ.ZQ[j];
+            if (j == -1)qi = YSSQ.ZQ.pe1;
+            if (j == -2)qi = YSSQ.ZQ.pe2;
+            if (qi < YSSQ.HS[i] || qi >= YSSQ.HS[i + 1])continue;
             s1 += ' ' + obb.jqmc[(j + 24) % 24] + JD.JD2str(qi + J2000).substr(6, 5);
             v = obb.qi_accurate2(qi);
             s2 = '(' + JD.JD2str(v + J2000).substr(9, 11) + ')';
@@ -2908,8 +2910,8 @@ function nianLi2HTML(y) {
     }
     return s;
 }
-document.write('<html xmlns:v="urn:schemas-microsoft-com:vml">');
-document.createStyleSheet().cssText = "v\\:*{behavior:url(#default#VML)}";
+//document.write('<html xmlns:v="urn:schemas-microsoft-com:vml">');
+//document.createStyleSheet().cssText = "v\\:*{behavior:url(#default#VML)}";
 var ht_b = {Vel: function (s) {
     return document.createElement('<v:' + s + '/>');
 }, INSel: function (el, el2) {

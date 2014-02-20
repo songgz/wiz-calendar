@@ -122,7 +122,7 @@ var SSQ = (function(){
     ];
 
     var qi_high = function(W){ //较高精度气
-        var t = XL.S_aLon_t2(W)*36525;
+        var t = EPHEM.sun.aLon_t2(W)*36525;
         t = t - dt_T(t)+8/24;
         var v = ( (t+0.5) %1 ) * 86400;
         if(v<1200 || v >86400-1200) t = XL.S_aLon_t(W)*36525 - dt_T(t)+8/24;
@@ -164,18 +164,14 @@ var SSQ = (function(){
     };
 
     return {
-        calc: function(jd,qs){ //jd应靠近所要取得的气朔日,qs='气'时，算节气的儒略日
+        suo: function(jd){
             jd += 2451545;
-            var i,D,n;
+            var i,D=0,n;
             var B = suoKB, pc = 14;
-            if(qs == '气') B = qiKB, pc=7;
             var f1=B[0]-pc, f2=B[B.length-1]-pc, f3=2436935;
 
             if( jd<f1 || jd>=f3 ){ //平气朔表中首个之前，使用现代天文算法。1960.1.1以后，使用现代天文算法 (这一部分调用了qi_high和so_high,所以需星历表支持)
-                if(qs == '气')
-                  return Math.floor( qi_high ( Math.floor((jd+pc-2451259)/365.2422*24) * Math.PI/12 ) +0.5 ); //2451259是1999.3.21,太阳视黄经为0,春分.定气计算
-                else
-                  return Math.floor( so_high ( Math.floor((jd+pc-2451551)/29.5306) * Math.PI*2 )      +0.5 ); //2451551是2000.1.7的那个朔日,黄经差为0.定朔计算
+                D = Math.floor( so_high ( Math.floor((jd+pc-2451551)/29.5306) * Math.PI*2 )      +0.5 ); //2451551是2000.1.7的那个朔日,黄经差为0.定朔计算
             }
 
             if( jd>=f1 && jd<f2 ) { //平气或平朔
@@ -185,21 +181,126 @@ var SSQ = (function(){
                 D = B[i] + B[i+1] * Math.floor( (jd+pc-B[i])/B[i+1] );
                 D = Math.floor(D+0.5);
                 if(D == 1683460) D++; //如果使用太初历计算-103年1月24日的朔日,结果得到的是23日,这里修正为24日(实历)。修正后仍不影响-103的无中置闰。如果使用秦汉历，得到的是24日，本行D不会被执行。
-                return D-2451545;
+                D =  D-2451545;
             }
 
             if( jd>=f2 && jd<f3){ //定气或定朔
-                if(qs=='气'){
-                    D = Math.floor( qi_low( Math.floor((jd+pc-2451259)/365.2422*24) * Math.PI/12 ) +0.5 ); //2451259是1999.3.21,太阳视黄经为0,春分.定气计算
-                    n = this.QB.substr( Math.floor((jd-f2)/365.2422*24),1 ); //找定气修正值
-                }else{
-                    D = Math.floor( so_low( Math.floor((jd+pc-2451551)/29.5306) * Math.PI*2 )     +0.5 ); //2451551是2000.1.7的那个朔日,黄经差为0.定朔计算
-                    n = this.SB.substr( Math.floor((jd-f2)/29.5306),1 ); //找定朔修正值
-                }
-                if(n=="1") return D+1;
-                if(n=="2") return D-1;
-                return D;
+                D = Math.floor( so_low( Math.floor((jd+pc-2451551)/29.5306) * Math.PI*2 )     +0.5 ); //2451551是2000.1.7的那个朔日,黄经差为0.定朔计算
+                n = SB.substr( Math.floor((jd-f2)/29.5306),1 ); //找定朔修正值
+                if(n=="1") D = D+1;
+                if(n=="2") D = D-1;
             }
+
+            return D;
+        },
+        qi: function(jd){
+            jd += 2451545;
+            var i,D,n;
+            var B = qiKB, pc=7;
+            var f1=B[0]-pc, f2=B[B.length-1]-pc, f3=2436935;
+
+            if( jd<f1 || jd>=f3 ){ //平气朔表中首个之前，使用现代天文算法。1960.1.1以后，使用现代天文算法 (这一部分调用了qi_high和so_high,所以需星历表支持)
+                D = Math.floor( qi_high ( Math.floor((jd+pc-2451259)/365.2422*24) * Math.PI/12 ) +0.5 ); //2451259是1999.3.21,太阳视黄经为0,春分.定气计算
+            }
+
+            if( jd>=f1 && jd<f2 ) { //平气或平朔
+                for(i=0; i<B.length; i+=2){
+                    if(jd+pc<B[i+2]) break
+                };
+                D = B[i] + B[i+1] * Math.floor( (jd+pc-B[i])/B[i+1] );
+                D = Math.floor(D+0.5);
+                if(D == 1683460) D++; //如果使用太初历计算-103年1月24日的朔日,结果得到的是23日,这里修正为24日(实历)。修正后仍不影响-103的无中置闰。如果使用秦汉历，得到的是24日，本行D不会被执行。
+                D = D-2451545;
+            }
+
+            if( jd>=f2 && jd<f3){ //定气或定朔
+                D = Math.floor( qi_low( Math.floor((jd+pc-2451259)/365.2422*24) * Math.PI/12 ) +0.5 ); //2451259是1999.3.21,太阳视黄经为0,春分.定气计算
+                n = QB.substr( Math.floor((jd-f2)/365.2422*24),1 ); //找定气修正值
+                if(n=="1") D = D+1;
+                if(n=="2") D = D-1;
+            }
+
+            return D;
+
+        },
+        calc: function(jd,qs){ //jd应靠近所要取得的气朔日,qs='气'时，算节气的儒略日
+            return qs == '气' ? this.qi(jd) : this.suo(jd);
+        },
+
+        calcY: function(jd){ //农历排月序计算,可定出农历,有效范围：两个冬至之间(冬至一 <= d < 冬至二)
+            var opt = { leap:0,         //闰月位置
+                ym:new Array(), //各月名称
+                ZQ:new Array(), //中气表,其中.liqiu是节气立秋的儒略日,计算三伏时用到
+                HS:new Array(), //合朔表
+                dx:new Array(), //各月大小
+                Yn:new Array() //年计数
+            };
+            var A=opt.ZQ, B=opt.HS;  //中气表,日月合朔表(整日)
+            var i, k, W, w;
+
+            //该年的气
+            W = int2( (jd-355+183)/365.2422 )*365.2422+355;  //355是2000.12冬至,得到较靠近jd的冬至估计值
+            if(this.calc(W,'气')>jd) W-=365.2422;
+            for(i=0;i<25;i++) A[i]=this.calc(W+15.2184*i,'气'); //25个节气时刻(北京时间),从冬至开始到下一个冬至以后
+            A.pe1=this.calc(W-15.2,'气'); A.pe2=this.calc(W-30.4,'气'); //补算二气,确保一年中所有月份的“气”全部被计算在内
+
+            //今年"首朔"的日月黄经差w
+            w = this.calc(A[0],'朔'); //求较靠近冬至的朔日
+            if(w>A[0]) w -= 29.53;
+
+            //该年所有朔,包含14个月的始末
+            for(i=0;i<15;i++) B[i]=this.calc(w+29.5306*i,'朔');
+
+            //月大小
+            opt.leap = 0;
+            for(i=0;i<14;i++){
+                opt.dx[i] = opt.HS[i+1]-opt.HS[i]; //月大小
+                opt.ym[i]=i;  //月序初始化
+            }
+
+
+            //-721年至-104年的后九月及月建问题,与朔有关，与气无关
+            var YY = int2( (opt.ZQ[0]+10 +180)/365.2422) + 2000; //确定年份
+            if( YY>=-721 && YY <=-104 ){
+                var ns = new Array(), yy;
+                for(i=0;i<3;i++){
+                    yy = YY+i-1;
+                    //颁行历年首, 闰月名称, 月建
+                    if(yy>=-721) ns[i]=this.calc(1457698-J2000+int2(0.342+(yy+721)*12.368422)*29.5306,'朔'), ns[i+3]='十三', ns[i+6]=2;  //春秋历,ly为-722.12.17
+                    if(yy>=-479) ns[i]=this.calc(1546083-J2000+int2(0.500+(yy+479)*12.368422)*29.5306,'朔'), ns[i+3]='十三', ns[i+6]=2;  //战国历,ly为-480.12.11
+                    if(yy>=-220) ns[i]=this.calc(1640641-J2000+int2(0.866+(yy+220)*12.369000)*29.5306,'朔'), ns[i+3]='后九', ns[i+6]=11; //秦汉历,ly为-221.10.31
+                }
+                var nn,f1;
+                for(i=0;i<14;i++){
+                    for(nn=2;nn>=0;nn--) if(opt.HS[i]>=ns[nn]) break;
+                    f1 = int2( (opt.HS[i]-ns[nn]+15)/29.5306 ); //该月积数
+                    if(f1 < 12) opt.ym[i] = obb.ymc[(f1+ns[nn+6])%12]; else opt.ym[i] = ns[nn+3];
+                }
+                return;
+            }
+
+
+            //无中气置闰法确定闰月,(气朔结合法,数据源需有冬至开始的的气和朔)
+            if( B[13] <= A[24] ){ //第13月的月末没有超过冬至(不含冬至),说明今年含有13个月
+                for(i=1; B[i+1]>A[2*i] && i<13; i++); //在13个月中找第1个没有中气的月份
+                opt.leap = i;
+                for(;i<14;i++) opt.ym[i]--;
+            }
+
+            //名称转换(月建别名)
+            for(i=0;i<14;i++){
+                var Dm = opt.HS[i]+J2000, v2=opt.ym[i]; //Dm初一的儒略日,v2为月建序号
+                var mc = obb.ymc[v2%12]; //月建对应的默认月名称：建子十一,建丑十二,建寅为正……
+                if     ( Dm>=1724360 && Dm<=1729794 ) mc = obb.ymc[(v2+1)%12]; //  8.01.15至 23.12.02 建子为十二,其它顺推
+                else if( Dm>=1807724 && Dm<=1808699 ) mc = obb.ymc[(v2+1)%12]; //237.04.12至239.12.13 建子为十二,其它顺推
+                else if( Dm>=1999349 && Dm<=1999467 ) mc = obb.ymc[(v2+2)%12]; //761.12.02至762.03.30 建子为正月,其它顺推
+                else if( Dm>=1973067 && Dm<=1977052 ){if(v2%12==0) mc="正"; if(v2==2) mc='一';} //689.12.18至700.11.15 建子为正月,建寅为一月,其它不变
+
+                if(Dm==1729794||Dm==1808699) mc='拾贰'; //239.12.13及23.12.02均为十二月,为避免两个连续十二月，此处改名
+
+                opt.ym[i]=mc;
+            }
+            return opt;
         }
 
     };
