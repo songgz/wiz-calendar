@@ -17,12 +17,15 @@ VSOP87.prototype = {
 VSOP87.orbit = function(planet,orb,t,n){ //planet星体,orb轨道,t儒略世纪数,n计算项数
     var rad = 180 * 3600 / Math.PI; //每弧度的角秒数
     t/=10; //转为儒略千年数
-    var v = 0, tn = 1, c = 0, s = 0;
+    var v = 0, tn = 1, c = 0, s = 0, N = 0;
     var P = VSOP87[planet][orb];
-    var N = 3 * n / P[0].length;
+    var N0 = P[0].length;
     for(var i = 0; i < P.length; i++, tn *= t){
-        n = Math.floor((P[i].length * N + 0.5) / 3) * 3;
-        for (var j = 0, c = 0; j < n; j += 3){
+        s = P[i].length
+        N = Math.floor(3 * n * s / N0 + 0.5);
+        if (i) N += 3;
+        if (N > s) N = s;
+        for (var j = 0, c = 0; j < N; j += 3){
             c += P[i][j] * Math.cos(P[i][j+1] + P[i][j+2] * t);
         }
         v += c*tn;

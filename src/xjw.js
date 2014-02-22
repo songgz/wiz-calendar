@@ -468,14 +468,14 @@ function XL0_calc(xt, zn, t, n) {
     t /= 10;
     var i, j, v = 0, tn = 1, c;
     var F = XL0[xt], n1, n2, N;
-    var n0, pn = zn * 6 + 1, N0 = 3 * n / (F[pn + 1] - F[pn]);
+    var n0, pn = zn * 6 + 1, N0 = F[pn + 1] - F[pn];
     for (i = 0; i < 6; i++, tn *= t) {
         n1 = F[pn + i], n2 = F[pn + 1 + i], n0 = n2 - n1;
         if (!n0)continue;
         if (n < 0)N = n2; else {
-            N = int2((n0*N0 + 0.5)/3)*3 + n1;
-//            if (i)N += 3;
-//            if (N > n2)N = n2;
+            N = int2(3 * n * n0 / N0 + 0.5) + n1;
+            if (i)N += 3;
+            if (N > n2)N = n2;
         }
         for (j = n1, c = 0; j < N; j += 3)c += F[j] * Math.cos(F[j + 1] + t * F[j + 2]);
         v += c * tn;
@@ -644,7 +644,7 @@ var XL = {E_Lon: function (t, n) {
     return this.M_Lon(t, Mn) + gxc_moonLon(t) - (this.E_Lon(t, Sn) + gxc_sunLon(t) + Math.PI);
 }, S_aLon: function (t, n) {
     //return this.E_Lon(t, n) + nutationLon2(t) + gxc_sunLon(t) + Math.PI;
-    return EPHEM.earth.lon(t) + EPHEM.nutation.lon(t) + gxc_sunLon(t) + Math.PI;
+    return EPHEM.earth.lon(t) + EPHEM.nutation.lon(t) + EPHEM.sun.gxcLon(t) + Math.PI;
 }, E_Lon_t: function (W) {
     var t, v = 628.3319653318;
     t = (W - 1.75347) / v;

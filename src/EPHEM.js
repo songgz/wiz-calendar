@@ -31,7 +31,7 @@ var EPHEM = (function () {
     eph.earth = (function () {
             return {
                 lon: function (t) {
-                    alert(XL0_calc(0,0, t,64) + '=' + VSOP87.earth.orbL(t));
+                    //alert(XL0_calc(0,0, t,64) + '=' + VSOP87.earth.orbL(t));
                     return VSOP87.earth.orbL(t);
                     //return XL0_calc(0,0, t,64) //xt星体,zn坐标号,t儒略世纪数,n计算项数
                 },
