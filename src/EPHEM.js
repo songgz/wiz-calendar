@@ -31,6 +31,7 @@ var EPHEM = (function () {
     eph.earth = (function () {
             return {
                 lon: function (t) {
+                    alert(XL0_calc(0,0, t,64) + '=' + VSOP87.earth.orbL(t));
                     return VSOP87.earth.orbL(t);
                     //return XL0_calc(0,0, t,64) //xt星体,zn坐标号,t儒略世纪数,n计算项数
                 },
@@ -64,7 +65,7 @@ var EPHEM = (function () {
                     return t;
                 },
                 aLon: function (t) {  //太阳视黄经
-                    return eph.earth.lon(t) + eph.nutation.lon(t) + gxc_sunLon(t) + Math.PI; //注意，这里的章动计算很耗时
+                    return eph.earth.lon(t) + eph.nutation.lon(t) + this.gxcLon(t) + Math.PI; //注意，这里的章动计算很耗时
                 },
                 gxcLon: function(t) {
                     var v = -0.043126 + 628.301955 * t - 0.000002732 * t * t;

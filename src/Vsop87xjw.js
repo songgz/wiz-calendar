@@ -1,41 +1,46 @@
-var VSOP87 = function (planet) {
-    this.L = planet.L;
-    this.B = planet.B;
-    this.R = planet.R;
+var VSOP87 = function (name) {
+    this.name = name;
 };
 
 VSOP87.prototype = {
     orbL: function(T){
-        return VSOP87.orbit(this.L,T,64);
+        return VSOP87.orbit(this.name,'L',T,64);
     },
     orbB: function(T){
-        return VSOP87.orbit(this.B,T);
+        return VSOP87.orbit(this.name,'B',T,64);
     },
     orbR: function(T){
-        return VSOP87.orbit(this.R,T);
+        return VSOP87.orbit(this.name,'R',T,64);
     }
 };
 
-VSOP87.orbit = function (terms, T, len) {
-    var order = terms.length;
-    var Tn = 1;
-    var value = 0;
-    var sum = 0;
-    len = len || 3000;
-    len = len * 3;
-    for (var o = 0; o < order; o++) {
-        sum = 0;
-        var term = terms[o].length;
-        if (term > len) {
-            term = len;
+VSOP87.orbit = function(planet,orb,t,n){ //planet星体,orb轨道,t儒略世纪数,n计算项数
+    var rad = 180 * 3600 / Math.PI; //每弧度的角秒数
+    t/=10; //转为儒略千年数
+    var v = 0, tn = 1, c = 0, s = 0;
+    var P = VSOP87[planet][orb];
+    var N = 3 * n / P[0].length;
+    for(var i = 0; i < P.length; i++, tn *= t){
+        n = Math.floor((P[i].length * N + 0.5) / 3) * 3;
+        for (var j = 0, c = 0; j < n; j += 3){
+            c += P[i][j] * Math.cos(P[i][j+1] + P[i][j+2] * t);
         }
-        for (var i = 0; i < term; i += 3) {
-            sum += terms[o][i] * Math.cos(terms[o][i+1] + terms[o][i+2] * T);
-        }
-        value += sum * Tn;
-        Tn *= T;
+        v += c*tn;
     }
-    return value / 10000000000;
+    v/=10000000000;
+
+    if(planet=='EARTH'){ //地球
+        var t2=t*t, t3=t2*t; //千年数的各次方
+        if(orb=='L') v += (-0.0728 -2.7702*t -1.1019*t2 -0.0996*t3) / rad;
+        if(orb=='B') v += (+0.0000 +0.0004*t +0.0004*t2 -0.0026*t3) / rad;
+        if(orb=='R') v += (-0.0020 +0.0044*t +0.0213*t2 -0.0250*t3) / 1000000;
+    }else{ //其它行星
+        var dv = XL0_xzb[ (xt-1)*3+zn ];
+        if(orb=='L') v += -3*t/rad;
+        if(orb=='R') v += dv/1000000;
+        else      v += dv/rad;
+    }
+    return v;
 };
 
 VSOP87.EARTH = {
@@ -62,4 +67,4 @@ VSOP87.EARTH = {
     ]
 };
 
-VSOP87.earth = new VSOP87(VSOP87.EARTH);
+VSOP87.earth = new VSOP87('EARTH');
