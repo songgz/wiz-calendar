@@ -125,15 +125,15 @@ var SSQ = (function(){
         var t = EPHEM.sun.aLon_t2(W)*36525;
         t = t - dt_T(t)+8/24;
         var v = ( (t+0.5) %1 ) * 86400;
-        if(v<1200 || v >86400-1200) t = XL.S_aLon_t(W)*36525 - dt_T(t)+8/24;
+        if(v<1200 || v > 86400 - 1200) t = EPHEM.sun.aLon_t(W)*36525 - dt_T(t)+8/24;
         return  t;
     };
 
     var so_high = function(W){ //较高精度朔
-        var t = XL.MS_aLon_t2(W)*36525;
+        var t = EPHEM.ms.aLon_t2(W)*36525;
         t = t - dt_T(t)+8/24;
         var v = ( (t+0.5) %1 ) * 86400;
-        if(v<1800 || v >86400-1800) t = XL.MS_aLon_t(W)*36525 - dt_T(t)+8/24;
+        if(v<1800 || v > 86400-1800) t = EPHEM.ms.aLon_t(W)*36525 - dt_T(t)+8/24;
         return  t;
     };
 

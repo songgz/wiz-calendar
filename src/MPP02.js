@@ -2,18 +2,19 @@ var MPP02 = function () {
     this.L = MPP02.L;
     this.B = MPP02.B;
     this.R = MPP02.R;
+    this.R2A = 180 * 3600 / Math.PI; // 3600.0 * (180 / Math.PI); //每弧度的角秒数
 };
 MPP02.prototype = {
     orbL: function(T){
         var v = 0;
         var t= T,t2=t*t,t3=t2*t,t4=t3*t,t5=t4*t,tx=t-10;
-        v += (3.81034409 + 8399.684730072*t -3.319e-05*t2 + 3.11e-08*t3 - 2.033e-10*t4)*WC.Angle.R2A; //月球平黄经(弧度)
+        v += (3.81034409 + 8399.684730072*t -3.319e-05*t2 + 3.11e-08*t3 - 2.033e-10*t4)*this.R2A; //月球平黄经(弧度)
         v += 5028.792262*t + 1.1124406*t2 + 0.00007699*t3 - 0.000023479*t4 -0.0000000178*t5;  //岁差(角秒)
         if(tx>0) v += -0.866 +1.43*tx +0.054*tx*tx; //对公元3000年至公元5000年的拟合,最大误差小于10角秒
-        return (v + MPP02.orbit(MPP02.MOON.L,T))/WC.Angle.R2A;
+        return (v + MPP02.orbit(MPP02.MOON.L,T))/this.R2A;
     },
     orbB: function(T){
-        return MPP02.orbit(MPP02.MOON.B,T)/WC.Angle.R2A;
+        return MPP02.orbit(MPP02.MOON.B,T)/this.R2A;
     },
     orbR: function(T){
         return MPP02.orbit(MPP02.MOON.R,T)

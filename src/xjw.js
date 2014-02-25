@@ -432,14 +432,14 @@ function nutation2(t) {
     }
     return [dL / 100 / rad, dE / 100 / rad];
 }
-//function nutationLon2(t) {
-//    var i, a, t2 = t * t, dL = 0, B = this.nutB;
-//    for (i = 0; i < B.length; i += 5) {
-//        if (i == 0)a = -1.742 * t; else a = 0;
-//        dL += (B[i + 3] + a) * Math.sin(B[i] + B[i + 1] * t + B[i + 2] * t2);
-//    }
-//    return dL / 100 / rad;
-//}
+function nutationLon2(t) {
+    var i, a, t2 = t * t, dL = 0, B = this.nutB;
+    for (i = 0; i < B.length; i += 5) {
+        if (i == 0)a = -1.742 * t; else a = 0;
+        dL += (B[i + 3] + a) * Math.sin(B[i] + B[i + 1] * t + B[i + 2] * t2);
+    }
+    return dL / 100 / rad;
+}
 function MQC(h) {
     return 0.0002967 / Math.tan(h + 0.003138 / (h + 0.08919));
 }
@@ -630,7 +630,7 @@ function pty_zty2(t) {
     return L / pi2;
 }
 var XL = {E_Lon: function (t, n) {
-    return XL0_calc(0, 0, t, n);
+    return EPHEM.earth.lon(t);
 }, M_Lon: function (t, n) {
     return XL1_calc(0, t, n);
 }, E_v: function (t) {
