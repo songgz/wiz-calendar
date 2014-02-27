@@ -226,14 +226,13 @@ var SSQ = (function(){
         calc: function(jd,qs){ //jd应靠近所要取得的气朔日,qs='气'时，算节气的儒略日
             return qs == '气' ? this.qi(jd) : this.suo(jd);
         },
-
-        calcY: function(jd){ //农历排月序计算,可定出农历,有效范围：两个冬至之间(冬至一 <= d < 冬至二)
+                                                                                                                                                                                  calcY: function(jd){ //农历排月序计算,可定出农历,有效范围：两个冬至之间(冬至一 <= d < 冬至二)
             var opt = { leap:0,         //闰月位置
-                ym:new Array(), //各月名称
-                ZQ:new Array(), //中气表,其中.liqiu是节气立秋的儒略日,计算三伏时用到
-                HS:new Array(), //合朔表
-                dx:new Array(), //各月大小
-                Yn:new Array() //年计数
+                ym: [], //各月名称
+                ZQ: [], //中气表,其中.liqiu是节气立秋的儒略日,计算三伏时用到
+                HS: [], //合朔表
+                dx: [], //各月大小
+                Yn: [] //年计数
             };
             var A=opt.ZQ, B=opt.HS;  //中气表,日月合朔表(整日)
             var i, k, W, w;
@@ -262,7 +261,7 @@ var SSQ = (function(){
             //-721年至-104年的后九月及月建问题,与朔有关，与气无关
             var YY = int2( (opt.ZQ[0]+10 +180)/365.2422) + 2000; //确定年份
             if( YY>=-721 && YY <=-104 ){
-                var ns = new Array(), yy;
+                var ns = [], yy;
                 for(i=0;i<3;i++){
                     yy = YY+i-1;
                     //颁行历年首, 闰月名称, 月建
@@ -301,6 +300,28 @@ var SSQ = (function(){
                 opt.ym[i]=mc;
             }
             return opt;
+        },
+
+        qi_accurate: function(W)  { //精气
+            var t = EPHEM.sun.aLon_t(W)*36525;  return t - dt_T(t) + 8/24;
+        },
+        so_accurate: function(W)  { //精朔
+            var t = EPHEM.ms.aLon_t(W)*36525; return t - dt_T(t) + 8/24;
+        },
+        qi_accurate2: function(jd) { //精气
+            var d = Math.PI/12;
+            var w=Math.floor((jd+293)/365.2422*24) * d;
+            var a= this.qi_accurate ( w );
+            if(a-jd>5 ) return this.qi_accurate ( w-d );
+            if(a-jd<-5) return this.qi_accurate ( w+d );
+            return a;
+        },
+        so_accurate2: function(jd) { //精朔
+            return this.so_accurate ( Math.floor((jd+8)/29.5306) * Math.PI*2 );
+        },
+        jqmc: function(i){
+            var jqmc = ['冬至','小寒','大寒','立春','雨水','惊蛰','春分','清明','谷雨','立夏','小满','芒种','夏至','小暑','大暑','立秋','处暑','白露','秋分','寒露','霜降','立冬','小雪','大雪'];
+            return jqmc[i];
         }
 
     };
