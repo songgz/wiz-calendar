@@ -721,9 +721,8 @@ SSQ.init();
 
 //月历类件
 function Lunar(){
- var i;
- this.lun=new Array();
- for(i=0;i<31;i++) this.lun[i] = new Object();
+ this.lun=[];
+ for(var i=0;i<31;i++) this.lun[i] = {};
  this.lun.dn=0;
 
  this.substr2=function(s,n,end){ //截串(网页设计对过长的文字做截处理)
