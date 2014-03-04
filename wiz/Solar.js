@@ -1,5 +1,5 @@
 var Solar = (function(){
-    var corrections = unzip('FrcFs11AFsckF1tsDtFqEtF3posFdFgiFseFtmelpsEfhkF1anmelpFlF3ikrotcnEqEq1FfqmcDsrFor11FgFrcgDscFs11FgEeFtE1sfFs11sCoEsaF1tsD3FpeE1eFsssEciFsFnmelpFcFhkF1tcnEqEpFgkrotcnEqrEtFermcDsrE111FgBmcmr11DaEfnaF111sD3FpeForeF1tssEfiFpEoeFssD3iFstEqFppDgFstcnEqEpFg33FscnEqrAoAF1ClAEsDmDtCtBaDlAFbAEpAAAAAD1FgBiBqoBbnBaBoAAAAAAAEgDqAdBqAFrBaBoACdAAf3AACgAAAeBbCamDgEifAE1AABa3C3BgFdiAAACoCeE3ADiEifDaAEqAAFe3AcFbcAAAAAF3iFaAAACpACmFmAAAAAAAACrDaAAADG0');
+    var corrections = Ephem.unzip('FrcFs11AFsckF1tsDtFqEtF3posFdFgiFseFtmelpsEfhkF1anmelpFlF3ikrotcnEqEq1FfqmcDsrFor11FgFrcgDscFs11FgEeFtE1sfFs11sCoEsaF1tsD3FpeE1eFsssEciFsFnmelpFcFhkF1tcnEqEpFgkrotcnEqrEtFermcDsrE111FgBmcmr11DaEfnaF111sD3FpeForeF1tssEfiFpEoeFssD3iFstEqFppDgFstcnEqEpFg33FscnEqrAoAF1ClAEsDmDtCtBaDlAFbAEpAAAAAD1FgBiBqoBbnBaBoAAAAAAAEgDqAdBqAFrBaBoACdAAf3AACgAAAeBbCamDgEifAE1AABa3C3BgFdiAAACoCeE3ADiEifDaAEqAAFe3AcFbcAAAAAF3iFaAAACpACmFmAAAAAAAACrDaAAADG0');
     var qiKB = [//气直线拟合参数
         1640650.479938, 15.21842500, // -221-11-09 h=0.01709 古历·秦汉
         1642476.703182, 15.21874996, // -216-11-09 h=0.01557 古历·秦汉
@@ -39,21 +39,21 @@ var Solar = (function(){
         2322147.76// 1645-09-21
     ];
     var nearWinterSolstice = function(jd){
-        var solstice = Math.floor((jd - 355 + 183) / 365.2422) * 365.2422 + 355;
-        Term.calc(solstice) > jd && (solstice -= 365.2422);
+        var solstice = Math.floor((jd - 355 + 183) / 365.2422) * 365.2422 + 355; ////该年的气  //355是2000.12冬至,得到较靠近jd的冬至估计值
+        calc(solstice) > jd && (solstice -= 365.2422);
         return solstice;
     };
     var calc = function (jd) {
         jd += 2451545;
         var i, D, n;
         var B = qiKB, pc = 7;
-        var f1 = B[0] - pc, f2 = B[B.length - 1] - pc, f3 = 2436935;
+        var f1 = B[0] - pc, f2 = B[B.length - 1] - pc, f3 = 2436935;  // 2436935是1960.1.1
 
-        if (jd < f1 || jd >= f3) { //平气朔表中首个之前，使用现代天文算法。1960.1.1以后，使用现代天文算法 (这一部分调用了qi_high和so_high,所以需星历表支持)
-            D = Math.floor(Ephem.sun.qi_high(Math.floor((jd + pc - 2451259) / 365.2422 * 24) * Math.PI / 12) + 0.5); //2451259是1999.3.21,太阳视黄经为0,春分.定气计算
+        if (jd < f1 || jd >= f3) { //平气表中首个之前，使用现代天文算法。1960.1.1以后，使用现代天文算法 (这一部分调用了qi_high和so_high,所以需星历表支持)
+            D = Math.floor(Ephem.sun.term_high(Math.floor((jd + pc - 2451259) / 365.2422 * 24) * Math.PI / 12) + 0.5); //2451259是1999.3.21,太阳视黄经为0,春分.定气计算
         }
 
-        if (jd >= f1 && jd < f2) { //平气或平朔
+        if (jd >= f1 && jd < f2) { //平气
             for (i = 0; i < B.length; i += 2) {
                 if (jd + pc < B[i + 2]) break
             }
@@ -63,19 +63,37 @@ var Solar = (function(){
             D = D - 2451545;
         }
 
-        if (jd >= f2 && jd < f3) { //定气或定朔
-            D = Math.floor(Ephem.sun.qi_low(Math.floor((jd + pc - 2451259) / 365.2422 * 24) * Math.PI / 12) + 0.5); //2451259是1999.3.21,太阳视黄经为0,春分.定气计算
+        if (jd >= f2 && jd < f3) { //定气
+            D = Math.floor(Ephem.sun.term_low(Math.floor((jd + pc - 2451259) / 365.2422 * 24) * Math.PI / 12) + 0.5); //2451259是1999.3.21,太阳视黄经为0,春分.定气计算
             n = corrections.substr(Math.floor((jd - f2) / 365.2422 * 24), 1); //找定气修正值
-            if (n == "1") D = D + 1;
-            if (n == "2") D = D - 1;
+            D = D + (n ? n - 2 : n);
         }
 
         return D;
     };
 
-
     var solar = {
+        terms: ['冬至', '小寒', '大寒', '立春', '雨水', '惊蛰', '春分', '清明', '谷雨', '立夏', '小满', '芒种', '夏至', '小暑', '大暑', '立秋', '处暑', '白露', '秋分', '寒露', '霜降', '立冬', '小雪', '大雪']
+    };
+    var termCaches = {};
 
+    solar.getTerms = function(jd){
+        var winterDay = nearWinterSolstice(jd), ar = [];
+        if (termCaches[winterDay]) {
+            ar = termCaches[winterDay];
+        } else {
+            ar.hash = {};
+            for (var i = 0, o; i < 25; i++) {
+                o = {
+                    JD: calc(winterDay + 15.2184 * i),
+                    name: solar.terms[i % 24]
+                };
+                ar.push(o);
+                ar.hash[o.JD] = o;
+            }
+            termCaches[winterDay] = ar;
+        }
+        return ar;
     };
 
     return solar;
