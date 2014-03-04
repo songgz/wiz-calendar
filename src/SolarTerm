@@ -109,13 +109,13 @@ var ST = (function () {
 
     return {
         qi: function (jd) {
-            jd += 2451545;
+            jd += 2451545; //JD2000
             var i, D, n;
             var B = qiKB, pc = 7;
-            var f1 = B[0] - pc, f2 = B[B.length - 1] - pc, f3 = 2436935;
+            var f1 = B[0] - pc, f2 = B[B.length - 1] - pc, f3 = 2436935; // 2436935是1960.1.1
 
             if (jd < f1 || jd >= f3) { //平气朔表中首个之前，使用现代天文算法。1960.1.1以后，使用现代天文算法 (这一部分调用了qi_high和so_high,所以需星历表支持)
-                D = Math.floor(qi_high(Math.floor((jd + pc - 2451259) / 365.2422 * 24) * Math.PI / 12) + 0.5); //2451259是1999.3.21,太阳视黄经为0,春分.定气计算
+                D = Math.floor(qi_high(Math.floor((jd + pc - 2451259) / 365.2422 * 24) * Math.PI / 12) + 0.5);   //2451259是1999.3.21,太阳视黄经为0,春分.定气计算  spring equinox
             }
 
             if (jd >= f1 && jd < f2) { //平气或平朔

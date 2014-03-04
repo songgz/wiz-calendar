@@ -29,7 +29,7 @@ MPP02.orbit = function(terms,T,len){
     t2/=1e4,t3/=1e8,t4/=1e8;
     for(var o=0;o<order;o++,Tn*=t1){
         var term = terms[o].length;
-        for(j=0,c=0;j<term;j+=6){
+        for(var j=0,c=0;j<term;j+=6){
             c+=terms[o][j]*Math.cos(terms[o][j+1] +t1*terms[o][j+2] +t2*terms[o][j+3] +t3*terms[o][j+4] +t4*terms[o][j+5]);
         }
         v += c*Tn;

@@ -1,13 +1,4 @@
 var Lunar1 = (function () {
-    var numCn = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九', '十']; //中文数字
-    var Gan = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"];
-    var Zhi = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"];
-    var ShX = ["鼠", "牛", "虎", "兔", "龙", "蛇", "马", "羊", "猴", "鸡", "狗", "猪"];
-    var XiZ = ['摩羯', '水瓶', '双鱼', '白羊', '金牛', '双子', '巨蟹', '狮子', '处女', '天秤', '天蝎', '射手']
-    var yxmc = ["朔", "上弦", "望", "下弦"]; //月相名称表
-
-    var ymc = ['十一', '十二', '正', '二', '三', '四', '五', '六', '七', '八', '九', '十']; //月名称,建寅
-    var rmc = ['初一', '初二', '初三', '初四', '初五', '初六', '初七', '初八', '初九', '初十', '十一', '十二', '十三', '十四', '十五', '十六', '十七', '十八', '十九', '二十', '廿一', '廿二', '廿三', '廿四', '廿五', '廿六', '廿七', '廿八', '廿九', '三十', '卅一'];
 
 
     //纪年数据结构：数据用逗号分开，每7个描述一个年号，格式为:起始公元,使用年数,已用年数,朝代,朝号,皇帝,年号 Anno
@@ -93,7 +84,17 @@ var Lunar1 = (function () {
         1736, 60, 0, '清', '高宗', '爱新觉罗弘历', '乾隆', 1796, 25, 0, '清', '仁宗', '爱新觉罗颙琰', '嘉庆', 1821, 30, 0, '清', '宣宗', '爱新觉罗旻宁', '道光', 1851, 11, 0, '清', '文宗', '爱新觉罗奕詝', '咸丰', 1862, 13, 0, '清', '穆宗', '爱新觉罗载淳', '同治', 1875, 34, 0, '清', '德宗', '爱新觉罗载湉', '光绪',
         1909, 3, 0, '清', '无朝', '爱新觉罗溥仪', '宣统', 1912, 37, 0, '近、现代', '中华民国', '', '民国', 1949, 9999, 1948, '当代', '中国', '', '公历纪元']
 
-    var lun = {};
+    var lun = {
+        numCn: ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九', '十'], //中文数字
+        Gan: ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"],
+        Zhi: ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"],
+        ShX: ["鼠", "牛", "虎", "兔", "龙", "蛇", "马", "羊", "猴", "鸡", "狗", "猪"],
+        XiZ: ['摩羯', '水瓶', '双鱼', '白羊', '金牛', '双子', '巨蟹', '狮子', '处女', '天秤', '天蝎', '射手'],
+        yxmc: ["朔", "上弦", "望", "下弦"], //月相名称表
+        ymc: ['十一', '十二', '正', '二', '三', '四', '五', '六', '七', '八', '九', '十'], //月名称,建寅
+        rmc: ['初一', '初二', '初三', '初四', '初五', '初六', '初七', '初八', '初九', '初十', '十一', '十二', '十三', '十四', '十五', '十六', '十七', '十八', '十九', '二十', '廿一', '廿二', '廿三', '廿四', '廿五', '廿六', '廿七', '廿八', '廿九', '三十', '卅一']
+
+    };
     lun.nh = function (y) { //取年号 reign
         var i, j, c, s = '', ob = JNB;
         for (i = 0; i < ob.length; i += 7) {
@@ -152,7 +153,7 @@ var Lunar1 = (function () {
         //农历杂节
         var w, w2;
         if (u.cur_dz >= 0 && u.cur_dz < 81) { //数九
-            w = obb.numCn[Math.floor(u.cur_dz / 9) + 1];
+            w = lun.numCn[Math.floor(u.cur_dz / 9) + 1];
             if (u.cur_dz % 9 == 0) r.B += '『' + w + '九』 ';
             else r.C += w + '九第' + (u.cur_dz % 9 + 1) + '天 ';
         }
@@ -200,9 +201,9 @@ var Lunar1 = (function () {
 
         //所属公历年对应的农历干支纪年
         c = By - 1984 + 12000;
-        opt.Ly = obb.Gan[c % 10] + obb.Zhi[c % 12];  //干支纪年
-        opt.ShX = obb.ShX[c % 12]; //该年对应的生肖
-        opt.nianhao = obb.getNH(By);
+        opt.Ly = lun.Gan[c % 10] + lun.Zhi[c % 12];  //干支纪年
+        opt.ShX = lun.ShX[c % 12]; //该年对应的生肖
+        opt.nianhao = lun.getNH(By);
 
         var D, w, ob2;
         //提取各日信息
@@ -237,7 +238,7 @@ var Lunar1 = (function () {
             if (mk < 13 && SSQ.HS[mk + 1] <= ob.d0) mk++; //农历所在月的序数
 
             ob.Ldi = ob.d0 - SSQ.HS[mk];   //距农历月首的编移量,0对应初一
-            ob.Ldc = obb.rmc[ob.Ldi];      //农历日名称
+            ob.Ldc = lun.rmc[ob.Ldi];      //农历日名称
             ob.cur_dz = ob.d0 - SSQ.ZQ[0];   //距冬至的天数
             ob.cur_xz = ob.d0 - SSQ.ZQ[12];  //距夏至的天数
             ob.cur_lq = ob.d0 - SSQ.ZQ[15];  //距立秋的天数
@@ -255,7 +256,7 @@ var Lunar1 = (function () {
             }
             var qk = int2((ob.d0 - SSQ.ZQ[0] - 7) / 15.2184);
             if (qk < 23 && ob.d0 >= SSQ.ZQ[qk + 1]) qk++; //节气的取值范围是0-23
-            if (ob.d0 == SSQ.ZQ[qk]) ob.Ljq = obb.jqmc[qk];
+            if (ob.d0 == SSQ.ZQ[qk]) ob.Ljq = lun.jqmc[qk];
             else ob.Ljq = '';
 
 
@@ -277,9 +278,9 @@ var Lunar1 = (function () {
             ob.Lyear0 = Math.floor(D / 365.2422 + 0.5); //农历纪年(10进制,1984年起算)
 
             D = ob.Lyear + 12000;
-            ob.Lyear2 = obb.Gan[D % 10] + obb.Zhi[D % 12]; //干支纪年(立春)
+            ob.Lyear2 = lun.Gan[D % 10] + lun.Zhi[D % 12]; //干支纪年(立春)
             D = ob.Lyear0 + 12000;
-            ob.Lyear3 = obb.Gan[D % 10] + obb.Zhi[D % 12]; //干支纪年(正月)
+            ob.Lyear3 = lun.Gan[D % 10] + lun.Zhi[D % 12]; //干支纪年(正月)
             ob.Lyear4 = ob.Lyear0 + 1984 + 2698; //黄帝纪年
 
 
@@ -289,23 +290,23 @@ var Lunar1 = (function () {
 
             D = mk + int2((SSQ.ZQ[12] + 390) / 365.2422) * 12 + 900000; //相对于1998年12月7(大雪)的月数,900000为正数基数
             ob.Lmonth = D % 12;
-            ob.Lmonth2 = obb.Gan[D % 10] + obb.Zhi[D % 12];
+            ob.Lmonth2 = lun.Gan[D % 10] + lun.Zhi[D % 12];
 
             //纪日,2000年1月7日起算
             D = ob.d0 - 6 + 9000000;
-            ob.Lday2 = obb.Gan[D % 10] + obb.Zhi[D % 12];
+            ob.Lday2 = lun.Gan[D % 10] + lun.Zhi[D % 12];
 
             //星座
             mk = int2((ob.d0 - SSQ.ZQ[0] - 15) / 30.43685);
             if (mk < 11 && ob.d0 >= SSQ.ZQ[2 * mk + 2]) mk++; //星座所在月的序数,(如果j=13,ob.d0不会超过第14号中气)
-            ob.XiZ = obb.XiZ[(mk + 12) % 12] + '座';
+            ob.XiZ = lun.XiZ[(mk + 12) % 12] + '座';
             //回历
             oba.getHuiLi(ob.d0, ob);
             //节日
 
             ob.Fjia = 0;
             oba.getDayName(ob, ob); //公历
-            obb.getDayName(ob, ob); //农历
+            lun.getDayName(ob, ob); //农历
 
             opt.lun[i] = ob;
         }
@@ -316,14 +317,14 @@ var Lunar1 = (function () {
         w = XL.MS_aLon(jd2 / 36525, 10, 3);
         w = int2((w - 0.78) / Math.PI * 2) * Math.PI / 2;
         do {
-            d = obb.so_accurate(w);
+            d = lun.so_accurate(w);
             D = int2(d + 0.5);
             xn = int2(w / pi2 * 4 + 4000000.01) % 4;
             w += pi2 / 4;
             if (D >= Bd0 + Bdn) break;
             if (D < Bd0) continue;
             ob = this.lun[D - Bd0];
-            ob.yxmc = obb.yxmc[xn]; //取得月相名称
+            ob.yxmc = lun.yxmc[xn]; //取得月相名称
             ob.yxjd = d;
             ob.yxsj = JD.timeStr(d);
         } while (D + 5 < Bd0 + Bdn);
@@ -332,14 +333,14 @@ var Lunar1 = (function () {
         w = XL.S_aLon(jd2 / 36525, 3);
         w = int2((w - 0.13) / pi2 * 24) * pi2 / 24;
         do {
-            d = obb.qi_accurate(w);
+            d = lun.qi_accurate(w);
             D = int2(d + 0.5);
             xn = int2(w / pi2 * 24 + 24000006.01) % 24;
             w += pi2 / 24;
             if (D >= Bd0 + Bdn) break;
             if (D < Bd0) continue;
             ob = this.lun[D - Bd0];
-            ob.jqmc = obb.jqmc[xn]; //取得节气名称
+            ob.jqmc = lun.jqmc[xn]; //取得节气名称
             ob.jqjd = d;
             ob.jqsj = JD.timeStr(d);
         } while (D + 12 < Bd0 + Bdn);
