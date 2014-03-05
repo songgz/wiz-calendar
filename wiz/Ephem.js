@@ -113,6 +113,23 @@ Ephem.moon = {
     },
     gxcLon: function () { //月球经度光行差,误差0.07"
         return -3.4E-6;
+    },
+    phases_high: function (W) { //较高精度朔
+        var t = EPHEM.ms.aLon_t2(W) * 36525;
+        t = t - JDate.dt(t) + 8 / 24;
+        var v = ( (t + 0.5) % 1 ) * 86400;
+        if (v < 1800 || v > 86400 - 1800) t = EPHEM.ms.aLon_t(W) * 36525 - JDate.dt(t) + 8 / 24;
+        return  t;
+    },
+    phases_low: function (W) { //低精度定朔计算,在2000年至600，误差在2小时以内(仍比古代日历精准很多)
+        var v = 7771.37714500204;
+        var t = ( W + 1.08472 ) / v;
+        t -= ( -0.0000331 * t * t
+            + 0.10976 * Math.cos(0.785 + 8328.6914 * t)
+            + 0.02224 * Math.cos(0.187 + 7214.0629 * t)
+            - 0.03342 * Math.cos(4.669 + 628.3076 * t) ) / v
+            + (32 * (t + 1.8) * (t + 1.8) - 20) / 86400 / 36525;
+        return t * 36525 + 8 / 24;
     }
 };
 
