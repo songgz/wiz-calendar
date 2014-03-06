@@ -27,7 +27,7 @@ VSOP87.prototype = {
             if (zn == 1) v += (+0.0000 + 0.0004 * t + 0.0004 * t2 - 0.0026 * t3) / Angle.R2A;
             if (zn == 2) v += (-0.0020 + 0.0044 * t + 0.0213 * t2 - 0.0250 * t3) / 1000000;
         } else { //其它行星
-            var dv = XL0_xzb[ (xt - 1) * 3 + zn ];
+            var dv = VSOP87.xzb[ (xt - 1) * 3 + zn ];
             if (zn == 0) v += -3 * t / Angle.R2A;
             if (zn == 2) v += dv / 1000000;
             else      v += dv / Angle.R2A;
