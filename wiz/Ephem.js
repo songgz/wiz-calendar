@@ -22,14 +22,13 @@ var Lunisolar = (function(global){
                     if (i == 0) a = -1.742 * t; else a = 0;
                     dL += (B[i + 3] + a) * Math.sin(B[i] + B[i + 1] * t + B[i + 2] * t2);
                 }
-                return dL / 100 / Angle.R2A;
+                return dL / 100 / global.Angle.R2A;
             }
         };
     })();
 
     ephem.earth = {
         lon: function (t, n) { //地球经度计算,返回Date分点黄经,传入世纪数、取项数   //t儒略世纪数,n计算项数
-            //alert(global.VSOP87.earth.orbit(0, t, 64) + '=' +  XL0_calc(0,0, t,64));
             return global.VSOP87.earth.orbit(0, t, n);
         },
 
@@ -43,7 +42,7 @@ var Lunisolar = (function(global){
         gxcLon: function (t) {
             var v = -0.043126 + 628.301955 * t - 0.000002732 * t * t;
             var e = 0.016708634 - 0.000042037 * t - 0.0000001267 * t * t;
-            return (-20.49552 * (1 + e * Math.cos(v))) / Angle.R2A;
+            return (-20.49552 * (1 + e * Math.cos(v))) / global.Angle.R2A;
         },
         aLon: function (t, n) {  //太阳视黄经
             return ephem.earth.lon(t, n) + ephem.nutation.lon(t) + this.gxcLon(t) + Math.PI; //注意，这里的章动计算很耗时
