@@ -55,6 +55,52 @@ var Lunisolar = (function(global){
         return dt;
     };
 
+    jd.dt_T = function (t) {
+        return jd.dt(t / 365.2425 + 2000) / 86400.0;
+    };
+
+    jd.DD = function (jd) {
+        var r = {};
+        var D = Math.floor(jd + 0.5), F = jd + 0.5 - D, c;
+        if (D >= 2299161)c = Math.floor((D - 1867216.25) / 36524.25), D += 1 + c - Math.floor(c / 4);
+        D += 1524;
+        r.Y = Math.floor((D - 122.1) / 365.25);
+        D -= Math.floor(365.25 * r.Y);
+        r.M = Math.floor(D / 30.601);
+        D -= Math.floor(30.601 * r.M);
+        r.D = D;
+        if (r.M > 13)r.M -= 13, r.Y -= 4715; else r.M -= 1, r.Y -= 4716;
+        F *= 24;
+        r.h = Math.floor(F);
+        F -= r.h;
+        F *= 60;
+        r.m = Math.floor(F);
+        F -= r.m;
+        F *= 60;
+        r.s = F;
+        return r;
+    };
+    jd.DD2str = function (r) {
+        var Y = "     " + r.Y, M = "0" + r.M, D = "0" + r.D;
+        var h = r.h, m = r.m, s = int2(r.s + .5);
+        if (s >= 60)s -= 60, m++;
+        if (m >= 60)m -= 60, h++;
+        h = "0" + h;
+        m = "0" + m;
+        s = "0" + s;
+        Y = Y.substr(Y.length - 5, 5);
+        M = M.substr(M.length - 2, 2);
+        D = D.substr(D.length - 2, 2);
+        h = h.substr(h.length - 2, 2);
+        m = m.substr(m.length - 2, 2);
+        s = s.substr(s.length - 2, 2);
+        return Y + "-" + M + "-" + D + " " + h + ":" + m + ":" + s;
+    };
+    jd.JD2str = function (jd) {
+        var r = this.DD(jd);
+        return this.DD2str(r);
+    };
+
     return global;
 })(Lunisolar || {})
 

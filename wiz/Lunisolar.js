@@ -22,6 +22,7 @@ var Lunisolar = (function (global) {
         Zhi: ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"],
         ShX: ["鼠", "牛", "虎", "兔", "龙", "蛇", "马", "羊", "猴", "鸡", "狗", "猪"],
         XiZ: ['摩羯', '水瓶', '双鱼', '白羊', '金牛', '双子', '巨蟹', '狮子', '处女', '天秤', '天蝎', '射手'],
+        jqmc: ['冬至', '小寒', '大寒', '立春', '雨水', '惊蛰', '春分', '清明', '谷雨', '立夏', '小满', '芒种', '夏至', '小暑', '大暑', '立秋', '处暑', '白露', '秋分', '寒露', '霜降', '立冬', '小雪', '大雪'],
         yxmc: ["朔", "上弦", "望", "下弦"], //月相名称表
         ymc: ['十一', '十二', '正', '二', '三', '四', '五', '六', '七', '八', '九', '十'], //月名称,建寅
         rmc: ['初一', '初二', '初三', '初四', '初五', '初六', '初七', '初八', '初九', '初十', '十一', '十二', '十三', '十四', '十五', '十六', '十七', '十八', '十九', '二十', '廿一', '廿二', '廿三', '廿四', '廿五', '廿六', '廿七', '廿八', '廿九', '三十', '卅一'],
@@ -119,6 +120,37 @@ var Lunisolar = (function (global) {
         }
         return s;
     };
+
+    global.jqmc = function (i) {
+        return dict.jqmc[i];
+    };
+
+    //Return an x-value at which the given function reaches zero.
+    //Stops and declares victory once the x-value is within ``precision``
+    //of the solution, which defaults to a half-second of clock time.
+    global.newton = function(f, x0, x1, precision){
+        precision = precision || 1/24/60/60/10;
+        var f0 = f(x0);
+        var f1 = f(x1);
+        var x, y;
+        while(f1 && Math.abs(x1 - x0) > precision && f1 != f0){
+            x = x1 + (x1 - x0) / (f0/f1 - 1);
+            x0 = x1;
+            x1 = x;
+
+            y = f(x1);
+            f0 = f1;
+            f1= y;
+        }
+        return x1;
+    };
+
+
+
+
+
+
+
 
     return global;
 })(this || {});

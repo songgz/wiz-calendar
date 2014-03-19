@@ -45,6 +45,11 @@ var Lunisolar = (function(global){
     solar.termCaches = {};
 
     solar.prototype = {
+        getTermK: function(jd){
+            var L0 = 280.4664472; //J2000时的太阳黄经，度
+            var DL = 0.9856473599513271; //太阳黄经变率， 度/日
+            return Math.floor((L0 + DL * (jd - global.JDate.J2000))/15.0);
+        },
         getNearWinterSolstice: function (jd) {
             var solstice = Math.floor((jd - 355 + 183) / 365.2422) * 365.2422 + 355; ////该年的气  //355是2000.12冬至,得到较靠近jd的冬至估计值
             this.getWinterSolstice(solstice) > jd && (solstice -= 365.2422);

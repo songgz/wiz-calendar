@@ -27,29 +27,29 @@
             var YSSQ = calcY(Math.floor((y - 2000) * 365.2422 + 180));
             for (i = 0; i < 14; i++) {
                 if (YSSQ.HS[i + 1] > YSSQ.ZQ[24])break;
-//                if (YSSQ.leap && i == YSSQ.leap)
-//                    s1 = '闰';
-//                else
-//                    s1 = '·';
-//                s1 += YSSQ.ym[i];
-//                if (s1.length < 3)s1 += '月';
-//                s1 += YSSQ.dx[i] > 29 ? '大' : '小';
-//                s1 += ' ' + JD.JD2str(YSSQ.HS[i] + J2000).substr(6, 5);
-//                v = SSQ.so_accurate2(YSSQ.HS[i]);
-//                s2 = '(' + JD.JD2str(v + J2000).substr(9, 11) + ')';
-//                if (int2(v + 0.5) != YSSQ.HS[i])s2 = '<font color=red>' + s2 + '</font>';
-//                s1 += s2;
-//                for (j = -2; j < 24; j++) {
-//                    if (j >= 0)qi = YSSQ.ZQ[j];
-//                    if (j == -1)qi = YSSQ.ZQ.pe1;
-//                    if (j == -2)qi = YSSQ.ZQ.pe2;
-//                    if (qi < YSSQ.HS[i] || qi >= YSSQ.HS[i + 1])continue;
-//                    s1 += ' ' + SSQ.jqmc((j + 24) % 24) + JD.JD2str(qi + J2000).substr(6, 5);
-//                    v = SSQ.qi_accurate2(qi);
-//                    s2 = '(' + JD.JD2str(v + J2000).substr(9, 11) + ')';
-//                    if (int2(v + 0.5) != qi)s2 = '<font color=red>' + s2 + '</font>';
-//                    s1 += s2;
-//                }
+                if (YSSQ.leap && i == YSSQ.leap)
+                    s1 = '闰';
+                else
+                    s1 = '·';
+                s1 += YSSQ.ym[i];
+                if (s1.length < 3)s1 += '月';
+                s1 += YSSQ.dx[i] > 29 ? '大' : '小';
+                s1 += ' ' + Lunisolar.JDate.JD2str(YSSQ.HS[i] + J2000).substr(6, 5);
+                v = Lunisolar.Ephem.moon.so_accurate2(YSSQ.HS[i]);
+                s2 = '(' + Lunisolar.JDate.JD2str(v + J2000).substr(9, 11) + ')';
+                if (Math.floor(v + 0.5) != YSSQ.HS[i])s2 = '<font color=red>' + s2 + '</font>';
+                s1 += s2;
+                for (j = -2; j < 24; j++) {
+                    if (j >= 0)qi = YSSQ.ZQ[j];
+                    if (j == -1)qi = YSSQ.ZQ.pe1;
+                    if (j == -2)qi = YSSQ.ZQ.pe2;
+                    if (qi < YSSQ.HS[i] || qi >= YSSQ.HS[i + 1])continue;
+                    s1 += ' ' + Lunisolar.jqmc((j + 24) % 24) + Lunisolar.JDate.JD2str(qi + J2000).substr(6, 5);
+                    v = Lunisolar.Ephem.sun.qi_accurate2(qi);
+                    s2 = '(' + Lunisolar.JDate.JD2str(v + J2000).substr(9, 11) + ')';
+                    if (Math.floor(v + 0.5) != qi)s2 = '<font color=red>' + s2 + '</font>';
+                    s1 += s2;
+                }
                 s += s1 + '<br>';
             }
             return s;
@@ -66,16 +66,16 @@
                 Yn: [] //年计数
             };
             var A = opt.ZQ, B = opt.HS;  //中气表,日月合朔表(整日)
-            var i, k, W, w;
+            var k, W, w;
 
             //该年的气
             //W = Math.floor((jd - 355 + 183) / 365.2422) * 365.2422 + 355;  //355是2000.12冬至,得到较靠近jd的冬至估计值
             //if (this.qi(W) > jd) W -= 365.2422;
             var solar = new this.SolarTerm();
             W = solar.getNearWinterSolstice(jd);
-            for (i = 0; i < 25; i++) A[i] = solar.getWinterSolstice(W + 15.2184 * i); //25个节气时刻(北京时间),从冬至开始到下一个冬至以后
-            A.pe1 =  SSQ.calc(W - 15.2, '气'); //solar.getWinterSolstice(W - 15.2);
-            alert(A.pe1 + "=" + SSQ.calc(W - 15.2, '气') );
+            for (var i = 0; i < 25; i++) A[i] = solar.getWinterSolstice(W + 15.2184 * i); //25个节气时刻(北京时间),从冬至开始到下一个冬至以后
+            A.pe1 =  solar.getWinterSolstice(W - 15.2);
+            //alert(A.pe1 + "=" + SSQ.calc(W - 15.2, '气') );
             A.pe2 = solar.getWinterSolstice(W - 30.4); //补算二气,确保一年中所有月份的“气”全部被计算在内
 
             //今年"首朔"的日月黄经差w
@@ -84,11 +84,11 @@
             if (w > A[0]) w -= 29.53;
 
             //该年所有朔,包含14个月的始末
-            for (i = 0; i < 15; i++) B[i] = lunar.getNewMoon(w + 29.5306 * i);
+            for (var i = 0; i < 15; i++) B[i] = lunar.getNewMoon(w + 29.5306 * i);
 
             //月大小
             opt.leap = 0;
-            for (i = 0; i < 14; i++) {
+            for (var i = 0; i < 14; i++) {
                 opt.dx[i] = opt.HS[i + 1] - opt.HS[i]; //月大小
                 opt.ym[i] = i;  //月序初始化
             }
@@ -106,7 +106,7 @@
                     if (yy >= -220) ns[i] = lunar.getNewMoon(1640641 - this.JDate.J2000 + int2(0.866 + (yy + 220) * 12.369000) * 29.5306), ns[i + 3] = '后九', ns[i + 6] = 11; //秦汉历,ly为-221.10.31
                 }
                 var nn, f1;
-                for (i = 0; i < 14; i++) {
+                for (var i = 0; i < 14; i++) {
                     for (nn = 2; nn >= 0; nn--) if (opt.HS[i] >= ns[nn]) break;
                     f1 = Math.floor((opt.HS[i] - ns[nn] + 15) / 29.5306); //该月积数
                     if (f1 < 12) opt.ym[i] = obb.ymc[(f1 + ns[nn + 6]) % 12]; else opt.ym[i] = ns[nn + 3];
@@ -117,14 +117,14 @@
 
             //无中气置闰法确定闰月,(气朔结合法,数据源需有冬至开始的的气和朔)
             if (B[13] <= A[24]) { //第13月的月末没有超过冬至(不含冬至),说明今年含有13个月
-                for (i = 1; B[i + 1] > A[2 * i] && i < 13; i++); //在13个月中找第1个没有中气的月份
+                for (var i = 1; B[i + 1] > A[2 * i] && i < 13; i++); //在13个月中找第1个没有中气的月份
                 opt.leap = i;
                 for (; i < 14; i++) opt.ym[i]--;
             }
 
             //名称转换(月建别名)
-            for (i = 0; i < 14; i++) {
-                var Dm = opt.HS[i] + JDate.J2000, v2 = opt.ym[i]; //Dm初一的儒略日,v2为月建序号
+            for (var i = 0; i < 14; i++) {
+                var Dm = opt.HS[i] + Lunisolar.JDate.J2000, v2 = opt.ym[i]; //Dm初一的儒略日,v2为月建序号
                 var mc = obb.ymc[v2 % 12]; //月建对应的默认月名称：建子十一,建丑十二,建寅为正……
                 if (Dm >= 1724360 && Dm <= 1729794) mc = obb.ymc[(v2 + 1) % 12]; //  8.01.15至 23.12.02 建子为十二,其它顺推
                 else if (Dm >= 1807724 && Dm <= 1808699) mc = obb.ymc[(v2 + 1) % 12]; //237.04.12至239.12.13 建子为十二,其它顺推
