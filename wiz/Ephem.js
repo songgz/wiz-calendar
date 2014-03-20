@@ -38,6 +38,21 @@ var Lunisolar = (function(global){
         }
     };
 
+//    var meanLonTime = function(d){
+//        var p1 = 6892.745/3600.0;
+//        var L0 = 280.4664472; //J2000时的太阳黄经，度
+//        var DL = 0.9856473599513271; //太阳黄经变率（速度），度/日
+//        var dl0 = d - L0;
+//        var t = dl0 / DL;
+//        var t0, Lp;
+//        do{
+//            t0 = t;
+//            Lp = (357.52910918 + 129596581.0481*(t0/36525.0)/3600.0)*(Math.PI/180);
+//            t = (dl0 - p1 * Math.sin(Lp))/DL;
+//        }while(Math.abs(t-t0)>1e-6);
+//        return global.JDate.J2000 + t;
+//    };
+
     ephem.sun = {
         gxcLon: function (t) {
             var v = -0.043126 + 628.301955 * t - 0.000002732 * t * t;
@@ -49,7 +64,8 @@ var Lunisolar = (function(global){
         },
         aLon_t: function (W) { //已知太阳视黄经反求时间
             var t, v = 628.3319653318; //太阳黄经平速度
-            t = ( W - 1.75347 - Math.PI   ) / v;     //t是世纪数
+            t = ( W - 1.75347 - Math.PI   ) / v;     //求近似值t，世纪数
+
             v = ephem.earth.v(t); //v的精度0.03%，详见原文
             t += ( W - ephem.sun.aLon(t, 10) ) / v;
             v = ephem.earth.v(t); //再算一次v有助于提高精度,不算也可以
@@ -57,7 +73,7 @@ var Lunisolar = (function(global){
             return t;
         },
         aLon_t2: function (W) { //已知太阳视黄经反求时间,高速低精度,最大误差不超过600秒
-            var t, L, v = 628.3319653318;
+            var t, v = 628.3319653318;
             t = (W - 1.75347 - Math.PI) / v;
             t -= (0.000005297 * t * t + 0.0334166 * Math.cos(4.669257 + 628.307585 * t) + 0.0002061 * Math.cos(2.67823 + 628.307585 * t) * t) / v;
             t += (W - ephem.earth.lon(t, 8) - Math.PI + (20.5 + 17.2 * Math.sin(2.1824 - 33.75705 * t)) / global.Angle.R2A) / v;
