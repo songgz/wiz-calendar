@@ -19,7 +19,7 @@ var Lunisolar = (function(global){
         }
         if (Math.floor(hs + 0.5) > Math.floor(global.Ephem.sun.qi_accurate(w - pi2 / 24) + 0.5) && Math.floor(hs1 + 0.5) > Math.floor(global.Ephem.sun.qi_accurate(w + pi2 / 24) + 0.5)) {
             for (j = 0, w += pi2 / 12; j <= 5; j++) {
-                if (Math.floor(global.Ephem.moon.so_accurate(ms + j * pi2) + 0.5) > Math.floor(global.Ephem.moon.qi_accurate(w + j * pi2 / 12) + 0.5)) {
+                if (Math.floor(global.Ephem.moon.so_accurate(ms + j * pi2) + 0.5) > Math.floor(global.Ephem.sun.qi_accurate(w + j * pi2 / 12) + 0.5)) {
                     hs1 = hs;
                     hs = global.Ephem.moon.so_accurate(ms - 2 * pi2);
                     break;
