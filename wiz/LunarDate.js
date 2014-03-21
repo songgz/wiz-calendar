@@ -32,6 +32,7 @@ var Lunisolar = (function(global){
 
     date.yuerun = function (y1, m1) {
         var w, ms, qi, hs, hs1, j;
+        var pi2 = Math.PI * 2;
         w = (y1 - 2000 + (m1 + 10.5) / 12) * pi2;
         qi = global.Ephem.sun.qi_accurate(w);
         w += pi2 / 24;
