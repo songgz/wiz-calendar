@@ -11,18 +11,17 @@ describe("LunarDate", function() {
 
     });
 
-    it("test to JD", function() {
+    it("test toJD", function() {
 
         expect(Lunisolar.LunarDate.toJD(2008,1,0,1)).toBeCloseTo(ymdJd(2008, 1, 0, 1));
 
     });
 
-//    it("test newton", function(){
-//        var f = function(x){
-//            return x*x*x + 2*x*x + 3*x + 4;
-//        };
-//        expect(Lunisolar.newton(f, -2.0, 0.0, 0.01)).toBeCloseTo(-1.65063);
-//    });
+    it("test toYmd ", function(){
+
+        expect(Lunisolar.LunarDate.toYmd(2008)).toEqual(jdYmd(2008));
+
+    });
 
 
 });
