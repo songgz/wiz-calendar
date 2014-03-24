@@ -23,5 +23,11 @@ describe("LunarDate", function() {
 
     });
 
+    it("test toYmd ", function(){
+
+        expect(Lunisolar.LunarDate.yuesoqi(2456741,1)).toEqual(1);
+
+    });
+
 
 });

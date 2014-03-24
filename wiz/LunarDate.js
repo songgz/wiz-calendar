@@ -1,10 +1,10 @@
 var Lunisolar = (function(global){
     "use strict";
     var date = global.LunarDate = global.LunarDate || function () {};
+    var pi2 = Math.PI * 2;
 
     date.toJD = function (y1, m1, rm, d1) { //ymdJd
         var w, ms, zq, hs, hs1, j;
-        var pi2 = Math.PI * 2;
         w = (y1 - 2000 + (m1 + 10) / 12) * pi2;
         zq = global.Ephem.sun.qi_accurate(w);
         ms = global.Ephem.ms.aLon(zq / 36525, 10, 3); //XL.MS_aLon
@@ -116,10 +116,20 @@ var Lunisolar = (function(global){
         return ri;
     };
 
+    var getNewMoon = function(jd){
+        var ms = global.Ephem.ms.aLon(jd / 36525, 10, 3);
+        ms = Math.floor(ms / pi2) * pi2;
+        var jd0 = global.Ephem.moon.so_accurate(ms);                              //定朔计算得出一个历月
+        if (jd0 > jd) {
+            jd0 = global.Ephem.moon.so_accurate(ms - pi2);
+        }
+        return jd0;
+    };
+
     //====================月朔气表======================
-    d.yuesoqi = function (jd, n) {
+    date.yuesoqi = function (jd, n) {
         var int2 = Math.floor;
-        var jd1, jd2, ms, w, i, j, jq, jqN, nh, yh, fd, ry, m, k;
+        var jd1, jd2, ms, w, j, jq, jqN, nh, yh, fd, ry, m, k;
         var s = "", s1 = "", s2 = "", s3 = "", Tq = [];
         n = n - 0;
         jd = jd - J2000;
@@ -135,23 +145,27 @@ var Lunisolar = (function(global){
             alert("纪日数据量太大！");
             return;
         }
+
         ms = global.Ephem.ms.aLon(jd / 36525, 10, 3);
         ms = int2((ms + 1) / pi2) * pi2;
+
         jd1 = global.Ephem.moon.so_accurate(ms);                              //定朔计算得出一个历月
         if (int2(jd1 + 0.5) > int2(jd + 0.5)) {
             ms -= pi2;
             jd1 = global.Ephem.moon.so_accurate(ms);
         }
+
         w = global.Ephem.sun.aLon(jd1 / 36525, 3);
         w = int2((w + 0.1) / pi2 * 24) * pi2 / 24;
-        for (i = 0; i < n; i++) {
+
+        for (var i = 0; i < n; i++) {
             ms += pi2;
             jd2 = global.Ephem.moon.so_accurate(ms);
             for (jqN = i ? 1 : 0; jqN <= 3;) {                             //定气计算该月所含节气及分布情况
                 Tq[jqN] = global.Ephem.sun.qi_accurate(w);
                 w += pi2 / 24;
-                if (int2(Tq[jqN] + 0.5) >= int2(jd2 + 0.5))break;
-                if (int2(Tq[0] + 0.5) >= int2(jd1 + 0.5))jqN++;
+                if (int2(Tq[jqN] + 0.5) >= int2(jd2 + 0.5)) break;
+                if (int2(Tq[0] + 0.5) >= int2(jd1 + 0.5)) jqN++;
             }
             jq = int2(w / pi2 * 24 + 0.3) + 2;
             nh = int2(jq / 24) + 1999;    //以节气情况确定月份
