@@ -1,7 +1,90 @@
 var Lunisolar = (function(global){
     "use strict";
-    var date = global.LunarDate = global.LunarDate || function () {};
     var pi2 = Math.PI * 2;
+
+    var date = global.LunarDate = global.LunarDate || function (jd) {
+        this.jd = jd - global.JDate.J2000;
+        this.preNewMoonMS = 0;
+        this.preNewMoonJD = 0;
+        this.nextNewMoonJD = 0;
+        this.preTermSun = 0;
+        this.preTermJD = 0;
+
+        this.getPreNewMoonJD = function (){
+            this.preNewMoonMS = global.Ephem.ms.aLon(this.jd / 36525, 10, 3);
+            this.preNewMoonMS = Math.floor(this.preNewMoonMS / pi2) * pi2;
+
+            this.preNewMoonJD = global.Ephem.moon.so_accurate(this.preNewMoonMS);                              //定朔计算得出一个历月
+            if (this.preNewMoonJD > this.jd) {
+                this.preNewMoonMS -= pi2;
+                this.preNewMoonJD = global.Ephem.moon.so_accurate(this.preNewMoonMS);
+            }
+            return this.preNewMoonJD;
+        };
+
+        this.getNextNewMoonJD = function(){
+            this.preNewMoonMS += pi2;
+            return this.nextNewMoonJD = global.Ephem.moon.so_accurate(this.preNewMoonMS);
+        };
+
+        this.getPreTerm = function(){
+            this.preTermSun = global.Ephem.sun.aLon(this.preNewMoonJD / 36525, 3);
+            this.preTermSun = Math.floor(this.preTermSun / pi2 * 24) * pi2 / 24;
+            return this.preTermJD = global.Ephem.sun.qi_accurate(this.preTermSun);
+        };
+
+        this.calcMonth = function() {
+            var pre = this.getPreNewMoonJD();
+            var first = this.getPreTerm();
+            var next = this.getNextNewMoonJD();
+            var d;
+            var jq = [];
+            for (var j = 0; j < 3; ) {                             //定气计算该月所含节气及分布情况
+                d = global.Ephem.sun.qi_accurate(this.preTermSun);
+                alert(JD.JD2str(d + J2000));
+                if(pre <= d && d < next){
+                    j++;
+                }else{
+                    break;
+                }
+                jq[j] = d;
+                this.preTermSun += pi2 / 24;
+            }
+
+            var termK = Math.floor(this.preTermSun / pi2 * 24) + 2;
+            var yearH = Math.floor(termK / 24) + 1999;
+
+            // /以节气情况确定月份
+            var jq  = (termK % 24 + 24) % 24;
+            var monthH = Math.floor(jq / 2);
+            var fd = jq.length < 2 ? jq % 2 : 0;
+            var leapMonth = jq.length == 1 ? fd : 0;
+            for (var j = 0; fd && j <= 5; j++) {
+                //确定非基准月份
+                if (global.Ephem.sun.term_high(this.preTermSun + (j + 0.5) * pi2 / 12) < global.Ephem.moon.phases_high(this.preTermSun + (j + 1) * pi2)) {
+                    monthH++;
+                    monthH %= 12;
+                    leapMonth = 0;
+                    break;
+                }
+            }
+
+        };
+    };
+
+    date.prototype = {
+        getYear: function(){
+            this.calcMonth();
+
+        },
+        getMonth: function(){
+
+        },
+        getDay: function(){
+
+        }
+    };
+
 
     date.toJD = function (y1, m1, rm, d1) { //ymdJd
         var w, ms, zq, hs, hs1, j;
@@ -129,7 +212,7 @@ var Lunisolar = (function(global){
     //====================月朔气表======================
     date.yuesoqi = function (jd, n) {
         var int2 = Math.floor;
-        var jd1, jd2, ms, w, j, jq, jqN, nh, yh, fd, ry, m, k;
+        var jd1, jd2, ms, w, jq, jqN, nh, yh, fd, ry, m, k;
         var s = "", s1 = "", s2 = "", s3 = "", Tq = [];
         n = n - 0;
         jd = jd - J2000;
@@ -163,9 +246,16 @@ var Lunisolar = (function(global){
             jd2 = global.Ephem.moon.so_accurate(ms);
             for (jqN = i ? 1 : 0; jqN <= 3;) {                             //定气计算该月所含节气及分布情况
                 Tq[jqN] = global.Ephem.sun.qi_accurate(w);
+                s2 = JD.JD2str(Tq[jqN] + J2000);
+                alert(s2);
+                if(jd1 <= Tq[jqN] && Tq[jqN] < jd2){
+                    jqN++
+                }else{
+                    break;
+                }
                 w += pi2 / 24;
-                if (int2(Tq[jqN] + 0.5) >= int2(jd2 + 0.5)) break;
-                if (int2(Tq[0] + 0.5) >= int2(jd1 + 0.5)) jqN++;
+//                if (int2(Tq[jqN] + 0.5) >= int2(jd2 + 0.5)) break;
+//                if (int2(Tq[0] + 0.5) >= int2(jd1 + 0.5)) jqN++;
             }
             jq = int2(w / pi2 * 24 + 0.3) + 2;
             nh = int2(jq / 24) + 1999;    //以节气情况确定月份
@@ -173,8 +263,8 @@ var Lunisolar = (function(global){
             yh = int2(jq / 2);
             fd = jqN < 3 ? jq % 2 : 0;
             ry = jqN == 1 ? fd : 0;
-            for (j = 0; fd && j <= 5; j++) {                                  //确定非基准月份
-                if (int2(0.5 + global.Ephem.sun.term_high(w + (j + 0.5) * pi2 / 12)) < int2(0.5 + global.Ephem.moon.phases_high(ms + (j + 1) * pi2))) {
+            for (var j = 0; fd && j <= 5; j++) {                                  //确定非基准月份
+                if (global.Ephem.sun.term_high(w + (j + 0.5) * pi2 / 12) < global.Ephem.moon.phases_high(ms + (j + 1) * pi2)) {
                     yh++;
                     yh %= 12;
                     ry = 0;
@@ -197,6 +287,7 @@ var Lunisolar = (function(global){
                 if (!i)s1 += ' ' + ((ry) ? '闰' : '') + global.Dict.ymc[(yh + 1) % 12] + '月起(' + n + '个月)：';
                 s1 += '<br>';
             }
+            alert(s1);
             s2 = global.JDate.JD2str(jd1 + global.JDate.J2000);
             if (Cp141.checked)s1 += s2.substr(0, s2.length - 8);
             k = int2(jd1 - 6 + 0.5);

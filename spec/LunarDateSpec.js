@@ -1,8 +1,8 @@
 describe("LunarDate", function() {
-    //var date;
+    var date;
 
     beforeEach(function() {
-        //date = new Lunisolar.LunarDate();
+        date = new Lunisolar.LunarDate(2456742);
     });
 
     it("test run yue", function() {
@@ -24,8 +24,8 @@ describe("LunarDate", function() {
     });
 
     it("test toYmd ", function(){
-
-        expect(Lunisolar.LunarDate.yuesoqi(2456741,1)).toEqual(1);
+        date.getYear();
+        //expect(Lunisolar.LunarDate.yuesoqi(2456741,1)).toEqual(1);
 
     });
 
