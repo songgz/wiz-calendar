@@ -1,8 +1,8 @@
 describe("LunarDate", function() {
-    var date;
+    //var date;
 
     beforeEach(function() {
-        date = new Lunisolar.LunarDate(2456742);
+
     });
 
     it("test run yue", function() {
@@ -23,10 +23,26 @@ describe("LunarDate", function() {
 
     });
 
-    it("test toYmd ", function(){
-        date.getYear();
-        //expect(Lunisolar.LunarDate.yuesoqi(2456741,1)).toEqual(1);
+//    it("test new LunarDate ", function(){
+//        var date = new Lunisolar.LunarDate(2456957);
+//        expect(date.getYear()).toEqual(2014);
+//        expect(date.getMonth()).toEqual(8);
+//        expect(date.isLeapMonth()).toEqual(0);
+//    });
+//
+//    it("test new LunarDate ", function(){
+//        var date = new Lunisolar.LunarDate(2456957);
+//        expect(date.getYear()).toEqual(2014);
+//        expect(date.getMonth()).toEqual(9);
+//        expect(date.isLeapMonth()).toEqual(1);
+//    });
 
+    it("test nextMonth ", function(){
+        var date = new Lunisolar.LunarDate(2456957);
+        date.nextMonth();
+        expect(date.getYear()).toEqual(2014);
+        expect(date.getMonth()).toEqual(10);
+        expect(date.isLeapMonth()).toEqual(0);
     });
 
 

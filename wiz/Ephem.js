@@ -141,7 +141,7 @@ var Lunisolar = (function(global){
             t = t - global.JDate.dt_T(t) + 8 / 24;
             var v = ( (t + 0.5) % 1 ) * 86400;
             if (v < 1800 || v > 86400 - 1800){
-                t = EPHEM.ms.aLon_t(W) * 36525 - global.JDate.dt_T(t) + 8 / 24;
+                t = ephem.ms.aLon_t(W) * 36525 - global.JDate.dt_T(t) + 8 / 24;
             }
             return  t;
         },

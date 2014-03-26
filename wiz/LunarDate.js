@@ -1,87 +1,91 @@
-var Lunisolar = (function(global){
+var Lunisolar = (function (global) {
     "use strict";
     var pi2 = Math.PI * 2;
 
     var date = global.LunarDate = global.LunarDate || function (jd) {
         this.jd = jd - global.JDate.J2000;
         this.preNewMoonMS = 0;
-        this.preNewMoonJD = 0;
-        this.nextNewMoonJD = 0;
         this.preTermSun = 0;
-        this.preTermJD = 0;
 
-        this.getPreNewMoonJD = function (){
-            this.preNewMoonMS = global.Ephem.ms.aLon(this.jd / 36525, 10, 3);
-            this.preNewMoonMS = Math.floor(this.preNewMoonMS / pi2) * pi2;
+        this.preNewMoonMS = global.Ephem.ms.aLon(this.jd / 36525, 10, 3);
+        this.preNewMoonMS = Math.floor(this.preNewMoonMS / pi2) * pi2;
+        var nm = global.Ephem.moon.so_accurate(this.preNewMoonMS);                              //定朔计算得出一个历月
+        if (nm > this.jd) {
+            this.preNewMoonMS -= pi2;
+        }
 
-            this.preNewMoonJD = global.Ephem.moon.so_accurate(this.preNewMoonMS);                              //定朔计算得出一个历月
-            if (this.preNewMoonJD > this.jd) {
-                this.preNewMoonMS -= pi2;
-                this.preNewMoonJD = global.Ephem.moon.so_accurate(this.preNewMoonMS);
-            }
-            return this.preNewMoonJD;
+        this.getNewMoonJD = function () {
+            return global.Ephem.moon.so_accurate(this.preNewMoonMS);
         };
 
-        this.getNextNewMoonJD = function(){
+        this.initPreTerm = function(){
+            this.preTermSun = global.Ephem.sun.aLon(this.getNewMoonJD() / 36525, 3);
+            this.preTermSun = Math.floor((this.preTermSun + 0.1) / pi2 * 24) * pi2 / 24;
+        };
+
+        this.getTermJD = function () {
+            return global.Ephem.sun.qi_accurate(this.preTermSun);
+        };
+
+        this.calcMonth = function () {
+            var pre = this.getNewMoonJD();
+            this.initPreTerm();
+            //alert(global.JDate.JD2str(this.getTermJD() + global.JDate.J2000));
+            //var preTerm = this.getTermJD();
             this.preNewMoonMS += pi2;
-            return this.nextNewMoonJD = global.Ephem.moon.so_accurate(this.preNewMoonMS);
-        };
-
-        this.getPreTerm = function(){
-            this.preTermSun = global.Ephem.sun.aLon(this.preNewMoonJD / 36525, 3);
-            this.preTermSun = Math.floor(this.preTermSun / pi2 * 24) * pi2 / 24;
-            return this.preTermJD = global.Ephem.sun.qi_accurate(this.preTermSun);
-        };
-
-        this.calcMonth = function() {
-            var pre = this.getPreNewMoonJD();
-            var first = this.getPreTerm();
-            var next = this.getNextNewMoonJD();
-            var d;
-            var jq = [];
-            for (var j = 0; j < 3; ) {                             //定气计算该月所含节气及分布情况
-                d = global.Ephem.sun.qi_accurate(this.preTermSun);
-                alert(JD.JD2str(d + J2000));
-                if(pre <= d && d < next){
-                    j++;
-                }else{
-                    break;
-                }
-                jq[j] = d;
+            var next = this.getNewMoonJD();
+            var d = 0;
+            this.terms = [];
+            for (var j = 0; j < 3; j++) {                         //定气计算该月所含节气及分布情况
                 this.preTermSun += pi2 / 24;
-            }
+                d = this.getTermJD();
+//                if (Math.round(d) >= Math.round(next)) break;
+//                if (Math.round(d) >= Math.round(pre)) this.terms.push(d);
+                if (Math.round(pre) <= Math.round(d) && Math.round(d) < Math.round(next)) {
+                    this.terms.push(d);
+                }
 
-            var termK = Math.floor(this.preTermSun / pi2 * 24) + 2;
-            var yearH = Math.floor(termK / 24) + 1999;
+            }
+            var termK = Math.floor(this.preTermSun / pi2 * 24 + 0.3) + 2;
+
+            this.yearH = Math.floor(termK / 24) + 1999;
 
             // /以节气情况确定月份
-            var jq  = (termK % 24 + 24) % 24;
-            var monthH = Math.floor(jq / 2);
-            var fd = jq.length < 2 ? jq % 2 : 0;
-            var leapMonth = jq.length == 1 ? fd : 0;
+            var jq = (termK % 24 + 24) % 24;
+            alert(jq);
+            this.monthH = Math.floor(jq / 2);
+            var fd = this.terms.length < 2 ? jq % 2 : 0;
+            this.leapMonth = this.terms.length == 1 ? fd : 0;
             for (var j = 0; fd && j <= 5; j++) {
                 //确定非基准月份
-                if (global.Ephem.sun.term_high(this.preTermSun + (j + 0.5) * pi2 / 12) < global.Ephem.moon.phases_high(this.preTermSun + (j + 1) * pi2)) {
-                    monthH++;
-                    monthH %= 12;
-                    leapMonth = 0;
+                if (Math.round(global.Ephem.sun.term_high(this.preTermSun + (j + 0.5) * pi2 / 12)) < Math.round(global.Ephem.moon.phases_high(this.preTermSun + (j + 1) * pi2))) {
+                    this.monthH++;
+                    this.monthH %= 12;
+                    this.leapMonth = 0;
                     break;
                 }
             }
+            if (this.monthH == 0) this.yearH--;
 
         };
+        this.calcMonth();
     };
 
     date.prototype = {
-        getYear: function(){
+        nextMonth: function () {
             this.calcMonth();
-
         },
-        getMonth: function(){
-
+        getYear: function () {
+            return this.yearH;
         },
-        getDay: function(){
-
+        getMonth: function () {
+            return this.monthH;
+        },
+        isLeapMonth: function(){
+            return this.leapMonth;
+        },
+        getDay: function () {
+            return ;
         }
     };
 
@@ -144,12 +148,12 @@ var Lunisolar = (function(global){
         var int2 = Math.floor;
         F = jd + 0.5 - int2(jd + 0.5);
         jd = int2(jd + 0.5) - J2000;
-        ms =global.Ephem.ms.aLon(jd / 36525, 10, 3);
+        ms = global.Ephem.ms.aLon(jd / 36525, 10, 3);
         ms = int2((ms + 2) / pi2) * pi2;
         jd1 = Math.floor(global.Ephem.moon.so_accurate(ms));
         if (int2(jd1 + 0.5) > jd) {
             jd2 = jd1;
-            jd1 =global.Ephem.moon.so_accurate(ms - pi2);
+            jd1 = global.Ephem.moon.so_accurate(ms - pi2);
         } else {
             ms += pi2;
             jd2 = global.Ephem.moon.so_accurate(ms);
@@ -199,7 +203,7 @@ var Lunisolar = (function(global){
         return ri;
     };
 
-    var getNewMoon = function(jd){
+    var getNewMoon = function (jd) {
         var ms = global.Ephem.ms.aLon(jd / 36525, 10, 3);
         ms = Math.floor(ms / pi2) * pi2;
         var jd0 = global.Ephem.moon.so_accurate(ms);                              //定朔计算得出一个历月
@@ -248,9 +252,9 @@ var Lunisolar = (function(global){
                 Tq[jqN] = global.Ephem.sun.qi_accurate(w);
                 s2 = JD.JD2str(Tq[jqN] + J2000);
                 alert(s2);
-                if(jd1 <= Tq[jqN] && Tq[jqN] < jd2){
+                if (jd1 <= Tq[jqN] && Tq[jqN] < jd2) {
                     jqN++
-                }else{
+                } else {
                     break;
                 }
                 w += pi2 / 24;
