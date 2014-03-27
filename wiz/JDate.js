@@ -82,7 +82,7 @@ var Lunisolar = (function(global){
     };
     jd.DD2str = function (r) {
         var Y = "     " + r.Y, M = "0" + r.M, D = "0" + r.D;
-        var h = r.h, m = r.m, s = int2(r.s + .5);
+        var h = r.h, m = r.m, s = Math.floor(r.s + .5);
         if (s >= 60)s -= 60, m++;
         if (m >= 60)m -= 60, h++;
         h = "0" + h;

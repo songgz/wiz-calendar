@@ -6,11 +6,12 @@ var Lunisolar = (function (global) {
         this.jd = jd - global.JDate.J2000;
         this.preNewMoonMS = 0;
         this.preTermSun = 0;
+        this.pre = 0;
 
         this.preNewMoonMS = global.Ephem.ms.aLon(this.jd / 36525, 10, 3);
-        this.preNewMoonMS = Math.floor(this.preNewMoonMS / pi2) * pi2;
+        this.preNewMoonMS = Math.floor((this.preNewMoonMS+1) / pi2) * pi2;
         var nm = global.Ephem.moon.so_accurate(this.preNewMoonMS);                              //定朔计算得出一个历月
-        if (nm > this.jd) {
+        if (Math.round(nm) > Math.round( this.jd )) {
             this.preNewMoonMS -= pi2;
         }
 
@@ -28,7 +29,7 @@ var Lunisolar = (function (global) {
         };
 
         this.calcMonth = function () {
-            var pre = this.getNewMoonJD();
+            this.pre = this.getNewMoonJD();
             this.initPreTerm();
             //alert(global.JDate.JD2str(this.getTermJD() + global.JDate.J2000));
             //var preTerm = this.getTermJD();
@@ -36,26 +37,21 @@ var Lunisolar = (function (global) {
             var next = this.getNewMoonJD();
             var d = 0;
             this.terms = [];
-            for (var j = 0; j < 3; j++) {                         //定气计算该月所含节气及分布情况
-                this.preTermSun += pi2 / 24;
-                d = this.getTermJD();
-//                if (Math.round(d) >= Math.round(next)) break;
-//                if (Math.round(d) >= Math.round(pre)) this.terms.push(d);
-                if (Math.round(pre) <= Math.round(d) && Math.round(d) < Math.round(next)) {
-                    this.terms.push(d);
-                }
 
+            for (var j = 0; j < 4; j++) {                         //定气计算该月所含节气及分布情况
+                d = this.getTermJD();
+                this.preTermSun += pi2 / 24;
+                if (Math.round(d) >= Math.round(next)) break;
+                if (Math.round(d) >= Math.round(this.pre)) this.terms.push(d);
             }
             var termK = Math.floor(this.preTermSun / pi2 * 24 + 0.3) + 2;
-
             this.yearH = Math.floor(termK / 24) + 1999;
 
             // /以节气情况确定月份
             var jq = (termK % 24 + 24) % 24;
-            alert(jq);
             this.monthH = Math.floor(jq / 2);
-            var fd = this.terms.length < 2 ? jq % 2 : 0;
-            this.leapMonth = this.terms.length == 1 ? fd : 0;
+            var fd = (this.terms.length < 3 ? jq % 2 : 0);
+            this.leapMonth = (this.terms.length == 1 ? fd : 0);
             for (var j = 0; fd && j <= 5; j++) {
                 //确定非基准月份
                 if (Math.round(global.Ephem.sun.term_high(this.preTermSun + (j + 0.5) * pi2 / 12)) < Math.round(global.Ephem.moon.phases_high(this.preTermSun + (j + 1) * pi2))) {
@@ -66,7 +62,6 @@ var Lunisolar = (function (global) {
                 }
             }
             if (this.monthH == 0) this.yearH--;
-
         };
         this.calcMonth();
     };
@@ -78,14 +73,36 @@ var Lunisolar = (function (global) {
         getYear: function () {
             return this.yearH;
         },
-        getMonth: function () {
+        getMonth: function(){
             return this.monthH;
+        },
+        getMonthName: function () {
+            return Lunisolar.Dict.ymc[(this.monthH + 1) % 12];
         },
         isLeapMonth: function(){
             return this.leapMonth;
         },
-        getDay: function () {
+        getDays: function () {
             return ;
+        },
+        getTerms: function(){
+            return this.terms;
+        },
+        getTermsDate: function(){
+            var tms = [];
+            for(var j = 0; j < this.terms.length; j++){
+                tms.push( Lunisolar.JDate.JD2str(this.terms[j] + Lunisolar.JDate.J2000) );
+            }
+            return tms.join(" ");
+        },
+        getFirstDate: function(){
+            return this.firstDate = this.firstDate  || Lunisolar.JDate.JD2str(this.pre + Lunisolar.JDate.J2000);
+        },
+        getFirstDay: function(){
+            return this.getFirstDate().substr(0, this.getFirstDate().length - 8);
+        },
+        getFirstTime: function() {
+            return  this.getFirstDate().substr(this.getFirstDate().length - 8, 8);
         }
     };
 

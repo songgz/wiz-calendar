@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>Wiz Calendar</title>
+    <script type="text/javascript" src="../wiz/Lunisolar.js"></script>
+    <script type="text/javascript" src="../wiz/Angle.js"></script>
+    <script type="text/javascript" src="../wiz/JDate.js"></script>
+    <script type="text/javascript" src="../wiz/VSOP87.js"></script>
+    <script type="text/javascript" src="../wiz/MPP02.js"></script>
+    <script type="text/javascript" src="../wiz/Ephem.js"></script>
+    <script type="text/javascript" src="../wiz/SolarTerm.js"></script>
+    <script type="text/javascript" src="../wiz/LunarPhase.js"></script>
+    <script type="text/javascript" src="../wiz/LunarDate.js"></script>
+    <script type="text/javascript">
+        function yearList(){
+            var date = new Lunisolar.LunarDate(2456928);
+            var str = "<li>";
+                str += date.getYear()+ "年" + date.getMonthName() + "月" + date.isLeapMonth();
+                str += "</li>";
+            for(var i = 0; i < 100; i++){
+                date.nextMonth();
+                str += "<li>";
+
+                str += date.getYear() + "年" + date.getMonthName() + "月" + date.isLeapMonth() + "首" +  date.getFirstTime();
+                str += date.getTermsDate();
+                str += "</li>";
+            }
+            document.getElementById('yearList').innerHTML = str;
+        }
+    </script>
+</head>
+<body>
+公元<input type="number" id="key_year" value="2014">年<input type="button" onclick="yearList()" value="确定">
+<div id='yearList' ></div>
+
+</body>
+</html>
