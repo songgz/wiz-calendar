@@ -15,16 +15,13 @@
     <script type="text/javascript">
         function yearList(){
             var date = new Lunisolar.LunarDate(2456928);
-            var str = "<li>";
-                str += date.getYear()+ "年" + date.getMonthName() + "月" + date.isLeapMonth();
-                str += "</li>";
+            var str = "";
             for(var i = 0; i < 100; i++){
-                date.nextMonth();
                 str += "<li>";
-
-                str += date.getYear() + "年" + date.getMonthName() + "月" + date.isLeapMonth() + "首" +  date.getFirstTime();
+                str += date.getYearName() + "年" + date.getYearGanzhi() + date.getShuxing() + "年" + date.getMonthName() + "月" + date.getLeapMonthName() + date.getMonthDaXiao() + date.getMonthGanzhi() + "朔" +  date.getFirstDate();
                 str += date.getTermsDate();
                 str += "</li>";
+                date.nextMonth();
             }
             document.getElementById('yearList').innerHTML = str;
         }
