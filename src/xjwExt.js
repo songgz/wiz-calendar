@@ -2932,7 +2932,7 @@ function Lunar() {
             ob.yxmc = obb.yxmc[xn];
             ob.yxjd = d;
             ob.yxsj = JD.timeStr(d);
-        } while (D + 5 < Td0 + Bdn);
+        } while (D + 5 < Td0 + Tdn);
         w = XL.S_aLon(jd2 / 36525, 3);
         w0 = int2((w - 0.13) / pi2) * pi2;
         w = int2((w - 0.04) / pi2 * 72) * pi2 / 72;

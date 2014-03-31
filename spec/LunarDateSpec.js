@@ -23,27 +23,27 @@ describe("LunarDate", function() {
 
     });
 
-    it("test new LunarDate ", function(){
-        var date = new Lunisolar.LunarDate(2456928);
-        expect(date.getYear()).toEqual(2014);
-        expect(date.getMonth()).toEqual(9);
-        expect(date.isLeapMonth()).toEqual(0);
-    });
-
-    it("test new LunarDate ", function(){
-        var date = new Lunisolar.LunarDate(2456957);
-        expect(date.getYear()).toEqual(2014);
-        expect(date.getMonth()).toEqual(9);
-        expect(date.isLeapMonth()).toEqual(1);
-    });
-
-    it("test nextMonth ", function(){
-        var date = new Lunisolar.LunarDate(2456957);
-        date.nextMonth();
-        expect(date.getYear()).toEqual(2014);
-        expect(date.getMonth()).toEqual(10);
-        expect(date.isLeapMonth()).toEqual(0);
-    });
+//    it("test new LunarDate ", function(){
+//        var date = new Lunisolar.LunarDate(2456928);
+//        expect(date.getYear()).toEqual(2014);
+//        expect(date.getMonth()).toEqual(9);
+//        expect(date.isLeapMonth()).toEqual(0);
+//    });
+//
+//    it("test new LunarDate ", function(){
+//        var date = new Lunisolar.LunarDate(2456957);
+//        expect(date.getYear()).toEqual(2014);
+//        expect(date.getMonth()).toEqual(9);
+//        expect(date.isLeapMonth()).toEqual(1);
+//    });
+//
+//    it("test nextMonth ", function(){
+//        var date = new Lunisolar.LunarDate(2456957);
+//        date.nextMonth();
+//        expect(date.getYear()).toEqual(2014);
+//        expect(date.getMonth()).toEqual(10);
+//        expect(date.isLeapMonth()).toEqual(0);
+//    });
 
 
 });

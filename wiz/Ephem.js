@@ -1,6 +1,7 @@
 var Lunisolar = (function(global){
     "use strict";
     var ephem = global.Ephem = global.Ephem || {};
+    ephem.PI2 = Math.PI * 2;
 
     ephem.nutation = (function () {
         var nutB = [//中精度章动计算表
