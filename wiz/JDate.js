@@ -101,6 +101,12 @@ var Lunisolar = (function(global){
         return this.DD2str(r);
     };
 
+    jd.prototype = {
+        valueOf: function () {
+            return this.jd;
+        }
+    };
+
     return global;
 })(Lunisolar || {})
 

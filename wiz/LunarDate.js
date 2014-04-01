@@ -3,11 +3,41 @@ var Lunisolar = (function (global) {
     var pi2 = Math.PI * 2;
 
     var date = global.LunarDate = global.LunarDate || function (jd) {
-        this.jd = jd - global.JDate.J2000;
+        this.jd = NaN;
+        this.lunar = {
+            year: NaN,
+            month: NaN,
+            day: NaN,
+            hour: NaN,
+            minute: NaN,
+            second: NaN,
+            leap: NaN
+        };
+
+        switch (arguments.length) {
+            case 0:
+                this.jd = 0;
+                break;
+            case 1:
+                this.jd = jd - global.JDate.J2000;
+                break;
+            default:
+                this.lunar.year = arguments[0];
+                this.lunar.month = arguments[1];
+                this.lunar.day = arguments[2];
+                this.lunar.leap = arguments[3];
+                this.lunar.hour = arguments[4];
+                this.lunar.minute = arguments[5];
+                this.lunar.second = arguments[6];
+                break;
+        }
+
     };
 
     date.prototype = {
-
+        valueOf: function () {
+            return this.jd + global.JDate.J2000;
+        }
     };
 
     date.toJD = function (y1, m1, rm, d1) { //ymdJd
@@ -80,9 +110,15 @@ var Lunisolar = (function (global) {
         }
         w1 = global.Ephem.sun.aLon(jd1 / 36525, 3);
         w1 = int2(w1 / pi2 * 24) * pi2 / 24;
-        while (Math.round(global.Ephem.sun.qi_accurate(w1)) < Math.round(jd1)){w1 += pi2 / 24};
+        while (Math.round(global.Ephem.sun.qi_accurate(w1)) < Math.round(jd1)) {
+            w1 += pi2 / 24
+        }
+        ;
         w2 = w1;
-        while (Math.round(global.Ephem.sun.qi_accurate(w2 + pi2 / 24)) < Math.round(jd2)){w2 += pi2 / 24};
+        while (Math.round(global.Ephem.sun.qi_accurate(w2 + pi2 / 24)) < Math.round(jd2)) {
+            w2 += pi2 / 24
+        }
+        ;
         wn = int2((w2 + 0.1) / pi2 * 24) + 4;
         y = int2(wn / 24) + 1999;
         wn = (wn % 24 + 24) % 24;

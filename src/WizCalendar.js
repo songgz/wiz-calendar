@@ -292,7 +292,7 @@
       this.jd = this.jd * jd;
       return this;
     },
-    div: function () {
+    div: function (jd) {
       this.jd = this.jd / jd;
       return this;
     },
