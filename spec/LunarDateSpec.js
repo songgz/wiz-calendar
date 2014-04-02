@@ -1,5 +1,4 @@
 describe("LunarDate", function() {
-    //var date;
 
     beforeEach(function() {
 
@@ -20,6 +19,29 @@ describe("LunarDate", function() {
     it("test toYmd ", function(){
 
         expect(Lunisolar.LunarDate.toYmd(2008)).toEqual(jdYmd(2008));
+
+    });
+
+    it("test .toJD", function(){
+
+        var d = new Lunisolar.LunarDate(2008,1,0,1);
+        expect(d.toJD()).toEqual(ymdJd(2008, 1, 0, 1));
+        expect(d.valueOf()).toEqual(ymdJd(2008, 1, 0, 1));
+
+    });
+
+    it("test .toLD", function(){
+        var j = ymdJd(2008, 1, 0, 1);
+        var d = new Lunisolar.LunarDate(j);
+        var t = jdYmd(j);
+        expect(d.toLD().year).toEqual(t.Y);
+        expect(d.toLD().month).toEqual(t.M);
+        expect(d.toLD().day).toEqual(t.D);
+        expect(d.toLD().leap).toEqual(t.R);
+        expect(d.toLD().hour).toEqual(t.h);
+        expect(d.toLD().minute).toEqual(t.m);
+        expect(d.toLD().second).toEqual(t.s);
+//        expect(d.toLD().days).toEqual(t.N);
 
     });
 
