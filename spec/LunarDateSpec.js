@@ -18,7 +18,8 @@ describe("LunarDate", function() {
 
     it("test toYmd ", function(){
 
-        expect(Lunisolar.LunarDate.toYmd(2008)).toEqual(jdYmd(2008));
+        var j = ymdJd(2008, 1, 0, 1);
+        expect(Lunisolar.LunarDate.toYmd(j)).toEqual(jdYmd(j));
 
     });
 
@@ -41,7 +42,7 @@ describe("LunarDate", function() {
         expect(d.toLD().hour).toEqual(t.h);
         expect(d.toLD().minute).toEqual(t.m);
         expect(d.toLD().second).toEqual(t.s);
-//        expect(d.toLD().days).toEqual(t.N);
+        expect(d.toLD().days).toEqual(t.N);
 
     });
 

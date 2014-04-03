@@ -736,7 +736,8 @@ function Lunar(){
   var i,j,k,c,Bd0,Bdn;
   //日历物件初始化
   JD.h=12, JD.m=0, JD.s=0.1;
-  JD.Y=By; JD.M=Bm; JD.D=1;          Bd0 = int2(JD.toJD()) - J2000;  //公历月首,中午
+  JD.Y=By; JD.M=Bm; JD.D=1;
+     Bd0 = int2(JD.toJD()) - J2000;  //公历月首,中午
   JD.M++; if(JD.M>12) JD.Y++,JD.M=1; Bdn = int2(JD.toJD()) - J2000 - Bd0; //本月天数(公历)
 
   this.w0= (Bd0 + J2000 +1+7000000)%7; //本月第一天的星期

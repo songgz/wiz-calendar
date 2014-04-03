@@ -75,11 +75,11 @@ var Lunisolar = (function (global) {
         this.JdtoYmd = function (jd) {
             var F, ms, jd1, jd2, w1, w2, wn, y, m, d, n, fd, ry, j;
             var int2 = Math.floor;
-            F = jd + 0.5 - int2(jd + 0.5);
+            F = jd + 0.5 - Math.round(jd);
             jd = Math.round(jd) - global.JDate.J2000;
             ms = global.Ephem.ms.aLon(jd / 36525, 10, 3);
             ms = int2((ms + 2) / pi2) * pi2;
-            jd1 = Math.floor(global.Ephem.moon.so_accurate(ms));
+            jd1 = global.Ephem.moon.so_accurate(ms);
             if (Math.round(jd1) > jd) {
                 jd2 = jd1;
                 jd1 = global.Ephem.moon.so_accurate(ms - pi2);
@@ -136,14 +136,13 @@ var Lunisolar = (function (global) {
             return ri;
         };
 
-
         switch (arguments.length) {
             case 0:
                 this.jd = 0;
                 break;
             case 1:
                 this.jd = jd - global.JDate.J2000;
-                var d = jdYmd(jd);
+                var d = this.JdtoYmd(jd);
                 this.lunar.year = d.Y;
                 this.lunar.month = d.M;
                 this.lunar.day = d.D;
@@ -159,6 +158,11 @@ var Lunisolar = (function (global) {
                 this.lunar.leap = arguments[2];
                 this.lunar.day = arguments[3];
                 this.jd = this.YmdtoJd(this.lunar.year, this.lunar.month, this.lunar.leap, this.lunar.day);
+                var t = (this.lunar.day - Math.floor(this.lunar.day)) * 24;
+                this.lunar.hour = Math.floor(t);
+                t = (t - this.lunar.hour) * 60;
+                this.lunar.minute = Math.floor(t);
+                this.lunar.second = Math.floor((t - this.lunar.minute) * 60);
                 break;
             default:
                 this.lunar.year = arguments[0];
@@ -241,12 +245,12 @@ var Lunisolar = (function (global) {
     date.toYmd = function (jd) {
         var F, ms, jd1, jd2, w1, w2, wn, y, m, d, n, fd, ry, j;
         var int2 = Math.floor;
-        F = jd + 0.5 - int2(jd + 0.5);
-        jd = Math.round(jd) - J2000;
+        F = jd + 0.5 - Math.floor(jd + 0.5);
+        jd = Math.floor(jd + 0.5) - global.JDate.J2000;
         ms = global.Ephem.ms.aLon(jd / 36525, 10, 3);
         ms = int2((ms + 2) / pi2) * pi2;
-        jd1 = Math.floor(global.Ephem.moon.so_accurate(ms));
-        if (Math.round(jd1) > jd) {
+        jd1 =global.Ephem.moon.so_accurate(ms);
+        if (Math.floor(jd1 + 0.5) > jd) {
             jd2 = jd1;
             jd1 = global.Ephem.moon.so_accurate(ms - pi2);
         } else {
@@ -255,25 +259,23 @@ var Lunisolar = (function (global) {
         }
         w1 = global.Ephem.sun.aLon(jd1 / 36525, 3);
         w1 = int2(w1 / pi2 * 24) * pi2 / 24;
-        while (Math.round(global.Ephem.sun.qi_accurate(w1)) < Math.round(jd1)) {
+        while (Math.floor(global.Ephem.sun.qi_accurate(w1) + 0.5) < Math.floor(jd1 + 0.5)) {
             w1 += pi2 / 24
         }
-        ;
         w2 = w1;
-        while (Math.round(global.Ephem.sun.qi_accurate(w2 + pi2 / 24)) < Math.round(jd2)) {
+        while (Math.floor(global.Ephem.sun.qi_accurate(w2 + pi2 / 24) + 0.5) < Math.floor(jd2 + 0.5)) {
             w2 += pi2 / 24
         }
-        ;
         wn = int2((w2 + 0.1) / pi2 * 24) + 4;
         y = int2(wn / 24) + 1999;
         wn = (wn % 24 + 24) % 24;
         m = int2(wn / 2);
-        d = jd - Math.round(jd1) + 1;
-        n = Math.round(jd2) - Math.round(jd1);
+        d = jd - Math.floor(jd1 + 0.5) + 1;
+        n = Math.floor(jd2 + 0.5) - Math.floor(jd1 + 0.5);
         fd = w2 - w1 < pi2 / 20 ? wn % 2 : 0;
         ry = w2 == w1 ? fd : 0;
         for (j = 0, ms += pi2, w2 += 1.5 * pi2 / 12; fd && j <= 5; j++) {
-            if (Math.round(global.Ephem.sun.qi_accurate(w2 + j * pi2 / 12)) < Math.round(global.Ephem.moon.so_accurate(ms + j * pi2))) {
+            if (Math.floor(global.Ephem.sun.qi_accurate(w2 + j * pi2 / 12) + 0.5) < Math.floor(global.Ephem.moon.so_accurate(ms + j * pi2) + 0.5)) {
                 m++;
                 ry = 0;
                 if (m > 12) {
