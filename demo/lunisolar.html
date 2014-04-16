@@ -11,18 +11,32 @@
     <script type="text/javascript" src="../wiz/Ephem.js"></script>
     <script type="text/javascript" src="../wiz/SolarTerm.js"></script>
     <script type="text/javascript" src="../wiz/LunarPhase.js"></script>
+    <script type="text/javascript" src="../wiz/LunarDate.js"></script>
     <script type="text/javascript" src="../wiz/LunarMonth.js"></script>
+    <script type="text/javascript" src="../wiz/SolarDate.js"></script>
+    <script type="text/javascript" src="../wiz/SolarMonth.js"></script>
     <script type="text/javascript">
         function yearList(){
-            var date = new Lunisolar.LunarMonth(2456928);
-            var str = "";
-            for(var i = 0; i < 100; i++){
+//            var date = new Lunisolar.LunarMonth(2456928);
+//            var str = "";
+//            for(var i = 0; i < 100; i++){
+//                str += "<li>";
+//                str += date.getYearName() + "年" + date.getYearGanzhi() + date.getShuxing() + "年" + date.getMonthName() + "月" + date.getLeapMonthName() + date.getMonthDaXiao() + date.getMonthGanzhi() + "朔" +  date.getFirstDate();
+//                str += date.getTermsDate();
+//                str += "</li>";
+//                date.nextMonth();
+//            }
+
+            var month = new Lunisolar.SolarMonth(2014,4);
+            var first = month.getFirstDay().toLD();
+            var str ="" ;
+            for(var i = 0; i < month.days; i++){
                 str += "<li>";
-                str += date.getYearName() + "年" + date.getYearGanzhi() + date.getShuxing() + "年" + date.getMonthName() + "月" + date.getLeapMonthName() + date.getMonthDaXiao() + date.getMonthGanzhi() + "朔" +  date.getFirstDate();
-                str += date.getTermsDate();
+                str += i + 1 + "星" + (month.week + i) % 7 + "农" + (first.day + i);
                 str += "</li>";
-                date.nextMonth();
             }
+
+
             document.getElementById('yearList').innerHTML = str;
         }
     </script>

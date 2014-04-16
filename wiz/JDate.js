@@ -1,11 +1,6 @@
 var Lunisolar = (function(global){
     "use strict";
-    var jd = global.JDate = global.JDate || function (jd) {
-        this.jd = jd;
-    };
-
-    jd.J2000 = 2451545.0; //2000年前儒略日数(2000-1-1 12:00:00格林威治平时)
-    jd.DTS = [ // TD - UT1 计算表
+    var DTS = [ // TD - UT1 计算表
         -4000, 108371.7, -13036.80, 392.000, 0.0000,
         -500, 17201.0, -627.82, 16.170, -0.3413,
         -150, 12200.6, -346.41, 5.403, -0.1593,
@@ -28,8 +23,15 @@ var Lunisolar = (function(global){
         2005, 64.7, 0.4, 0, 0, //一次项记为x,则 10x=0.4秒/年*(2015-2005),解得x=0.4
         2015, 69, 0, 0, 0];
 
+    var jd = global.JDate = global.JDate || function (jde) {
+        this.jde = jde;
+    };
+
+    jd.J2000 = 2451545.0; //2000年前儒略日数(2000-1-1 12:00:00格林威治平时)
+
+    //输入公历年，返回秒
     jd.dt = function (year) { //力学时和世界时之间的精确差值 ΔT = TD - UT
-        var dts = jd.DTS, i, t1, t2, t3, dt = 0;
+        var dts = DTS, i, t1, t2, t3, dt = 0;
         if ((year >= -4000) && (year < 2015)) {
             for (i = 0; i < dts.length; i += 5) {
                 if (year < dts[i + 5]) {
@@ -55,8 +57,8 @@ var Lunisolar = (function(global){
         return dt;
     };
 
-    jd.dt_T = function (t) {
-        return jd.dt(t / 365.2425 + 2000) / 86400.0;
+    jd.dt_T = function (mjd) {
+        return jd.dt(mjd / 365.2425 + 2000) / 86400.0;
     };
 
     jd.DD = function (jd) {
@@ -80,6 +82,30 @@ var Lunisolar = (function(global){
         r.s = F;
         return r;
     };
+
+    jd.gd2jd = function (Y, M, D, h, m, s) {
+        //var jd = 0;
+        Y = Y || 2000;
+        M = M || 1;
+        D = D || 1;
+        h = h || 0;
+        m = m || 0;
+        s = s || 0;
+        D += (h + m / 60 + s / 3600) / 24;
+        var a = 0, b = 0;
+        if (M <= 2) {
+            M += 12;
+            Y -= 1;
+        }
+        if (Y * 372 + M * 31 + Math.floor(D) >= 588829) {
+            a = Math.floor(Y / 100);
+            b = 2 - a + Math.floor(a / 4);
+        }
+        return Math.floor(365.25 * (Y + 4716)) + Math.floor(30.6001 * (M + 1)) + D + b - 1524.5;
+        //if (UTC = 1) jd += JDate.dt(Y);
+        //return jd;
+    };
+
     jd.DD2str = function (r) {
         var Y = "     " + r.Y, M = "0" + r.M, D = "0" + r.D;
         var h = r.h, m = r.m, s = Math.floor(r.s + .5);

@@ -1,20 +1,9 @@
 var Lunisolar = (function (global) {
     "use strict";
-    var calendar = global.Calendar = global.Calendar || function () {
-    };
+    var calendar = global.Calendar = global.Calendar || {};
     calendar.name = 'Lunisolar Calendar';
     calendar.version = '0.5.1';
     calendar.build = '';
-
-    var util = global.Util = global.util || {};
-
-    util.unzip = function (str) {
-        var z10 = "0000000000", z20 = "00000000000000000000"; // z10 + z10
-        var map = {J: '00', I: '000', H: '0000', G: '00000', t: '01', s: '001', r: '0001', q: '00001', p: '000001', o: '0000001', n: '00000001', m: '000000001', l: '0000000001', k: '03', j: '0303', i: '003', h: '003003', g: '0003', f: '00003', e: '000003', d: '0000003', c: '00000003', b: '000000003', a: '0000000003', A: z20 + z20 + z20, B: z20 + z20 + z10, C: z20 + z20, D: z20 + z10, E: z20, F: z10};
-        return str.replace(/\D/g, function (c) {
-            return map[c];
-        });
-    };
 
     var dict = global.Dict = global.Dict || {
         Weeks: ['日', '一', '二', '三', '四', '五', '六', '七'],
@@ -111,8 +100,18 @@ var Lunisolar = (function (global) {
             1909, 3, 0, '清', '无朝', '爱新觉罗溥仪', '宣统', 1912, 37, 0, '近、现代', '中华民国', '', '民国', 1949, 9999, 1948, '当代', '中国', '', '公历纪元']
     };
 
-    global.nh = function (y) { //取年号 reign
-        var i, j, c, s = '', ob = global.obb.JNB;
+    var util = global.Util = global.Util || {};
+
+    util.unzip = function (str) {
+        var z10 = "0000000000", z20 = "00000000000000000000"; // z10 + z10
+        var map = {J: '00', I: '000', H: '0000', G: '00000', t: '01', s: '001', r: '0001', q: '00001', p: '000001', o: '0000001', n: '00000001', m: '000000001', l: '0000000001', k: '03', j: '0303', i: '003', h: '003003', g: '0003', f: '00003', e: '000003', d: '0000003', c: '00000003', b: '000000003', a: '0000000003', A: z20 + z20 + z20, B: z20 + z20 + z10, C: z20 + z20, D: z20 + z10, E: z20, F: z10};
+        return str.replace(/\D/g, function (c) {
+            return map[c];
+        });
+    };
+
+    util.getNH = function (y) { //取年号 reign
+        var i, j, c, s = '', ob = dict.JNB;
         for (i = 0; i < ob.length; i += 7) {
             j = ob[i];
             if (y < j || y >= j + ob[i + 1]) continue;

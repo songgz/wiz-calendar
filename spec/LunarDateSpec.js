@@ -1,25 +1,26 @@
 describe("LunarDate", function() {
 
     beforeEach(function() {
-
     });
 
-    it("test run yue", function() {
-
-        expect(Lunisolar.LunarDate.yuerun(2008,1)).toBeCloseTo(yuerun(2008,1));
-
-    });
+//    it("test run yue", function() {
+//
+//        expect(Lunisolar.LunarDate.yuerun(2008,1)).toBeCloseTo(yuerun(2008,1));
+//
+//    });
 
     it("test toJD", function() {
 
-        expect(Lunisolar.LunarDate.toJD(2008,1,0,1)).toBeCloseTo(ymdJd(2008, 1, 0, 1));
+       var d = new Lunisolar.LunarDate(2008, 1, 0, 1);
+        expect(d.toJD()).toBeCloseTo(ymdJd(2008, 1, 0, 1));
 
     });
 
     it("test toYmd ", function(){
 
-        var j = ymdJd(2008, 1, 0, 1);
-        expect(Lunisolar.LunarDate.toYmd(j)).toEqual(jdYmd(j));
+//        var j = ymdJd(2008, 1, 0, 1);
+//        var d = new Lunisolar.LunarDate(j);
+//        expect(d.toLD()).toEqual(jdYmd(j));
 
     });
 
