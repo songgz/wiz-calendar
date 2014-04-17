@@ -3,17 +3,19 @@ var Lunisolar = (function (global) {
     var month = global.SolarMonth = global.SolarMonth || function (year, month) {
         this.year = year;
         this.month = month;
-        this.jd0 =  Math.floor(global.JDate.gd2jd(this.year, this.month, 1, 12, 0, 0));
+        this.firstDay =  new global.SolarDate(Math.floor(global.JDate.gd2jd(this.year, this.month, 1, 12, 0, 0)));
 
         if((this.month + 1) > 12){
-            this.jd1 =  Math.floor(global.JDate.gd2jd(this.year + 1, 1, 1, 12, 0, 0));
+            this.lastDay =  new global.SolarDate(Math.floor(global.JDate.gd2jd(this.year + 1, 1, 1, 12, 0, 0)));
         }else{
-            this.jd1 =  Math.floor(global.JDate.gd2jd(this.year, this.month + 1, 1, 12, 0, 0));
+            this.lastDay =  new global.SolarDate(Math.floor(global.JDate.gd2jd(this.year, this.month + 1, 1, 12, 0, 0)));
         }
 
-        this.days =this.jd1 - this.jd0;
-        this.week= (this.jd0 + 1 + 7000000) % 7; //本月第一天的星期
+        this.days = this.lastDay - this.firstDay;
+        this.week= (this.firstDay + 1 + 7000000) % 7; //本月第一天的星期 //月首的星期
         this.jzYear = this.year -1984 + 12000;  //所属公历年对应的农历干支纪年
+        this.firstLunarDay = this.firstDay.toLD();
+        this.lastLunarDay = this.lastDay.toLD();
 
     };
 
@@ -28,23 +30,43 @@ var Lunisolar = (function (global) {
             return global.Util.getNH(this.year);
         },
         getFirstDay: function(){
-            return new global.SolarDate(this.jd0);
+            return this.firstDay;
         },
-        eachDay: function(fn){
-            for(var i = 0; i < this.days; i++){
-                var ob = {};
-                ob.d0 = Bd0 + i; //儒略日,北京时12:00
-                ob.di = i;     //公历月内日序数
-                ob.y  = By;    //公历年
-                ob.m  = Bm;    //公历月
-                ob.dn = Bdn;   //公历月天数
-                ob.week0 = this.w0; //月首的星期
-                ob.week  = (this.w0+i)%7; //当前日的星期
-                ob.weeki = int2((this.w0+i)/7); //本日所在的周序号
-                ob.weekN = int2((this.w0+Bdn-1)/7) + 1;  //本月的总周数
+        getLunarDay: function(offset){
+            var index = this.firstLunarDay.day  + offset;
+            if (index > this.firstLunarDay.days){
+               if(this.lastLunarDay.month - this.firstLunarDay.month <= 1 ){
+                   index = index % this.lastLunarDay.days;
+               }else{
+                   var d = new global.LunarDate(this.firstDay + offset);
+                   index = index % d.days + 1;
+               }
             }
+            return index;
+        },
+        getLunarDayName: function(offset){
+            var d = this.getLunarDay(offset)
+            if(d === 1){
+                var l = new global.LunarDate(this.firstDay + offset);
+                return l.getMonthName() + "月" + (l.days > 29 ? "大" : "小");
+            }
+            return global.Dict.rmc[this.getLunarDay(offset) - 1];
+        },
+        getWeek: function(offset){
+            return (this.week + offset) % 7;
+        },
+        getWeekName: function(offset){
+            return global.Dict.Weeks[this.getWeek(offset)];
+        },
+        getWeekNo: function(offset){ //本日所在的周序号
+            return Math.floor((this.week + offset) / 7);
+        },
+        getWeeks: function(offset){ //本月的总周数
+            return Math.floor((this.week + offset - 1) / 7) + 1;
+        },
+        getJDE: function(offset){
+            return this.firstDay + offset;    //儒略日,北京时12:00
         }
-
     };
 
     return global;

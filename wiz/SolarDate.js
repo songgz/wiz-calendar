@@ -5,6 +5,9 @@ var Lunisolar = (function (global) {
     };
 
     date.prototype = {
+        valueOf: function () {
+            return this.jde;
+        },
         getWeek: function(){
             return (this.jde + 1 + 7000000) % 7;
         },
