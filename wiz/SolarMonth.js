@@ -66,6 +66,9 @@ var Lunisolar = (function (global) {
         },
         getJDE: function(offset){
             return this.firstDay + offset;    //儒略日,北京时12:00
+        },
+        getLunarDate: function(offset){
+            return new global.LunarDate(this.getJDE(offset));
         }
     };
 

@@ -27,12 +27,12 @@
 //                date.nextMonth();
 //            }
 
-            var month = new Lunisolar.SolarMonth(2014,4);
+            var month = new Lunisolar.SolarMonth(2334,7);
             var first = month.getFirstDay().toLD();
             var str =""  + month.getYearGanZhi() + month.getYearShuXing() + month.getYearHao();
             for(var i = 0; i < month.days; i++){
                 str += "<li>";
-                str += i + 1 + "星" + (month.week + i) % 7 + "农" + (first.day + i);
+                str += i + 1 + "星" + month.getWeekName(i) + "农" + month.getLunarDayName(i);
                 str += "</li>";
             }
 
