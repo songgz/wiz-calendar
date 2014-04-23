@@ -1559,7 +1559,6 @@ function ML_calc() {
     var ob = new Object();
     var t = timeStr2hour(Cml_his.value);
     var jd = JD.JD(year2Ayear(Cml_y.value), Cml_m.value - 0, Cml_d.value - 0 + t / 24)
-
     obb.mingLiBaZi(jd + curTZ / 24 - J2000, Cp11_J.value / radd, ob); //八字计算
     Cal6.innerHTML =
             '<font color=red>  <b>[日标]：</b></font>' + '公历 ' + Cml_y.value + '-' + Cml_m.value + '-' + Cml_d.value + ' 儒略日数 ' + int2(jd + 0.5) + ' 距2000年首' + int2(jd + 0.5 - J2000) + '日<br>'

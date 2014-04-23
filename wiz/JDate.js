@@ -126,7 +126,20 @@ var Lunisolar = (function(global){
         var r = this.DD(jd);
         return this.DD2str(r);
     };
-
+    jd.timeStr = function(jde){ //提取jd中的时间(去除日期)
+        var h,m,s;
+        jde += 0.5;
+        jde = (jde - Math.floor(jde));
+        s = Math.floor(jde * 86400 + 0.5);
+        h = Math.floor( s / 3600);
+        s -= h * 3600;
+        m = Math.floor(s / 60);
+        s -= m * 60;
+        h = "0" + h;
+        m = "0" + m;
+        s = "0" + s;
+        return h.substr(h.length-2,2) + ':' + m.substr(m.length-2,2) + ':' + s.substr(s.length-2,2);
+    };
     jd.prototype = {
         valueOf: function () {
             return this.jd;

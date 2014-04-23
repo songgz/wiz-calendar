@@ -1,8 +1,8 @@
 describe("Lunisolar", function() {
-    var lun;
+
 
     beforeEach(function() {
-        lun = new Lunisolar.Calendar();
+
     });
 
     it("has specified a version number", function() {
