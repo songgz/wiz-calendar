@@ -18,4 +18,18 @@ describe("A JDate is just a function", function() {
         expect(d * 3.0).toBeCloseTo(30);
         expect(d - 3.0).toBeCloseTo(7.0);
     });
+
+    it("test gd2jd", function() {
+        //dj = 2456770.942824074 //2014-4-23 10:37:40   //甲午年 戊辰月 甲子日 己巳时 真太阳 10:24:48
+        var j = Lunisolar.JDate.gd2jd(2014,4,23,10,37,40);
+        expect(j).toBeCloseTo(2456770.942824074);
+
+    });
+
+    it("test DD", function() {
+        //dj = 2456770.942824074 //2014-4-23 10:37:40   //甲午年 戊辰月 甲子日 己巳时 真太阳 10:24:48
+        var d = Lunisolar.JDate.DD(2456770.942824074);
+        expect(d).toEqual({Y:2014,M:4,D:23,h:10,m:37,s:40});
+
+    });
 });

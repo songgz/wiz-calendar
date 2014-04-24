@@ -79,12 +79,17 @@ var Lunisolar = (function(global){
         r.m = Math.floor(F);
         F -= r.m;
         F *= 60;
-        r.s = F;
+        r.s = Math.round(F);
         return r;
     };
-
+//    jd.JD = function (y, m, d) {
+//        var n = 0, G = 0;
+//        if (y * 372 + m * 31 + int2(d) >= 588829)G = 1;
+//        if (m <= 2)m += 12, y--;
+//        if (G)n = int2(y / 100), n = 2 - n + int2(n / 4);
+//        return int2(365.25 * (y + 4716)) + int2(30.6001 * (m + 1)) + d + n - 1524.5;
+//    };
     jd.gd2jd = function (Y, M, D, h, m, s) {
-        //var jd = 0;
         Y = Y || 2000;
         M = M || 1;
         D = D || 1;
@@ -102,8 +107,6 @@ var Lunisolar = (function(global){
             b = 2 - a + Math.floor(a / 4);
         }
         return Math.floor(365.25 * (Y + 4716)) + Math.floor(30.6001 * (M + 1)) + D + b - 1524.5;
-        //if (UTC = 1) jd += JDate.dt(Y);
-        //return jd;
     };
 
     jd.DD2str = function (r) {
@@ -142,7 +145,7 @@ var Lunisolar = (function(global){
     };
     jd.prototype = {
         valueOf: function () {
-            return this.jd;
+            return this.jde;
         }
     };
 

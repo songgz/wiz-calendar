@@ -48,6 +48,11 @@ var Lunisolar = (function (global) {
         this.mjd += pty_zty2(jd2 / 36525) + this.J / Math.PI / 2; //本地真太阳时(使用低精度算法计算时差)
         this.trueSolarTime = global.JDate.timeStr(this.mjd);    //bz_zty真太阳时
 
+        var ts = this.trueSolarTime.split(':');
+        var m = ((ts[0] - 0) % 2 == 0) ? 60 + ts[1] : ts[1] - 0;
+        this.ebMomentIndex = Math.floor(m / 10) % 12;
+        this.hsMonthIndex = ((this.hsHourIndex % 5) * 2 + this.ebMomentIndex % 10) % 10; //五鼠遁
+
         this.mjd += 13 / 24; //转为前一日23点起算(原jd为本日中午12点起算)
         var D = Math.floor(this.mjd);
         var SC = Math.floor((this.mjd - D) * 12); //日数与时辰
@@ -115,14 +120,7 @@ var Lunisolar = (function (global) {
             return this.getHourHS() + this.getHourEB();
         },
         getMoment: function(){
-            var t = this.trueSolarTime.split(':');
-            var m = ((t[0] - 0) % 2 == 0) ? 60 : 0;
-            m = m + (t[1] - 0);
-
-            var z = Math.floor(m / 10) % 12;
-            var g = ((this.hsHourIndex % 5) * 2 + z % 10) % 10; //五鼠遁
-
-            return global.Dict.Gan[g] + global.Dict.Zhi[z];
+            return global.Dict.Gan[this.hsMonthIndex] + global.Dict.Zhi[this.ebMomentIndex];
         }
     };
 

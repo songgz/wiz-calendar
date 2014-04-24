@@ -185,6 +185,9 @@ var Lunisolar = (function (global) {
         toLD: function(){
             return this;
         },
+        toGD: function(){
+            return global.JDate.DD(this.valueOf());
+        },
         getMonthName: function () {
             return Lunisolar.Dict.ymc[(this.month + 1) % 12];
         }
