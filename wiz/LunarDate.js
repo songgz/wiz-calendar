@@ -53,9 +53,9 @@ var Lunisolar = (function (global) {
         }
         if (rm) rm = myYuerun(y1, m1);
         if (rm == 0){
-            return Math.floor(hs + d1 - 1 + 0.5);
+            return Math.floor(hs  - 1 ) + global.JDate.J2000 + d1 + 0.5;
         }else{
-            return Math.floor(hs1 + d1 - 1 + 0.5);
+            return Math.floor(hs1  - 1 ) + global.JDate.J2000 + d1 + 0.5 ;
         }
     };
 
@@ -156,8 +156,9 @@ var Lunisolar = (function (global) {
                 this.leap = arguments[2];
                 this.day = arguments[3];
                 this.jd = myYmdtoJd(this.year, this.month, this.leap, this.day);
-                this.day = this.day - Math.floor(this.day)
-                var t = this.day * 24;
+                var t = this.day;
+                this.day = Math.floor(this.day)
+                t =  (t -this.day) * 24;
                 this.hour = Math.floor(t);
                 t = (t - this.hour) * 60;
                 this.minute = Math.floor(t);
@@ -177,7 +178,7 @@ var Lunisolar = (function (global) {
 
     date.prototype = {
         valueOf: function () {
-            return this.jd + global.JDate.J2000;
+            return this.jd;
         },
         toJD: function(){
             return this.valueOf();

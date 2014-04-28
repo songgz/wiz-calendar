@@ -49,7 +49,7 @@ var Lunisolar = (function (global) {
         this.trueSolarTime = global.JDate.timeStr(this.mjd);    //bz_zty真太阳时
 
         var ts = this.trueSolarTime.split(':');
-        var m = ((ts[0] - 0) % 2 == 0) ? 60 + ts[1] : ts[1] - 0;
+        var m = ((ts[0] - 0) % 2 == 0) ? 60 + (ts[1] - 0) : ts[1] - 0;
         this.ebMomentIndex = Math.floor(m / 10) % 12;
         this.hsMonthIndex = ((this.hsHourIndex % 5) * 2 + this.ebMomentIndex % 10) % 10; //五鼠遁
 
