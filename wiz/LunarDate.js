@@ -53,9 +53,9 @@ var Lunisolar = (function (global) {
         }
         if (rm) rm = myYuerun(y1, m1);
         if (rm == 0){
-            return Math.floor(hs  - 1 ) + global.JDate.J2000 + d1 + 0.5;
+            return Math.floor(hs + d1 - 1 + 0.5 ) + global.JDate.J2000;
         }else{
-            return Math.floor(hs1  - 1 ) + global.JDate.J2000 + d1 + 0.5 ;
+            return Math.floor(hs1 + d1 - 1 + 0.5 ) + global.JDate.J2000;
         }
     };
 

@@ -36,8 +36,8 @@ var Lunisolar = (function (global) {
     };
 
     var bz = global.Bazi = global.Bazi || function (jde, J, timezone) { //命理八字计算。jd为格林尼治UT(J2000起算),J为本地经度,返回在物件ob中
-        this.zone = timezone || (new Date()).getTimezoneOffset() / 60;
-        this.J = (J || 116.383333) / global.Angle.R2D;
+        this.zone = -8; //timezone || (new Date()).getTimezoneOffset() / 60;
+        this.J =  116.383333 / global.Angle.R2D;
         this.jde = jde;
         this.mjd = jde + this.zone / 24  - global.JDate.J2000;
 
@@ -47,11 +47,6 @@ var Lunisolar = (function (global) {
         var k = Math.floor((w / (2 * Math.PI) * 360 + 45 + 15 * 360) / 30); //1984年立春起算的节气数(不含中气)
         this.mjd += pty_zty2(jd2 / 36525) + this.J / Math.PI / 2; //本地真太阳时(使用低精度算法计算时差)
         this.trueSolarTime = global.JDate.timeStr(this.mjd);    //bz_zty真太阳时
-
-        var ts = this.trueSolarTime.split(':');
-        var m = ((ts[0] - 0) % 2 == 0) ? 60 + (ts[1] - 0) : ts[1] - 0;
-        this.ebMomentIndex = Math.floor(m / 10) % 12;
-        this.hsMonthIndex = ((this.hsHourIndex % 5) * 2 + this.ebMomentIndex % 10) % 10; //五鼠遁
 
         this.mjd += 13 / 24; //转为前一日23点起算(原jd为本日中午12点起算)
         var D = Math.floor(this.mjd);
@@ -69,6 +64,11 @@ var Lunisolar = (function (global) {
         v = (D - 1) * 12 + 90000000 + SC;
         this.hsHourIndex = v % 10;
         this.ebHourIndex = v % 12;
+
+        var ts = this.trueSolarTime.split(':');
+        var m = ((ts[0] - 0) % 2 == 0) ? (ts[1] - 0) + 60 : ts[1] - 0;
+        this.ebMomentIndex = Math.floor(m / 10) % 12;
+        this.hsMomentIndex = ((this.hsHourIndex % 5) * 2 + this.ebMomentIndex % 10) % 10; //五鼠遁
 
         v -= SC;
         this.bz_JS = ''; //全天纪时表
@@ -120,7 +120,7 @@ var Lunisolar = (function (global) {
             return this.getHourHS() + this.getHourEB();
         },
         getMoment: function(){
-            return global.Dict.Gan[this.hsMonthIndex] + global.Dict.Zhi[this.ebMomentIndex];
+            return global.Dict.Gan[this.hsMomentIndex] + global.Dict.Zhi[this.ebMomentIndex];
         }
     };
 
