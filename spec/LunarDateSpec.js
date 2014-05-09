@@ -3,37 +3,25 @@ describe("LunarDate", function() {
     beforeEach(function() {
     });
 
-//    it("test run yue", function() {
-//
-//        expect(Lunisolar.LunarDate.yuerun(2008,1)).toBeCloseTo(yuerun(2008,1));
-//
-//    });
 
     it("test toJD", function() {
 
        var d = new Lunisolar.LunarDate(2008, 1, 0, 1);
-        expect(d.toJD()).toBeCloseTo(ymdJd(2008, 1, 0, 1));
-
-    });
-
-    it("test toYmd ", function(){
-
-//        var j = ymdJd(2008, 1, 0, 1);
-//        var d = new Lunisolar.LunarDate(j);
-//        expect(d.toLD()).toEqual(jdYmd(j));
+        //expect(d.toJD()).toBeCloseTo(ymdJd(2008, 1, 0, 1));
+        expect(d.toJD()).toBeCloseTo(Lunisolar.JDate.gd2jd(2008, 2, 7));
 
     });
 
     it("test .toJD", function(){
 
         var d = new Lunisolar.LunarDate(2008,1,0,1);
-        expect(d.toJD()).toEqual(ymdJd(2008, 1, 0, 1));
-        expect(d.valueOf()).toEqual(ymdJd(2008, 1, 0, 1));
+        expect(d.toJD() + 0.5).toEqual(ymdJd(2008, 1, 0, 1));
+        expect(d.valueOf() + 0.5).toEqual(ymdJd(2008, 1, 0, 1));
 
     });
 
     it("test .toLD", function(){
-        var j = ymdJd(2008, 1, 0, 1);
+        var j = ymdJd(2008, 1, 0, 1) - 0.5;
         var d = new Lunisolar.LunarDate(j);
         var t = jdYmd(j);
         expect(d.year).toEqual(t.Y);
@@ -46,28 +34,5 @@ describe("LunarDate", function() {
         expect(d.days).toEqual(t.N);
 
     });
-
-//    it("test new LunarDate ", function(){
-//        var date = new Lunisolar.LunarDate(2456928);
-//        expect(date.getYear()).toEqual(2014);
-//        expect(date.getMonth()).toEqual(9);
-//        expect(date.isLeapMonth()).toEqual(0);
-//    });
-//
-//    it("test new LunarDate ", function(){
-//        var date = new Lunisolar.LunarDate(2456957);
-//        expect(date.getYear()).toEqual(2014);
-//        expect(date.getMonth()).toEqual(9);
-//        expect(date.isLeapMonth()).toEqual(1);
-//    });
-//
-//    it("test nextMonth ", function(){
-//        var date = new Lunisolar.LunarDate(2456957);
-//        date.nextMonth();
-//        expect(date.getYear()).toEqual(2014);
-//        expect(date.getMonth()).toEqual(10);
-//        expect(date.isLeapMonth()).toEqual(0);
-//    });
-
 
 });
