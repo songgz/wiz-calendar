@@ -17,6 +17,34 @@
     <script type="text/javascript" src="../wiz/SolarMonth.js"></script>
     <script type="text/javascript" src="../wiz/Bazi.js"></script>
     <script type="text/javascript">
+        /****************
+天文纪年与普通纪年的转换
+****************/
+function year2Ayear(c){ //传入普通纪年或天文纪年，传回天文纪年
+   var y = String(c).replace(/[^0-9Bb\*-]/g,'');
+   var q = y.substr(0,1);
+ if( q=='B' || q=='b' || q=='*' ){ //通用纪年法(公元前)
+     y = 1-y.substr(1,y.length);
+     if(y>0) { alert('通用纪法的公元前纪法从B.C.1年开始。并且没有公元0年'); return -10000; }
+ }
+ else y -= 0;
+ if( y < -4712 )   alert('超过B.C. 4713不准'); 
+ if( y > 9999  )   alert('超过9999年的农历计算很不准。');
+ return y;
+}
+        function dingQi(){ //定气测试函数
+           var i,T,s="",s2="";
+           var y=2017-2000;
+           var n=24;
+           for(i=0;i<n;i++){
+               T = Lunisolar.Ephem.sun.aLon_t( (y+i*15/360+1)*2*Math.PI );    //精确节气时间计算
+               s2+=Lunisolar.JDate.JD2str( T*36525+Lunisolar.JDate.J2000+8/24-Lunisolar.JDate.dt_T(T*36525) )+Lunisolar.jqmc((i+6)%24);  //日期转为字串
+               if(i%2==1) s2+=' 视黄经'+(i*15)+'<br>'; else s2+='　'
+               if(i%50==0) s+=s2,s2="";
+            }
+            document.getElementById('yearList').innerHTML=s+s2;
+        }
+
         function yearList(){
 //            var date = new Lunisolar.LunarMonth(2456928);
 //            var str = "";
@@ -28,7 +56,7 @@
 //                date.nextMonth();
 //            }
 
-            var month = new Lunisolar.SolarMonth(2334,7);
+            var month = new Lunisolar.SolarMonth(2008,1);
             var first = month.getFirstDay().toLD();
             var str =""  + month.getYearGanZhi() + month.getYearShuXing() + month.getYearHao();
             for(var i = 0; i < month.days; i++){
@@ -44,6 +72,7 @@
 </head>
 <body>
 公元<input type="number" id="key_year" value="2014">年<input type="button" onclick="yearList()" value="确定">
+<input type="button" onclick="dingQi()" value="定气">
 <div id='yearList' ></div>
 
 </body>

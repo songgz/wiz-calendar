@@ -1,13 +1,8 @@
 describe("SolarTerm", function() {
-    var term;
-
-    beforeEach(function() {
-        term = new Lunisolar.SolarTerm();
-    });
-
+    
     it("test getTermK", function() {
-
-        expect(term.getTermK(Lunisolar.JDate.J2000)).toEqual(1);
+    	var term = new Lunisolar.SolarTerm();
+        expect(term.getTermK(Lunisolar.JDate.J2000)).toEqual(18);
 
     });
 

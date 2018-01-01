@@ -6,9 +6,9 @@ var Lunisolar = (function (global) {
         this.firstDay =  new global.SolarDate(Math.floor(global.JDate.gd2jd(this.year, this.month, 1, 12, 0, 0)));
 
         if((this.month + 1) > 12){
-            this.lastDay =  new global.SolarDate(Math.floor(global.JDate.gd2jd(this.year + 1, 1, 1, 12, 0, 0)));
+            this.lastDay =  new global.SolarDate(Math.floor(global.JDate.gd2jd(this.year + 1, 1, 0, 12, 0, 0)));
         }else{
-            this.lastDay =  new global.SolarDate(Math.floor(global.JDate.gd2jd(this.year, this.month + 1, 1, 12, 0, 0)));
+            this.lastDay =  new global.SolarDate(Math.floor(global.JDate.gd2jd(this.year, this.month + 1, 0, 12, 0, 0)));
         }
 
         this.days = this.lastDay - this.firstDay;
@@ -32,14 +32,15 @@ var Lunisolar = (function (global) {
         getFirstDay: function(){
             return this.firstDay;
         },
-        getLunarDay: function(offset){
+        getLunarDay: function(offset){            
             var index = this.firstLunarDay.day  + offset;
-            if (index > this.firstLunarDay.days){
-               if(this.lastLunarDay.month - this.firstLunarDay.month <= 1 ){
-                   index = index % this.lastLunarDay.days;
+
+            if (index > this.firstLunarDay.days){                
+               if(this.lastLunarDay.month - this.firstLunarDay.month > 0 ){
+                   index = (index-this.firstLunarDay.days) % this.lastLunarDay.days;                   
                }else{
-                   var d = new global.LunarDate(this.firstDay + offset);
-                   index = index % d.days + 1;
+                   //var d = new global.LunarDate(this.firstDay + offset);
+                   index = index % this.firstLunarDay.days;
                }
             }
             return index;
@@ -50,7 +51,7 @@ var Lunisolar = (function (global) {
                 var l = new global.LunarDate(this.firstDay + offset);
                 return l.getMonthName() + "月" + (l.days > 29 ? "大" : "小");
             }
-            return global.Dict.rmc[this.getLunarDay(offset) - 1];
+            return global.Dict.rmc[d - 1];
         },
         getWeek: function(offset){
             return (this.week + offset) % 7;

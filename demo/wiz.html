@@ -11,7 +11,7 @@
     <script type="text/javascript" src="../wiz/Ephem.js"></script>
     <script type="text/javascript" src="../wiz/SolarTerm.js"></script>
     <script type="text/javascript" src="../wiz/LunarPhase.js"></script>
-    <script type="text/javascript" src="../src/xjw.js"></script>
+    
     <script type="text/javascript">
         /**********************
          年历面页生成
@@ -34,9 +34,9 @@
                 s1 += YSSQ.ym[i];
                 if (s1.length < 3)s1 += '月';
                 s1 += YSSQ.dx[i] > 29 ? '大' : '小';
-                s1 += ' ' + Lunisolar.JDate.JD2str(YSSQ.HS[i] + J2000).substr(6, 5);
+                s1 += ' ' + Lunisolar.JDate.JD2str(YSSQ.HS[i] + Lunisolar.JDate.J2000).substr(6, 5);
                 v = Lunisolar.Ephem.moon.so_accurate2(YSSQ.HS[i]);
-                s2 = '(' + Lunisolar.JDate.JD2str(v + J2000).substr(9, 11) + ')';
+                s2 = '(' + Lunisolar.JDate.JD2str(v + Lunisolar.JDate.J2000).substr(9, 11) + ')';
                 if (Math.floor(v + 0.5) != YSSQ.HS[i])s2 = '<font color=red>' + s2 + '</font>';
                 s1 += s2;
                 for (j = -2; j < 24; j++) {
@@ -44,9 +44,9 @@
                     if (j == -1)qi = YSSQ.ZQ.pe1;
                     if (j == -2)qi = YSSQ.ZQ.pe2;
                     if (qi < YSSQ.HS[i] || qi >= YSSQ.HS[i + 1])continue;
-                    s1 += ' ' + Lunisolar.jqmc((j + 24) % 24) + Lunisolar.JDate.JD2str(qi + J2000).substr(6, 5);
+                    s1 += ' ' + Lunisolar.jqmc((j + 24) % 24) + Lunisolar.JDate.JD2str(qi + Lunisolar.JDate.J2000).substr(6, 5);
                     v = Lunisolar.Ephem.sun.qi_accurate2(qi);
-                    s2 = '(' + Lunisolar.JDate.JD2str(v + J2000).substr(9, 11) + ')';
+                    s2 = '(' + Lunisolar.JDate.JD2str(v + Lunisolar.JDate.J2000).substr(9, 11) + ')';
                     if (Math.floor(v + 0.5) != qi)s2 = '<font color=red>' + s2 + '</font>';
                     s1 += s2;
                 }
@@ -125,10 +125,10 @@
             //名称转换(月建别名)
             for (var i = 0; i < 14; i++) {
                 var Dm = opt.HS[i] + Lunisolar.JDate.J2000, v2 = opt.ym[i]; //Dm初一的儒略日,v2为月建序号
-                var mc = obb.ymc[v2 % 12]; //月建对应的默认月名称：建子十一,建丑十二,建寅为正……
-                if (Dm >= 1724360 && Dm <= 1729794) mc = obb.ymc[(v2 + 1) % 12]; //  8.01.15至 23.12.02 建子为十二,其它顺推
-                else if (Dm >= 1807724 && Dm <= 1808699) mc = obb.ymc[(v2 + 1) % 12]; //237.04.12至239.12.13 建子为十二,其它顺推
-                else if (Dm >= 1999349 && Dm <= 1999467) mc = obb.ymc[(v2 + 2) % 12]; //761.12.02至762.03.30 建子为正月,其它顺推
+                var mc = Lunisolar.Dict.ymc[v2 % 12]; //月建对应的默认月名称：建子十一,建丑十二,建寅为正……
+                if (Dm >= 1724360 && Dm <= 1729794) mc = Lunisolar.Dict.ymc[(v2 + 1) % 12]; //  8.01.15至 23.12.02 建子为十二,其它顺推
+                else if (Dm >= 1807724 && Dm <= 1808699) mc = Lunisolar.Dict.ymc[(v2 + 1) % 12]; //237.04.12至239.12.13 建子为十二,其它顺推
+                else if (Dm >= 1999349 && Dm <= 1999467) mc = Lunisolar.Dict.ymc[(v2 + 2) % 12]; //761.12.02至762.03.30 建子为正月,其它顺推
                 else if (Dm >= 1973067 && Dm <= 1977052) {
                     if (v2 % 12 == 0) mc = "正";
                     if (v2 == 2) mc = '一';

@@ -1,37 +1,37 @@
 var Lunisolar = (function (global) {
     "use strict";
     var pi2 = Math.PI * 2;
-
-    var myYuerun = function (y1, m1) {
+    
+    var yuerun = function(y1, m1) {
         var w, ms, qi, hs, hs1, j;
-        var pi2 = Math.PI * 2;
         w = (y1 - 2000 + (m1 + 10.5) / 12) * pi2;
         qi = global.Ephem.sun.qi_accurate(w);
-        ms = global.Ephem.ms.aLon(qi / 36525, 10, 3);  //XL.MS_aLon
+        w += pi2 / 24;
+        ms = global.Ephem.ms.aLon(qi / 36525, 10, 3);
         ms = Math.floor((ms + 2) / pi2) * pi2;
         hs = global.Ephem.moon.so_accurate(ms);
-        if (Math.floor(hs + 0.5) > Math.floor(qi + 0.5)) {
+        if (Math.floor(hs + 0.5) > int2(qi + 0.5)) {
             hs1 = hs;
             hs = global.Ephem.moon.so_accurate(ms - pi2);
         } else {
             ms += pi2;
             hs1 = global.Ephem.moon.so_accurate(ms);
         }
-        if (Math.floor(hs + 0.5) > Math.floor(global.Ephem.sun.qi_accurate(w - pi2 / 12) + 0.5) && Math.floor(hs1 + 0.5) <= Math.floor(global.Ephem.sun.qi_accurate(w + pi2 / 24)+0.5)) {
+        if (Math.floor(hs + 0.5) > Math.floor(global.Ephem.sun.qi_accurate(w - pi2 / 12) + 0.5) && Math.floor(hs1 + 0.5) <= Math.floor(global.Ephem.sun.qi_accurate(w) + 0.5)) {
             for (j = 0; j <= 5; j++) {
                 w += pi2 / 12;
                 ms += pi2;
-                if (Math.floor(global.Ephem.moon.so_accurate(ms)+0.5) > Math.floor(global.Ephem.sun.qi_accurate(w)+0.5)) return 0;
+                if (Math.floor(global.Ephem.moon.so_accurate(ms) + 0.5) > Math.floor(global.Ephem.sun.qi_accurate(w) + 0.5))return 0;
             }
             return 1;
         } else return 0;
     };
 
-    var myYmdtoJd = function(y1, m1, rm, d1){
+    var ymdJd = function(y1, m1, rm, d1) {
         var w, ms, zq, hs, hs1, j;
         w = (y1 - 2000 + (m1 + 10) / 12) * pi2;
         zq = global.Ephem.sun.qi_accurate(w);
-        ms = global.Ephem.ms.aLon(zq / 36525, 10, 3); //XL.MS_aLon
+        ms = global.Ephem.ms.aLon(zq / 36525, 10, 3);
         ms = Math.floor((ms + 2) / pi2) * pi2;
         hs = global.Ephem.moon.so_accurate(ms);
         if (Math.floor(hs + 0.5) > Math.floor(zq + 0.5)) {
@@ -41,7 +41,7 @@ var Lunisolar = (function (global) {
             ms += pi2;
             hs1 = global.Ephem.moon.so_accurate(ms);
         }
-        if (Math.floor(hs + 0.5) > Math.floor(global.Ephem.sun.qi_accurate(w - pi2 / 24) + 0.5) && Math.floor(hs1 + 0.5) > Math.floor(global.Ephem.sun.qi_accurate(w + pi2 / 24)+0.5)) {
+        if (Math.floor(hs + 0.5) > int2(global.Ephem.sun.qi_accurate(w - pi2 / 24) + 0.5) && Math.floor(hs1 + 0.5) > int2(global.Ephem.sun.qi_accurate(w + pi2 / 24) + 0.5)) {
             for (j = 0, w += pi2 / 12; j <= 5; j++) {
                 if (Math.floor(global.Ephem.moon.so_accurate(ms + j * pi2) + 0.5) > Math.floor(global.Ephem.sun.qi_accurate(w + j * pi2 / 12) + 0.5)) {
                     hs1 = hs;
@@ -50,21 +50,16 @@ var Lunisolar = (function (global) {
                 }
             }
         }
-        if (rm) rm = myYuerun(y1, m1);
-        if (rm == 0){
-            return Math.floor(hs + Math.floor(d1) - 1 + 0.5) + global.JDate.J2000 - 0.5 + d1 - Math.floor(d1);
-        }else{
-            return Math.floor(hs1 + Math.floor(d1) - 1 + 0.5) + global.JDate.J2000 - 0.5 + d1 - Math.floor(d1);
-        }
+        if (rm)rm = yuerun(y1, m1);
+        if (rm == 0)return Math.floor(hs + d1 - 1 + 0.5) + J2000; else return Math.floor(hs1 + d1 - 1 + 0.5) + J2000;
     };
 
-    var myJdtoYmd = function (jd) {
+    var jdYmd =function (jd) {
         var F, ms, jd1, jd2, w1, w2, wn, y, m, d, n, fd, ry, j;
-        var int2 = Math.floor;
         F = jd + 0.5 - Math.floor(jd + 0.5);
         jd = Math.floor(jd + 0.5) - global.JDate.J2000;
         ms = global.Ephem.ms.aLon(jd / 36525, 10, 3);
-        ms = int2((ms + 2) / pi2) * pi2;
+        ms = Math.floor((ms + 2) / pi2) * pi2;
         jd1 = global.Ephem.moon.so_accurate(ms);
         if (Math.floor(jd1 + 0.5) > jd) {
             jd2 = jd1;
@@ -74,18 +69,14 @@ var Lunisolar = (function (global) {
             jd2 = global.Ephem.moon.so_accurate(ms);
         }
         w1 = global.Ephem.sun.aLon(jd1 / 36525, 3);
-        w1 = int2(w1 / pi2 * 24) * pi2 / 24;
-        while (Math.floor(global.Ephem.sun.qi_accurate(w1) + 0.5) < Math.floor(jd1 + 0.5)) {
-            w1 += pi2 / 24
-        }
+        w1 = Math.floor(w1 / pi2 * 24) * pi2 / 24;
+        while (Math.floor(global.Ephem.sun.qi_accurate(w1) + 0.5) < Math.floor(jd1 + 0.5))w1 += pi2 / 24;
         w2 = w1;
-        while (Math.floor(global.Ephem.sun.qi_accurate(w2 + pi2 / 24) + 0.5) < Math.floor(jd2 + 0.5)) {
-            w2 += pi2 / 24
-        }
-        wn = int2((w2 + 0.1) / pi2 * 24) + 4;
-        y = int2(wn / 24) + 1999;
+        while (Math.floor(global.Ephem.sun.qi_accurate(w2 + pi2 / 24) + 0.5) < Math.floor(jd2 + 0.5))w2 += pi2 / 24;
+        wn = Math.floor((w2 + 0.1) / pi2 * 24) + 4;
+        y = Math.floor(wn / 24) + 1999;
         wn = (wn % 24 + 24) % 24;
-        m = int2(wn / 2);
+        m = Math.floor(wn / 2);
         d = jd - Math.floor(jd1 + 0.5) + 1;
         n = Math.floor(jd2 + 0.5) - Math.floor(jd1 + 0.5);
         fd = w2 - w1 < pi2 / 20 ? wn % 2 : 0;
@@ -112,10 +103,10 @@ var Lunisolar = (function (global) {
         ri.D = d;
         ri.N = n;
         F *= 24;
-        ri.h = int2(F);
+        ri.h = Math.floor(F);
         F -= ri.h;
         F *= 60;
-        ri.m = int2(F);
+        ri.m = Math.floor(F);
         F -= ri.m;
         F *= 60;
         ri.s = F;
@@ -139,7 +130,7 @@ var Lunisolar = (function (global) {
                 break;
             case 1:
                 this.jd = arguments[0] - global.JDate.J2000;
-                var d = myJdtoYmd(arguments[0]);
+                var d = jdYmd(arguments[0]);
                 this.year = d.Y;
                 this.month = d.M;
                 this.day = d.D;
@@ -154,7 +145,7 @@ var Lunisolar = (function (global) {
                 this.month = arguments[1];
                 this.leap = arguments[2];
                 this.day = arguments[3];
-                this.jd = myYmdtoJd(this.year, this.month, this.leap, this.day);
+                this.jd = ymdJd(this.year, this.month, this.leap, this.day);
                 var t = this.day;
                 this.day = Math.floor(this.day)
                 t =  (t -this.day) * 24;
