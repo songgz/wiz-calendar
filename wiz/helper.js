@@ -61,14 +61,14 @@ function showHelp(f){
 }
 
     //html月历生成,结果返回在lun中,curJD为当前日期(用于设置今日标识)
-  var yueLiHTML=function(By,Bm,curJD){
+  var yueLiHTML = function(By,Bm,curJD){
     var month = new Lunisolar.SolarMonth(By,Bm); 
-    var pg='<table border=0 cellpadding=3 cellspacing=1 width="100%">';     
-    pg += '<tr><td colspan=7>';
-    pg += '<span>'+month.getYearHao() +' 农历'+month.getYearGanZhi()+'年【'+month.getYearShuXing()+'年】'+'</span>';
-    pg += '</td></tr>'; //显示年号
+    var pg='<table class="wizdate" border=0 cellpadding=1 cellspacing=1 width="100%">';
+    pg += '<caption>';
+    pg += month.getYearHao() +' 农历'+month.getYearGanZhi()+'年【'+month.getYearShuXing()+'年】';
+    pg += '</caption>'; //显示年号
     //月历处理
-    pg += '<tr><td>日</td><td>一</td><td>二</td><td>三</td><td>四</td><td>五</td><td>六</td></tr>';
+    pg += '<thead><tr><th>日</th><th>一</th><th>二</th><th>三</th><th>四</th><th>五</th><th>六</th></tr></thead><tbody>';
     var w0 = month.getWeek(0);
     var days = month.days;
     var ws = Math.ceil((days + w0) / 7);
@@ -78,14 +78,19 @@ function showHelp(f){
       for(var j=0; j < 7; j++){        
           d = ((i * 7) + j) - w0;
           if(d >= 0 && d < days){
-            pg += '<td>' + (d + 1) + month.getLunarDayName(d) + '</td>';
+            pg += '<td><span';
+            if(j==0 || j==6){
+                pg += ' class="red"';
+            }
+            pg += '>' + (d + 1) + '</span>';
+            pg += month.getLunarDayName(d) + '</td>';
           }else{
             pg += '<td></td>';
           }    
       }
       pg += '</tr>';
     }
-    pg += '</table>';
+    pg += '</tbody></table>';
     return pg;
 };
 
