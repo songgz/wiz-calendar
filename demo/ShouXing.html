@@ -117,7 +117,7 @@
  <td width=500 valign=top>
 <table width="100%" cellspacing=0 cellpadding=0><!--月历表-->
  <tr><td>
-  公元<input type=text id=Cal_y size=4 value=2008>年<input type=text maxlength=2 id=Cal_m size=2 value=1>月
+  公元<input type="number" style="width: 4.5em" id="Cal_y" min="-3000", max="5000" value="2008">年<input type="number" style="width: 2.5em" id="Cal_m" min="1" max="12" value="1">月
   <input type=button value="确定" onclick='getLunar()'>
   <input type=button value="年↑" onclick='changeYear(0)'><input type=button value="年↓" onclick='changeYear(1)'>
   <input type=button value="月↑" onclick='changeMonth(0)'><input type=button value="月↓" onclick='changeMonth(1)'>
@@ -217,7 +217,7 @@
 
 <!--天象表-->
 <tr id=page6 style="display:none"><td class=dBot2 colspan=2 align=center>
-<input id=Ce_y type=text size=4 value=2008>年<input id=Ce_m type=text size=2 value=1 maxleng=2>月<input id=Ce_d type=text size=2 value=1>日 TD
+<input id="Ce_y" type="number" size=4 value="2008">年<input id=Ce_m type=text size=2 value=1 maxleng=2>月<input id=Ce_d type=text size=2 value=1>日 TD
 个数<input id=Ce_n type=text size=4 value=10>
 <a href="javascript:showHelp(5)">帮助</a><br>
 <a href="javascript:tianXiang(1,0)">月亮近点</a> <a href="javascript:tianXiang(2,0)">月亮远点</a>
@@ -1202,14 +1202,14 @@ function ML_settime(){ set_date_screen(1); ML_calc(); }
 **********************/
 
 function changeYear(ud){ //跳到上(或下)一年
- var y = year2Ayear(document.getElementById("Cal_y").value);
+ var y =document.getElementById("Cal_y").value;
  if(y==-10000) return;
  if(ud==0){
    if(y<=-10000) { alert('到顶了！'); return; }
-   document.getElementById("Cal_y").value = Ayear2year(y-1);
+   document.getElementById("Cal_y").value = (y-1);
  }else{
    if(y>=9999) { alert('到顶了！'); return; }
-   document.getElementById("Cal_y").value = Ayear2year(y+1);
+   document.getElementById("Cal_y").value = (y-0+1);
  }
  getLunar();
 }
