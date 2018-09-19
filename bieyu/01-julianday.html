@@ -1,0 +1,173 @@
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>陽曆日期時刻與儒略日之轉换</title>
+</head>
+<body>
+<p style="font-size:12pt"><b>將陽曆年月日時分秒，轉换爲儒略日,再轉换爲陽曆日期</b></p>
+<p style="font-size:9pt">請輸入年月日時分秒<br></p>
+<b>西元:</b><input id=in1 type=text size="4">年
+<input id=in2 type=text size="2">月
+<input id=in3 type=text size="2">日
+<input id=in4 type=text size="2" value=12>時
+<input id=in5 type=text size="2" value=0>分
+<input id=in6 type=text size="2" value=0>秒
+<input type=button onclick="Trans1()" value="轉换爲儒略日"><br>
+<textarea rows=5 cols=80 id=show1></textarea>
+<p style="font-size:12pt"><b>將儒略日轉换爲陽曆日期</b></p>
+<p style="font-size:9pt">請輸入儒略日<br></p>
+<input id=ina type=text size="20" value=2451545>日
+<input type=button onclick="Trans2()" value="轉换爲陽曆日期"><br>
+<textarea rows=5 cols=80 id=show2></textarea>
+
+<script language=javascript>
+    var today = new Date();
+    yr = today.getFullYear();
+    mh = today.getMonth() + 1;
+    dy = today.getDate();
+    document.getElementById("in1").value = yr;
+    document.getElementById("in2").value = mh;
+    document.getElementById("in3").value = dy;
+
+    function Trans1() {
+        var yr = in1.value - 0;
+        var mh = in2.value - 0;
+        var dy = in3.value - 0;
+        var hr = in4.value - 0;
+        var mt = in5.value - 0;
+        var sd = in6.value - 0;
+        var op = false;
+        if (yr < -7000 || yr > 7000) {
+            alert("超出計算能力");
+            return false;
+        }
+        if ((hr < 0 || hr >= 24) || (mt < 0 || mt >= 60) || (sd < 0 || sd >= 60)) {
+            alert("時間超出範圍");
+            return false;
+        }
+        var vd = ValidDate(op, yr, mh, dy)
+        if (vd == true) {
+            hr = hr + ((sd / 60) + mt) / 60;
+            var out1 = "儒略日:";
+            var jd = Jdays(op, yr, mh, dy, hr);
+            out1 += jd;
+            out1 += "\r\n";
+            out1 += "陽曆：";
+            var jt = Jtime(op, jd);
+            out1 += jt;
+        }
+        else {
+            var out1 = "無效的日期";
+        }
+        show1.innerText = out1;	//for IE
+        show1.textContent = out1;	//for mozilla
+    }
+
+    function Trans2() {
+        var op = false;
+        var out2 = "陽曆：";
+        var jd2 = ina.value - 0;
+        var jt2 = Jtime(op, jd2);
+        out2 += jt2;
+        show2.innerText = out2;	//for IE
+        show2.textContent = out2;	//for mozilla
+    }
+
+    function Jdays(op, yr, mh, dy, hr) {//將年月日時，轉换爲儒略日
+        if (yr < -400000 || yr > 400000) return false;
+        var yp = yr + Math.floor((mh - 3) / 10);
+        if (((yr > 1582) || (yr == 1582 && mh > 10) || (yr == 1582 && mh == 10 && dy >= 15)) || op) {
+            var init = 1721119.5;
+            var jdy = Math.floor(yp * 365.25) - Math.floor(yp / 100) + Math.floor(yp / 400);
+        }
+        else {
+            if ((yr < 1582) || (yr == 1582 && mh < 10) || (yr == 1582 && mh == 10 && dy <= 4)) {
+                var init = 1721117.5;
+                var jdy = Math.floor(yp * 365.25);
+            }
+            else {
+                return false;
+            }
+        }
+        var mp = Math.floor(mh + 9) % 12;
+        var jdm = mp * 30 + Math.floor((mp + 1) * 34 / 57);
+        var jdd = dy - 1;
+        var jdh = hr / 24;
+        var jd = jdy + jdm + jdd + jdh + init;
+        return jd;
+    }
+
+    function Jtime(op, jd) {//將儒略日轉换爲年月日時分秒
+        if (jd >= 2299160.5 || op) {
+            var y4h = 146097;
+            var init = 1721119.5;
+        }
+        else {
+            var y4h = 146100;
+            var init = 1721117.5;
+        }
+        var jdr = Math.floor(jd - init);
+        var yh = y4h / 4;
+        var cen = Math.floor((jdr + 0.75) / yh);
+        var d = Math.floor(jdr + 0.75 - cen * yh);
+        var ywl = 1461 / 4;
+        var jy = Math.floor((d + 0.75) / ywl);
+        d = Math.floor(d + 0.75 - ywl * jy + 1);
+        var ml = 153 / 5;
+        mp = Math.floor((d - 0.5) / ml);
+        d = Math.floor((d - 0.5) - 30.6 * mp + 1);
+        var y = (100 * cen) + jy;
+        var m = (mp + 2) % 12 + 1;
+        if (m < 3) y = y + 1;
+        var sd = Math.floor((jd + 0.5 - Math.floor(jd + 0.5)) * 24 * 60 * 60 + 0.00005);
+        var mt = Math.floor(sd / 60);
+        var ss = sd % 60;
+        var hh = Math.floor(mt / 60);
+        var mmt = mt % 60;
+        var yy = Math.floor(y);
+        var mm = Math.floor(m);
+        var dd = Math.floor(d);
+        var yc = "     " + yy;
+        yc = yc.substr(yc.length - 5, 5);
+        var dytm = yc;
+        dytm += "年";
+        dytm += ((mm < 10) ? "0" : "") + mm + "月";
+        dytm += ((dd < 10) ? "0" : "") + dd + "日";
+        dytm += ((hh < 10) ? "0" : "") + hh + "時";
+        dytm += ((mmt < 10) ? "0" : "") + mmt + "分";
+        dytm += ((ss < 10) ? "0" : "") + ss + "秒";
+        return dytm;
+    }
+
+    function ValidDate(op, yy, mm, dd) {//驗證日期是否有效
+        var vd = true;
+        if (mm <= 0 || mm > 12) {
+            alert("月份超出範圍");
+            vd = false;
+        }
+        else {
+            var ndf1 = -(yy % 4 == 0);	//可被四整除
+            var ndf2 = ((yy % 400 == 0) - (yy % 100 == 0)) && (((yy > 1582) && (!op)) || op);
+            var ndf = ndf1 + ndf2;
+            var dom = 30 + ((Math.abs(mm - 7.5) + 0.5) % 2) - (mm == 2) * (2 + ndf);
+            if (dd <= 0 || dd > dom) {
+                if (ndf == 0 && mm == 2 && dd == 29) {
+                    alert("此年無閏月");
+                }
+                else {
+                    alert("日期超出範圍");
+                }
+                vd = false;
+            }
+        }
+        if ((yy == 1582 && mm == 10 && dd >= 5 && dd < 15) && !op) {
+            alert("此日期不存在");
+            vd = false;
+        }
+        return vd;
+    }
+</script>
+<hr>
+<center><p><font size=4 color=blue face=arial><a href="../inright.html">回上頁</p></center>
+</body>
+</html>

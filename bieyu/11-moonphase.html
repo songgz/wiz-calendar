@@ -1,0 +1,193 @@
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>計算並畫出指定日期之月相</title>
+</head>
+<body>
+<p style="font-size:12pt"><b>計算並畫出指定日期之月相</b></p>
+<p style="font-size:9pt">請輸入陽曆日期<br></p>
+
+<b>陽曆:</b><input id=in1 type=text size="4">年
+<input id=in2 type=text size="2">月
+<input id=in3 type=text size="2" 2>日
+
+<input type=button onclick="GetMoonPhase()" value="計算並畫出指定日期之月相"><br>
+
+<canvas id="canvas" width="400" height="400" style="background-color:#333">
+</canvas>
+
+<script Language="javascript">
+    var canvas = document.getElementById("canvas");
+    var ctx = canvas.getContext("2d");
+    var radius = canvas.height / 2;
+    ctx.translate(radius, radius);
+    //radius = radius * 0.90;
+
+
+    var synmonth = 29.530588853;     //synodic month (new Moon to new Moon)
+    var phase;	//定義phase為全域變數
+
+    var today = new Date();
+    yr = today.getFullYear();
+    mh = today.getMonth() + 1;
+    dy = today.getDate();
+    document.getElementById("in1").value = yr;
+    document.getElementById("in2").value = mh;
+    document.getElementById("in3").value = dy;
+
+
+    function GetMoonPhase() {
+//取得輸入之陽曆年月日值
+        var yr = in1.value - 0;	//取得年之輸入值
+        var mh = in2.value - 0;	//取得月之輸入值
+        var dy = in3.value - 0;	//取得日之輸入值
+        var op = false;
+
+//限定範圍
+        if (yr < -7000 || yr > 7000) {
+            alert("超出計算能力");
+            return false;
+        }
+        if (yr < -1000 || yr > 3000) {
+            alert("适用于西元-1000年至西元3000年，超出此范围误差较大");
+        }
+
+//驗證輸入日期的正確性,若不正確則跳離
+        if (ValidDate(op, yr, mh, dy) == false) {
+            return false;
+        }
+
+
+        var jd = Jdays(false, yr, mh, dy, 12);
+        var mnm1 = MeanNewMoonDay(jd);   //求得自2000年1月起第kn個平均朔望日之JD值
+        phase = (jd - mnm1) / synmonth;	//取得月內日數隊平均每月日數之比值,此即為相位(0-1之間)
+
+
+        drawpic();
+    }
+
+    function ValidDate(op, yy, mm, dd) {//驗證日期是否有效
+        var vd = true;
+        if (mm <= 0 || mm > 12) {
+            alert("月份超出範圍");
+            vd = false;
+        }
+        else {
+            var ndf1 = -(yy % 4 == 0);	//可被四整除
+            var ndf2 = ((yy % 400 == 0) - (yy % 100 == 0)) && (((yy > 1582) && (!op)) || op);
+            var ndf = ndf1 + ndf2;
+            var dom = 30 + ((Math.abs(mm - 7.5) + 0.5) % 2) - (mm == 2) * (2 + ndf);
+            if (dd <= 0 || dd > dom) {
+                if (ndf == 0 && mm == 2 && dd == 29) {
+                    alert("此年無閏月");
+                }
+                else {
+                    alert("日期超出範圍");
+                }
+                vd = false;
+            }
+        }
+        if ((yy == 1582 && mm == 10 && dd >= 5 && dd < 15) && !op) {
+            alert("此日期不存在");
+            vd = false;
+        }
+        return vd;
+    }
+
+    function Jdays(op, yr, mh, dy, hr) {//將年月日時，轉换爲儒略日
+        if (yr < -400000 || yr > 400000) return false;
+        var yp = yr + Math.floor((mh - 3) / 10);
+        if (((yr > 1582) || (yr == 1582 && mh > 10) || (yr == 1582 && mh == 10 && dy >= 15)) || op) {
+            var init = 1721119.5;
+            var jdy = Math.floor(yp * 365.25) - Math.floor(yp / 100) + Math.floor(yp / 400);
+        }
+        else {
+            if ((yr < 1582) || (yr == 1582 && mh < 10) || (yr == 1582 && mh == 10 && dy <= 4)) {
+                var init = 1721117.5;
+                var jdy = Math.floor(yp * 365.25);
+            }
+            else {
+                return false;
+            }
+        }
+        var mp = Math.floor(mh + 9) % 12;
+        var jdm = mp * 30 + Math.floor((mp + 1) * 34 / 57);
+        var jdd = dy - 1;
+        var jdh = hr / 24;
+        var jd = jdy + jdm + jdd + jdh + init;
+        return jd;
+    }
+
+    //副程式功能：對於指定日期時刻所屬的朔望月，求出其均值新月點的月序數
+    function MeanNewMoonDay(jd) {
+        var t, thejd, jdt;
+//k為從2000年1月6日14時20分36秒起至指定年月日之陰曆月數,以synodic month為單位
+        var k = Math.floor((jd - 2451550.09765) / synmonth); //2451550.09765為2000年1月6日14時20分36秒之JD值。
+        jdt = 2451550.09765 + k * synmonth;
+//Time in Julian centuries from 2000 January 0.5.
+        t = (jdt - 2451545) / 36525;  //以100年為單位,以2000年1月1日12時為0點
+        thejd = jdt + 0.0001337 * t * t - 0.00000015 * t * t * t + 0.00000000073 * t * t * t * t;
+        //2451550.09765為2000年1月6日14時20分36秒，此為2000年後的第一個均值新月
+        return thejd;
+    }
+
+    function drawpic() {
+        var y;
+        var m;
+        var phai = phase * 2 * Math.PI;
+
+        var ac = Math.abs(Math.cos(phai));
+
+        if (phai <= 0.5 * Math.PI) {
+            var co = "black";
+            var ad = 0;
+        }
+        else {
+            if (phai <= 1 * Math.PI) {
+                var co = "white";
+                var ad = 0;
+            }
+            else {
+                if (phai <= 1.5 * Math.PI) {
+                    var co = "white";
+                    var ad = 1;
+                }
+                else {
+                    if (phai <= 2 * Math.PI) {
+                        var co = "black";
+                        var ad = 1;
+                    }
+                    else {
+                        exit;
+                    }
+                }
+            }
+        }
+
+        ctx.beginPath();
+        ctx.arc(0, 0, 100, (0.5 + ad) * Math.PI, (1.5 + ad) * Math.PI);
+        ctx.fillStyle = "black";
+        ctx.fill();
+        ctx.closePath();
+
+        ctx.beginPath();
+        ctx.arc(0, 0, 100, (1.5 + ad) * Math.PI, (2.5 + ad) * Math.PI);
+        ctx.fillStyle = "white";
+        ctx.fill();
+        ctx.closePath();
+
+        ctx.beginPath();
+        for (y = -100; y <= 100; y++) {
+            m = Math.abs(Math.sqrt(10000 - y * y) * Math.cos(phai));
+            ctx.moveTo(-m, y);
+            ctx.lineTo(+m, y);
+            ctx.strokeStyle = co;
+            ctx.stroke();
+        }
+        ctx.closePath();   				//000000為底色黑色,660000為陰影暗咖啡色
+    }
+</script>
+<hr>
+<center><p><font size=4 color=blue face=arial><a href="../inright.html">回上頁</p></center>
+</body>
+</html>

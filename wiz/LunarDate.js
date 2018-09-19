@@ -51,7 +51,7 @@ var Lunisolar = (function (global) {
             }
         }
         if (rm)rm = yuerun(y1, m1);
-        if (rm == 0)return Math.floor(hs + d1 - 1 + 0.5) + J2000; else return Math.floor(hs1 + d1 - 1 + 0.5) + J2000;
+        if (rm == 0)return Math.floor(hs + d1 - 1 + 0.5) + global.JDate.J2000; else return Math.floor(hs1 + d1 - 1 + 0.5) + global.JDate.J2000;
     };
 
     var jdYmd =function (jd) {

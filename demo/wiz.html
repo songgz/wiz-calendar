@@ -71,7 +71,7 @@
             //该年的气
             //W = Math.floor((jd - 355 + 183) / 365.2422) * 365.2422 + 355;  //355是2000.12冬至,得到较靠近jd的冬至估计值
             //if (this.qi(W) > jd) W -= 365.2422;
-            var solar = new this.SolarTerm();
+            var solar = new Lunisolar.SolarTerm();
             W = solar.getNearWinterSolstice(jd);
             for (var i = 0; i < 25; i++) A[i] = solar.getWinterSolstice(W + 15.2184 * i); //25个节气时刻(北京时间),从冬至开始到下一个冬至以后
             A.pe1 =  solar.getWinterSolstice(W - 15.2);
@@ -79,7 +79,7 @@
             A.pe2 = solar.getWinterSolstice(W - 30.4); //补算二气,确保一年中所有月份的“气”全部被计算在内
 
             //今年"首朔"的日月黄经差w
-            var lunar = new this.LunarPhase();
+            var lunar = new Lunisolar.LunarPhase();
             w = lunar.getNewMoon(A[0]); //求较靠近冬至的朔日
             if (w > A[0]) w -= 29.53;
 
@@ -101,9 +101,9 @@
                 for (i = 0; i < 3; i++) {
                     yy = YY + i - 1;
                     //颁行历年首, 闰月名称, 月建
-                    if (yy >= -721) ns[i] = lunar.getNewMoon(1457698 - this.JDate.J2000 + int2(0.342 + (yy + 721) * 12.368422) * 29.5306), ns[i + 3] = '十三', ns[i + 6] = 2;  //春秋历,ly为-722.12.17
-                    if (yy >= -479) ns[i] = lunar.getNewMoon(1546083 - this.JDate.J2000 + int2(0.500 + (yy + 479) * 12.368422) * 29.5306), ns[i + 3] = '十三', ns[i + 6] = 2;  //战国历,ly为-480.12.11
-                    if (yy >= -220) ns[i] = lunar.getNewMoon(1640641 - this.JDate.J2000 + int2(0.866 + (yy + 220) * 12.369000) * 29.5306), ns[i + 3] = '后九', ns[i + 6] = 11; //秦汉历,ly为-221.10.31
+                    if (yy >= -721) ns[i] = lunar.getNewMoon(1457698 - Lunisolar.JDate.J2000 + int2(0.342 + (yy + 721) * 12.368422) * 29.5306), ns[i + 3] = '十三', ns[i + 6] = 2;  //春秋历,ly为-722.12.17
+                    if (yy >= -479) ns[i] = lunar.getNewMoon(1546083 - Lunisolar.JDate.J2000 + int2(0.500 + (yy + 479) * 12.368422) * 29.5306), ns[i + 3] = '十三', ns[i + 6] = 2;  //战国历,ly为-480.12.11
+                    if (yy >= -220) ns[i] = lunar.getNewMoon(1640641 - Lunisolar.JDate.J2000 + int2(0.866 + (yy + 220) * 12.369000) * 29.5306), ns[i + 3] = '后九', ns[i + 6] = 11; //秦汉历,ly为-221.10.31
                 }
                 var nn, f1;
                 for (var i = 0; i < 14; i++) {

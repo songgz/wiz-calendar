@@ -7,7 +7,7 @@ describe("A JDate is just a function", function() {
     });
 
     it("test valueOf", function() {
-        var d = Lunisolar.JDate(10);
+        var d = new Lunisolar.JDate(10);
         expect(d + 5).toEqual(15);
         expect(d / 3).toBeCloseTo(3.33, 2);
         expect(d * 3).toEqual(30);

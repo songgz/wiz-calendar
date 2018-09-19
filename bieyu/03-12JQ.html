@@ -1,0 +1,290 @@
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>列出指定年自立春開始的12節氣</title>
+</head>
+<body>
+<p style="font-size:12pt"><b>列出指定年自立春開始的12節氣</b></p>
+<p style="font-size:9pt">請输入年<br></p>
+
+<b>西元:</b><input id=in1 type=text size="4">年
+
+<input type=button onclick="jieqi()" value="計算"><br>
+<textarea rows=16 cols=80 id=show1></textarea>
+<script language=javascript>
+
+    var today = new Date();
+    yr = today.getFullYear();
+    document.getElementById("in1").value = yr;
+
+    var ptsa = new Array(485, 203, 199, 182, 156, 136, 77, 74, 70, 58, 52, 50, 45, 44, 29, 18, 17, 16, 14, 12, 12, 12, 9, 8)
+    var ptsb = new Array(324.96, 337.23, 342.08, 27.85, 73.14, 171.52, 222.54, 296.72, 243.58, 119.81, 297.17, 21.02, 247.54, 325.15, 60.93, 155.12, 288.79, 198.04, 199.76, 95.39, 287.11, 320.81, 227.73, 15.45)
+    var ptsc = new Array(1934.136, 32964.467, 20.186, 445267.112, 45036.886, 22518.443, 65928.934, 3034.906, 9037.513, 33718.147, 150.678, 2281.226, 29929.562, 31555.956, 4443.417, 67555.328, 4562.452, 62894.029, 31436.921, 14577.848, 31931.756, 34777.259, 1222.114, 16859.074)
+    var jq = new Array("春分", "清明", "穀雨", "立夏", "小滿", "芒種", "夏至", "小暑", "大暑", "立秋", "處暑", "白露", "秋分", "寒露", "霜降", "立冬", "小雪", "大雪", "冬至", "小寒", "大寒", "立春", "雨水", "驚蟄")
+    var jdez = new Array(30);
+    var jdjq = new Array(26);
+
+    function jieqi() {
+        var i, ptb, dt;
+        var ini = 0, num = 26;
+        var yr = in1.value - 0;
+        if (yr < -7000 || yr > 7000) {
+            alert("超出计算能力");
+            return false;
+        }
+
+        if (yr < -1000 || yr > 3000) {
+            alert("适用于西元-1000年至西元3000年，超出此范围误差较大");
+        }
+        //var jd=VE(yr);
+        //var ty=VE(yr+1)-jd;
+        var jdpjq = new Array, jqc;
+        var out = "";
+        GetPureJQsinceSpring(yr, ptsa, ptsb, ptsc, jdpjq);
+        for (i = 0; i < 12; i++) {
+            jqc = jq[(2 * i + 21) % 24] + ":";
+            jt = Jtime(false, jdpjq[i]);
+            out += jqc + jt + "\r\n";
+        }
+        show1.innerText = out;	//for IE
+        show1.textContent = out;	//for mozilla
+    }
+
+    function VE(yy) {//计算指定年的春分点
+        var yx = yy;
+        if (yx >= 1000 && yx <= 8001) {
+            var m = (yx - 2000) / 1000;
+            jdve = 2451623.80984 + 365242.37404 * m + 0.05169 * m * m - 0.00411 * m * m * m - 0.00057 * m * m * m * m;
+        }
+        else {
+            if (yx >= -8000 && yx < 1000) {
+                m = yx / 1000;
+                jdve = 1721139.29189 + 365242.1374 * m + 0.06134 * m * m + 0.00111 * m * m * m - 0.00071 * m * m * m * m;
+            }
+            else {
+                alter("超出计算能力范围");
+                return false;
+            }
+        }
+        return jdve
+    }
+
+    function MeanJQJD(yy, jdve, ty, ini, num) {
+        var ath = 2 * Math.PI / 24;
+        var tx = (jdve - 2451545) / 365250;
+        var e = 0.0167086342 - 0.0004203654 * tx - 0.0000126734 * tx * tx + 0.0000001444 * tx * tx * tx - 0.0000000002 * tx * tx * tx * tx + 0.0000000003 * tx * tx * tx * tx * tx;
+        var tt = yy / 1000;
+        var vp = 111.25586939 - 17.0119934518333 * tt - 0.044091890166673 * tt * tt - 4.37356166661345E-04 * tt * tt * tt + 8.16716666602386E-06 * tt * tt * tt * tt;
+        var rvp = vp * 2 * Math.PI / 360;
+        var peri = new Array(30);
+        var i;
+        for (i = 1; i <= (ini + num); i++) {
+            var flag = 0;
+            var th = ath * (i - 1) + rvp;
+            if (th > Math.PI && th <= 3 * Math.PI) {
+                th = 2 * Math.PI - th;
+                flag = 1;
+            }
+            if (th > 3 * Math.PI) {
+                th = 4 * Math.PI - th;
+                flag = 2;
+            }
+            var f1 = 2 * Math.atan((Math.sqrt((1 - e) / (1 + e)) * Math.tan(th / 2)));
+            var f2 = (e * Math.sqrt(1 - e * e) * Math.sin(th)) / (1 + e * Math.cos(th));
+            var f = (f1 - f2) * ty / 2 / Math.PI;
+            if (flag == 1) f = ty - f;
+            if (flag == 2) f = 2 * ty - f;
+            peri[i] = f;
+        }
+        for (i = ini; i <= (ini + num); i++) {
+            jdez[i] = jdve + peri[i] - peri[1];
+        }
+        return true;
+    }
+
+    function Perturbation(jdez) {
+        var t = (jdez - 2451545) / 36525;
+        var s = 0;
+        for (k = 0; k <= 23; k++) {
+            s = s + ptsa[k] * Math.cos(ptsb[k] * 2 * Math.PI / 360 + ptsc[k] * 2 * Math.PI / 360 * t);
+        }
+        var w = 35999.373 * t - 2.47;
+        var l = 1 + 0.0334 * Math.cos(w * 2 * Math.PI / 360) + 0.0007 * Math.cos(2 * w * 2 * Math.PI / 360);
+        var ptb = 0.00001 * s / l;
+        return ptb;
+    }
+
+    function DeltaT(yy, mm) {
+        var u, t, dt, y;
+        y = yy + (mm - 0.5) / 12;
+
+        if (y <= -500) {
+            u = (y - 1820) / 100;
+            dt = (-20 + 32 * u * u);
+        }
+        else {
+            if (y < 500) {
+                u = y / 100;
+                dt = (10583.6 - 1014.41 * u + 33.78311 * u * u - 5.952053 * u * u * u - 0.1798452 * u * u * u * u + 0.022174192 * u * u * u * u * u + 0.0090316521 * u * u * u * u * u * u);
+            }
+            else {
+                if (y < 1600) {
+                    u = (y - 1000) / 100;
+                    dt = (1574.2 - 556.01 * u + 71.23472 * u * u + 0.319781 * u * u * u - 0.8503463 * u * u * u * u - 0.005050998 * u * u * u * u * u + 0.0083572073 * u * u * u * u * u * u);
+                }
+                else {
+                    if (y < 1700) {
+                        t = y - 1600;
+                        dt = (120 - 0.9808 * t - 0.01532 * t * t + t * t * t / 7129);
+                    }
+                    else {
+                        if (y < 1800) {
+                            t = y - 1700;
+                            dt = (8.83 + 0.1603 * t - 0.0059285 * t * t + 0.00013336 * t * t * t - t * t * t * t / 1174000);
+                        }
+                        else {
+                            if (y < 1860) {
+                                t = y - 1800;
+                                dt = (13.72 - 0.332447 * t + 0.0068612 * t * t + 0.0041116 * t * t * t - 0.00037436 * t * t * t * t + 0.0000121272 * t * t * t * t * t - 0.0000001699 * t * t * t * t * t * t + 0.000000000875 * t * t * t * t * t * t * t);
+                            }
+                            else {
+                                if (y < 1900) {
+                                    t = y - 1860;
+                                    dt = (7.62 + 0.5737 * t - 0.251754 * t * t + 0.01680668 * t * t * t - 0.0004473624 * t * t * t * t + t * t * t * t * t / 233174);
+                                }
+                                else {
+                                    if (y < 1920) {
+                                        t = y - 1900;
+                                        dt = (-2.79 + 1.494119 * t - 0.0598939 * t * t + 0.0061966 * t * t * t - 0.000197 * t * t * t * t);
+                                    }
+                                    else {
+                                        if (y < 1941) {
+                                            t = y - 1920;
+                                            dt = (21.2 + 0.84493 * t - 0.0761 * t * t + 0.0020936 * t * t * t);
+                                        }
+                                        else {
+                                            if (y < 1961) {
+                                                t = y - 1950;
+                                                dt = (29.07 + 0.407 * t - t * t / 233 + t * t * t / 2547);
+                                            }
+                                            else {
+                                                if (y < 1986) {
+                                                    t = y - 1975;
+                                                    dt = (45.45 + 1.067 * t - t * t / 260 - t * t * t / 718);
+                                                }
+                                                else {
+                                                    if (y < 2005) {
+                                                        t = y - 2000;
+                                                        dt = (63.86 + 0.3345 * t - 0.060374 * t * t + 0.0017275 * t * t * t + 0.000651814 * t * t * t * t + 0.00002373599 * t * t * t * t * t);
+                                                    }
+                                                    else {
+                                                        if (y < 2050) {
+                                                            t = y - 2000;
+                                                            dt = (62.92 + 0.32217 * t + 0.005589 * t * t);
+                                                        }
+                                                        else {
+                                                            if (y < 2150) {
+                                                                u = (y - 1820) / 100;
+                                                                dt = (-20 + 32 * u * u - 0.5628 * (2150 - y));
+                                                            }
+                                                            else {
+                                                                u = (y - 1820) / 100;
+                                                                dt = (-20 + 32 * u * u);
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if (y < 1955 || y >= 2005) dt = dt - (0.000012932 * (y - 1955) * (y - 1955));
+        var DeltaT = dt / 60;    //將秒轉換為分
+        return DeltaT
+    }
+
+    function Jtime(op, jd) {//将儒略日转换为年月日时分秒
+        if (jd >= 2299160.5 || op) {
+            var y4h = 146097;
+            var init = 1721119.5;
+        }
+        else {
+            var y4h = 146100;
+            var init = 1721117.5;
+        }
+        var jdr = Math.floor(jd - init);
+        var yh = y4h / 4;
+        var cen = Math.floor((jdr + 0.75) / yh);
+        var d = Math.floor(jdr + 0.75 - cen * yh);
+        var ywl = 1461 / 4;
+        var jy = Math.floor((d + 0.75) / ywl);
+        d = Math.floor(d + 0.75 - ywl * jy + 1);
+        var ml = 153 / 5;
+        mp = Math.floor((d - 0.5) / ml);
+        d = Math.floor((d - 0.5) - 30.6 * mp + 1);
+        var y = (100 * cen) + jy;
+        var m = (mp + 2) % 12 + 1;
+        if (m < 3) y = y + 1;
+        var sd = Math.floor((jd + 0.5 - Math.floor(jd + 0.5)) * 24 * 60 * 60 + 0.00005);
+        var mt = Math.floor(sd / 60);
+        var ss = sd % 60;
+        var hh = Math.floor(mt / 60);
+        var mmt = mt % 60;
+        var yy = Math.floor(y);
+        var mm = Math.floor(m);
+        var dd = Math.floor(d);
+        var yc = "     " + yy;
+        yc = yc.substr(yc.length - 5, 5);
+        var dytm = yc;
+        dytm += "年";
+        dytm += ((mm < 10) ? "0" : "") + mm + "月";
+        dytm += ((dd < 10) ? "0" : "") + dd + "日";
+        dytm += ((hh < 10) ? "0" : "") + hh + "时";
+        dytm += ((mmt < 10) ? "0" : "") + mmt + "分";
+        dytm += ((ss < 10) ? "0" : "") + ss + "秒";
+        return dytm;
+    }
+
+    //副程式功能：對Perturbaton作調整後的自春分點開始的24節氣,可只取部份
+    function GetAdjustedJQ(yy, ini, num, jdjq) {
+        var veb = VE(yy);
+        var ty = VE(yy + 1) - veb;     //求指定年的春分點及回歸年長
+        if (MeanJQJD(yy, veb, ty, ini, num) == true) {	//輸入指定年,JD,回歸年長,求該回歸年各節氣之長
+            for (i = ini + 1; i <= (ini + num); i++) {
+                ptb = Perturbation(jdez[i]);	//取得受perturbation影響所需微調
+                dt = DeltaT(yy, Math.floor(i / 2) + 3);	//修正dynamical time to Universal time
+                jdjq[i] = jdez[i] + ptb - dt / 60 / 24;	//加上攝動調整值ptb，減去對應的Delta T值(分鐘轉換為日)
+                jdjq[i] = jdjq[i] + 1 / 3;	//因中國時間比格林威治時間先行8小時，即1/3日
+            }
+        }
+
+    }
+
+    //副程式功能：求出以立春點開始的不含中氣之12節氣
+    function GetPureJQsinceSpring(yy, ptsa, ptsb, ptsc, jdpjq) {
+        var sjdjq = new Array;
+        var yea = yy - 1;
+        GetAdjustedJQ(yea, 21, 3, sjdjq);   //求出含指定年立春開始之3個節氣JD值,以前一年的年值代入
+//轉移春分前之立春至驚蟄之節氣至jdpjq變數中，以重整index
+        jdpjq[0] = sjdjq[22];                     //此為立春
+        jdpjq[1] = sjdjq[24];                     //此為驚蟄
+        yea = yy;
+        GetAdjustedJQ(yea, 0, 26, sjdjq);       //求出指定年節氣之JD值,從驚蟄開始，到雨水
+//轉移春分至小寒之節氣至jdpjq變數中，以重整index
+        for (i = 1; i <= 13; i++) {
+            jdpjq[i + 1] = sjdjq[2 * i];
+        }
+    }
+
+</script>
+<hr>
+<center><p><font size=4 color=blue face=arial><a href="../inright.html">回上頁</p></center>
+</body>
+</html>
