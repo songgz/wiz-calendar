@@ -175,7 +175,7 @@ var ht={
  },
  rect: function(x,y,sx,sy)     { return this.rect0(x,y,sx,sy,"rect"); }, //画矩形
  oval: function(x,y,sx,sy)     { return this.rect0(x,y,sx,sy,"oval"); }, //画圆形
- img:  function(x,y,sx,sy,src) { return this.rect0(x,y,sx,sy,'image src="'+src+'"'); }, //载入图片
+ img:  function(x,y,sx,sy,src) { return this.rect0(x,y,sx,sy,'image src2="'+src+'"'); }, //载入图片
  rrect:function(x,y,sx,sy,arc) { return this.rect0(x,y,sx,sy,"roundrect arcsize="+arc); },    //画圆角矩形,arcsize为圆角半径
  arc:  function(x,y,sx,sy,a,b) { return this.rect0(x,y,sx,sy,'arc startAngle="'+a+'" endAngle="'+b+'"'); }, //圆弧
  point:function(x,y,s){ var el=this.oval(x-s/2,y-s/2,s,s); el.fillcolor=this.qb.strokecolor; return el; }//画点

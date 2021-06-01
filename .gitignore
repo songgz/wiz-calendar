@@ -2,3 +2,5 @@ log/*.log
 tmp/
 .idea/
 *.lock
+node_modules/
+coverage/
