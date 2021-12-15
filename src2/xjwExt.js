@@ -569,8 +569,9 @@ function suoN(jd) {
     return Math.floor((jd + 8) / 29.5306);
 }
 function gxc_sunLon(t) {
-    var v = -0.043126 + 628.301955 * t - 0.000002732 * t * t;
-    var e = 0.016708634 - 0.000042037 * t - 0.0000001267 * t * t;
+    var t2 = t*t;
+    var v = -0.043126 + 628.301955 * t - 0.000002732 * t2;
+    var e = 0.016708634 - 0.000042037 * t - 0.0000001267 * t2;
     return (-20.49552 * (1 + e * Math.cos(v))) / rad;
 }
 function gxc_sunLat(t) {

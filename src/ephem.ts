@@ -11,13 +11,13 @@ import {Angle} from "./angle";
 export class Nutation {
     /**
      * 求黄经章动
-     * @param jc - 儒略世纪数
+     * @param mjc - J2000.0算起的儒略世纪数
      */
-    static long(jc: number): number {
-        let i, a, jc2 = Math.pow(jc, 2), dL = 0, B = Nutation.nutB;
+    static long(mjc: number): number {
+        let i, a, jc2 = Math.pow(mjc, 2), dL = 0, B = Nutation.nutB;
         for (i = 0; i < B.length; i += 5) {
-            if (i == 0) a = -1.742 * jc; else a = 0;
-            dL += (B[i + 3] + a) * Math.sin(B[i] + B[i + 1] * jc + B[i + 2] * jc2);
+            if (i == 0) a = -1.742 * mjc; else a = 0;
+            dL += (B[i + 3] + a) * Math.sin(B[i] + B[i + 1] * mjc + B[i + 2] * jc2);
         }
         return dL / 100 / Angle.R2A;
     }
@@ -38,16 +38,20 @@ export class Nutation {
 export class Earth {
     /**
      * 求地球的黄经
-     * @param jc - 儒略世纪数
+     * @param mjc - J2000.0算起的儒略世纪数
      * @param n - 计算项数，控制精度
      */
-    static long(jc: number, n: number): number { //地球经度计算,返回Date分点黄经,传入世纪数、取项数   //jc儒略世纪数,n计算项数
-        return Vsop87.earth.orbit(0, jc, n);
+    static long(mjc: number, n: number): number {
+        return Vsop87.earth.orbit(0, mjc, n);
     }
 
-    static v(jc: number) { //地球速度,jc是世纪数,误差小于0.0003
-        const f = 628.307585 * jc;
-        return 628.332 + 21 * Math.sin(1.527 + f) + 0.44 * Math.sin(1.48 + f * 2) + 0.129 * Math.sin(5.82 + f) * jc + 0.00055 * Math.sin(4.21 + f) * jc * jc;
+    /**
+     * 求地球的速度，误差小于0.0003
+     * @param mjc - J2000.0算起的儒略世纪数
+     */
+    static v(mjc: number) {
+        const f = 628.307585 * mjc;
+        return 628.332 + 21 * Math.sin(1.527 + f) + 0.44 * Math.sin(1.48 + f * 2) + 0.129 * Math.sin(5.82 + f) * mjc + 0.00055 * Math.sin(4.21 + f) * mjc * mjc;
     }
 }
 
@@ -58,12 +62,12 @@ export class Sun {
     static MeanV = 628.3319653318;
     /***
      * 求太阳的黄经光行差
-     * @param jc - 是儒略世纪数
+     * @param mjc - J2000.0算起的儒略世纪数
      */
-    static aberrationLong(jc: number): number {
-        const jc2 = Math.pow(jc, 2);
-        const v = -0.043126 + 628.301955 * jc - 0.000002732 * jc2; //平近点角
-        const e = 0.016708634 - 0.000042037 * jc - 0.0000001267 * jc2; //地球轨道偏心率
+    static longAberration(mjc: number): number {
+        const jc2 = Math.pow(mjc, 2);
+        const v = -0.043126 + 628.301955 * mjc - 0.000002732 * jc2; //平近点角
+        const e = 0.016708634 - 0.000042037 * mjc - 0.0000001267 * jc2; //地球轨道偏心率
         return (-20.49552 * (1 + e * Math.cos(v))) / Angle.R2A;
     }
 
@@ -74,7 +78,7 @@ export class Sun {
      * @param n - 计算项数，项数越大精度越高
      */
     static aLong(mjc: number, n: number): number {
-        return Sun.long(mjc, n) + Nutation.long(mjc) + Sun.aberrationLong(mjc);
+        return Sun.long(mjc, n) + Nutation.long(mjc) + Sun.longAberration(mjc);
     }
 
     static long(jc: number, n: number) {
@@ -237,7 +241,7 @@ export class MoonPhase {
      * @param sn - 日的精度计算项数
      */
     static aLongD(mjc: number, mn: number, sn: number) {
-        return Moon.long(mjc, mn) + Moon.aberrationLong(mjc) - (Sun.long(mjc, sn) + Sun.aberrationLong(mjc));
+        return Moon.long(mjc, mn) + Moon.aberrationLong(mjc) - (Sun.long(mjc, sn) + Sun.longAberration(mjc));
     }
 
     /**

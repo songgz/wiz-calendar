@@ -1,6 +1,6 @@
 var Lunisolar = (function(global){
     "use strict";
-    global.MPP02 =  /** @class */ (function () {
+    global.Mpp02 =  /** @class */ (function () {
         function MPP02() {
         }
         MPP02.prototype.orbit = function (zn, t, n) {

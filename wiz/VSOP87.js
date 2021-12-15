@@ -1,6 +1,6 @@
 var Lunisolar = (function(global){
     "use strict";
-    global.VSOP87 = /** @class */ (function () {
+    global.Vsop87 = /** @class */ (function () {
         function VSOP87(xt) {
             this.xt = xt || 0;
         }
