@@ -11,6 +11,7 @@
     "test": "jest --coverage",
     "build1": "tsc --build",
     "build": "webpack",
+    "dev": "webpack-dev-server --open",
     "start": "webpack serve --open",
     "clean": "tsc --build --clean"
   },

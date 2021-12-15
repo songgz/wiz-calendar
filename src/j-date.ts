@@ -1,14 +1,6 @@
+// Julian Date
 export class JDate {
-    private jdn: number;
-
-    constructor(jdn: number){
-        this.jdn = jdn || 0;
-    }
-
-    valueOf() {
-        return this.jdn;
-    }
-
+    static J2000: number = 2451545.0; //2000年前儒略日数(2000-1-1 12:00:00格林威治平时)
     static DTS: number[] = [ // TD - UT1 世界时与原子时之差计算表
         -4000, 108371.7, -13036.80, 392.000, 0.0000,
         -500, 17201.0, -627.82, 16.170, -0.3413,
@@ -31,12 +23,9 @@ export class JDate {
         2000, 63.87, 0.1, 0, 0,
         2005, 64.7, 0.4, 0, 0, //一次项记为x,则 10x=0.4秒/年*(2015-2005),解得x=0.4
         2015, 69, 0, 0, 0];
-
-    static J2000: number = 2451545.0; //2000年前儒略日数(2000-1-1 12:00:00格林威治平时)
-
     //输入公历年，返回秒Delta Time
-    static dt(year: number) { //力学时和世界时之间的精确差值 ΔT = TD - UT
-        var dts = JDate.DTS, i, t1, t2, t3, dt = 0;
+    static deltaT(year: number) { //力学时和世界时之间的精确差值 ΔT = TD - UT
+        let dts = JDate.DTS, i, t1, t2, t3, dt = 0;
         if ((year >= -4000) && (year < 2015)) {
             for (i = 0; i < dts.length; i += 5) {
                 if (year < dts[i + 5]) {
@@ -48,8 +37,8 @@ export class JDate {
                 }
             }
         } else {
-            var jsd = 31; //加速度sjd是y1年之后的加速度估计。瑞士星历表jsd=31,NASA网站jsd=32,skmap的jsd=29
-            var dy = (year - 1820) / 100;
+            const jsd = 31; //加速度sjd是y1年之后的加速度估计。瑞士星历表jsd=31,NASA网站jsd=32,skmap的jsd=29
+            let dy = (year - 1820) / 100;
             if (year > 2015 + 100) {
                 dt = -20 + jsd * dy * dy;
             } else {
@@ -65,10 +54,10 @@ export class JDate {
     //jd = mjd+2400000.5;
     //return day
     static dt_T(mjd: number) {
-        return JDate.dt(mjd / 365.2425 + 2000) / 86400.0;
+        return JDate.deltaT(mjd / 365.2425 + 2000) / 86400.0;
     }
 
-    static gd2jd(Y: number, M: number, D: number, h: number, m: number, s: number) {
+    static gd2jd(Y: number, M: number, D: number, h?: number, m?: number, s?: number) {
         Y = Y || 2000;
         M = M || 1;
         D = D || 1;
@@ -146,4 +135,25 @@ export class JDate {
         s = "0" + s;
         return h.substr(h.length-2,2) + ':' + m.substr(m.length-2,2) + ':' + s.substr(s.length-2,2);
     }
+
+    static fromUTC(Y: number, M: number, D: number, h?: number, m?: number, s?: number) {
+
+        return new JDate(JDate.gd2jd(Y, M, D, h, m, s));
+    }
+
+    private jdn: number; //the julian day number
+
+    constructor(jdn: number){
+        this.jdn = jdn || 0;
+    }
+
+    valueOf() {
+        return this.jdn;
+    }
+
+
+
+
+
+
 }

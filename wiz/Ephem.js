@@ -30,7 +30,7 @@ var Lunisolar = (function(global){
 
     ephem.earth = {
         lon: function (t, n) { //地球经度计算,返回Date分点黄经,传入世纪数、取项数   //t儒略世纪数,n计算项数
-            return global.VSOP87.earth.orbit(0, t, n);
+            return global.Vsop87.earth.orbit(0, t, n);
         },
 
         v: function (t) { //地球速度,t是世纪数,误差小于万分3
@@ -117,7 +117,7 @@ var Lunisolar = (function(global){
 
     ephem.moon = {
         lon: function (t, n) {
-            return global.MPP02.moon.orbit(0, t, n);  //  XL1_calc(0,t,n)  //月球经度计算,返回Date分点黄经,传入世纪数,n是项数比例
+            return global.Mpp02.moon.orbit(0, t, n);  //  XL1_calc(0,t,n)  //月球经度计算,返回Date分点黄经,传入世纪数,n是项数比例
         },
         v: function (t) { //月球速度计算,传入世经数
             var v = 8399.71 - 914 * Math.sin(0.7848 + 8328.691425 * t + 0.0001523 * t * t); //误差小于5%

@@ -1,4 +1,4 @@
-import {LunarDate} from "./LunarDate";
+import {LunarDate} from "./lunar-date";
 
 class SolarDate {
     private  jde: number;
