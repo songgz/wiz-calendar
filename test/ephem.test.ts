@@ -1,4 +1,4 @@
-import {Earth, Nutation, Sun} from "../src/ephem";
+import {Earth, Moon, MoonPhase, Nutation, Sun} from "../src/ephem";
 
 describe('Nutation Class', () => {
     test('long method', () => {
@@ -17,11 +17,43 @@ describe('Earth Class', () => {
 });
 
 describe('Sun Class', () => {
-    test('aberrationLong method', () => {
+    test('longAberration method', () => {
         expect(Sun.longAberration(2443259.9)).toBeCloseTo(62.49560759520799, 8);
     });
 
     test('aLong method', () => {
         expect(Sun.aLong(2443259.9, 64)).toBeCloseTo(-8809681237664844000, 8);
+    });
+
+    test('jc method', () => {
+        expect(Sun.jc(2443259.9)).toBeCloseTo(3850.507554298232, 8);
+    });
+
+    test('jc2 method', () => {
+        expect(Sun.jc2(2443259.9)).toBeCloseTo(4032.0006009355775, 8);
+    });
+});
+
+describe('Moon Class', () => {
+    test('long method', () => {
+        expect(Moon.long(2443259.9, 64)).toBeCloseTo(-7524816295101071000, 8);
+    });
+
+    test('v method', () => {
+        expect(Moon.v(2443259.9)).toBeCloseTo(9369.257215821703, 8);
+    });
+});
+
+describe('MoonPhase Class', () => {
+    test('aLongD method', () => {
+        expect(MoonPhase.aLongD(2443259.9, 20, 10)).toBeCloseTo(1620980256488352800, 8);
+    });
+
+    test('jc method', () => {
+        expect(MoonPhase.jc(2443259.9)).toBeCloseTo(314.39281238895694, 8);
+    });
+
+    test('jc2 method', () => {
+        expect(MoonPhase.jc2(2443259.9)).toBeCloseTo(314.39299994517637, 8);
     });
 });

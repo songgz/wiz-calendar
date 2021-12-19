@@ -65,7 +65,7 @@ var Lunisolar = (function(global){
                         index: i
                     });
                     if (i) {
-                        ar[i - 1].days = ar[i].JD - ar[i - 1].JD;
+                        ar[i - 1].daysOfMonth = ar[i].JD - ar[i - 1].JD;
                     }
                 }
                 if (ar[13].JD <= terms[24].JD) {

@@ -439,7 +439,7 @@ var msc={
   //基本参数计算
   this.T=T, this.L=L, this.fa=fa;
   this.dt = dt_T(T); //TD-UT
-  this.jd = T - this.dt;    //UT
+  this.mjd = T - this.dt;    //UT
   T/=36525;
   var zd = nutation2(T);
   this.dL = zd[0];   //黄经章

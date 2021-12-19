@@ -17,9 +17,9 @@ export class Vsop87 {
      */
     orbit(zn: number, t: number, n: number) {
         t /= 10; //转为儒略千年数
-        var v = 0, tn = 1;
-        var F = Vsop87.orbits[this.xt], n1, n2, N;
-        var n0, pn = zn * 6 + 1, N0 = F[pn + 1] - F[pn]; //N0序列总数
+        let v = 0, tn = 1;
+        let F = Vsop87.orbits[this.xt], n1, n2, N;
+        let n0, pn = zn * 6 + 1, N0 = F[pn + 1] - F[pn]; //N0序列总数
         for (let i = 0; i < 6; i++) {
             n1 = F[pn + i], n2 = F[pn + 1 + i], n0 = n2 - n1;
             if (!n0) continue;
@@ -39,12 +39,12 @@ export class Vsop87 {
         }
         v /= F[0];
         if (this.xt == 0) { //地球
-            var t2 = t * t, t3 = t2 * t; //千年数的各次方
+            const t2 = t * t, t3 = t2 * t; //千年数的各次方
             if (zn == 0) v += (-0.0728 - 2.7702 * t - 1.1019 * t2 - 0.0996 * t3) / Vsop87.R2A;
             if (zn == 1) v += (+0.0000 + 0.0004 * t + 0.0004 * t2 - 0.0026 * t3) / Vsop87.R2A;
             if (zn == 2) v += (-0.0020 + 0.0044 * t + 0.0213 * t2 - 0.0250 * t3) / 1000000;
         } else { //其它行星
-            var dv = Vsop87.xzb[ (this.xt - 1) * 3 + zn ];
+            const dv = Vsop87.xzb[(this.xt - 1) * 3 + zn];
             if (zn == 0) v += -3 * t / Vsop87.R2A;
             if (zn == 2) v += dv / 1000000;
             else      v += dv / Vsop87.R2A;

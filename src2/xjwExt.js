@@ -1512,7 +1512,7 @@ function lineOvl(x1, y1, dx, dy, r, ba) {
 var msc = {calc: function (T, L, fa, high) {
     this.T = T, this.L = L, this.fa = fa;
     this.dt = dt_T(T);
-    this.jd = T - this.dt;
+    this.mjd = T - this.dt;
     T /= 36525;
     var zd = nutation2(T);
     this.dL = zd[0];

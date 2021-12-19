@@ -2,7 +2,7 @@ var Lunisolar = (function (global) {
     "use strict";
     var pi2 = global.Ephem.PI2;
     var month = global.LunarMonth = global.LunarMonth || function (jd) {
-        this.jd = jd - global.JDate.J2000;
+        this.mjd = jd - global.JDate.J2000;
         this.preNewMoonMS = 0;
         this.preTermSun = 0;
         this.first = 0;

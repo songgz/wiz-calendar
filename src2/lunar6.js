@@ -85,7 +85,7 @@
 						index: i
 					});
 					if (i) {
-						ar[i - 1].days = ar[i].JD - ar[i - 1].JD;
+						ar[i - 1].daysOfMonth = ar[i].JD - ar[i - 1].JD;
 					}
 				}
 				if (ar[13].JD <= terms[24].JD) {
@@ -424,7 +424,8 @@
 			'1144': 'a,感恩节(美国)',
 			'1021': 'a,感恩节(加拿大)'
 		}
-	};	
+	};
+	
 	Lunar.prototype.festival = function(){
 		var y = this.oDate.getFullYear(), m = this.oDate.getMonth() + 1, d = this.oDate.getDate(), skey = align(m) + align(d);
 		var day = this.oDate.getDay(), nWeek = Math.ceil(d / 7), wkey = align(m) + nWeek + day;
@@ -460,4 +461,5 @@
 	function align(n){
 		return (n < 10 ? '0' : '') + n;
 	}
-})();
+})();
+

@@ -11,7 +11,7 @@ var Lunisolar = (function (global) {
             this.lastDay =  new global.SolarDate(Math.floor(global.JDate.gd2jd(this.year, this.month + 1, 0, 12, 0, 0)));
         }
 
-        this.days = this.lastDay - this.firstDay;
+        this.daysOfMonth = this.lastDay - this.firstDay;
         this.week= (this.firstDay + 1 + 7000000) % 7; //本月第一天的星期 //月首的星期
         this.jzYear = this.year -1984 + 12000;  //所属公历年对应的农历干支纪年
         this.firstLunarDay = this.firstDay.toLD();
@@ -35,12 +35,12 @@ var Lunisolar = (function (global) {
         getLunarDay: function(offset){            
             var index = this.firstLunarDay.day  + offset;
 
-            if (index > this.firstLunarDay.days){                
+            if (index > this.firstLunarDay.daysOfMonth){
                if(this.lastLunarDay.month - this.firstLunarDay.month > 0 ){
-                   index = (index-this.firstLunarDay.days) % this.lastLunarDay.days;                   
+                   index = (index-this.firstLunarDay.daysOfMonth) % this.lastLunarDay.days;
                }else{
                    //var d = new global.LunarDate(this.firstDay + offset);
-                   index = index % this.firstLunarDay.days;
+                   index = index % this.firstLunarDay.daysOfMonth;
                }
             }
             return index;
@@ -49,7 +49,7 @@ var Lunisolar = (function (global) {
             var d = this.getLunarDay(offset)
             if(d === 1){
                 var l = new global.LunarDate(this.firstDay + offset);
-                return l.getMonthName() + "月" + (l.days > 29 ? "大" : "小");
+                return l.getMonthName() + "月" + (l.daysOfMonth > 29 ? "大" : "小");
             }
             return global.Dict.rmc[d - 1];
         },

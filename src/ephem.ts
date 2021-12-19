@@ -88,7 +88,6 @@ export class Sun {
     /**
      * 根据太阳视黄经，求近似时间，单位为儒略世纪数
      * @param aLong - 太阳的视黄经
-     * 628.3319653318 - 太阳黄经平速度
      */
     private static approxJC(aLong: number): number {
         return (aLong - 1.75347 - Math.PI) / Sun.MeanV;
@@ -222,14 +221,14 @@ export class Moon {
      */
     static closestNewMoon(jd: number) {
         let w = Math.floor((jd + 8) / 29.5306) * Angle.PI2; //合朔时的日月黄经差
-        return MoonPhase.jd(w);
+        return MoonPhase.mjd(w);
     }
 
     static closestNewMoon2(jd: number) {
         let ms = MoonPhase.aLongD(jd / 36525, 10, 3);
         ms = Math.floor((ms + 2) / Angle.PI2) * Angle.PI2; //合朔时的日月黄经差
         //console.log(ms);
-        return MoonPhase.jd(ms);
+        return MoonPhase.mjd(ms);
     }
 }
 
@@ -280,8 +279,9 @@ export class MoonPhase {
      * 根据月日视黄经差，求东八区朔日时间，单位儒略日
      * 高精度
      * @param aLongD - 月日视黄经差
+     * @return - J2000.0算起的儒略日
      */
-    static jd(aLongD: number): number {
+    static mjd(aLongD: number): number {
         const t = MoonPhase.jc(aLongD) * 36525;
         return t - JDate.dt_T(t) + 8 / 24;
     }
