@@ -121,11 +121,11 @@ export class JDate {
         return this.DD2str(r);
     }
 
-    static timeStr(jde: number){ //提取jd中的时间(去除日期)
-        var h,m,s;
-        jde += 0.5;
-        jde = (jde - Math.floor(jde));
-        s = Math.floor(jde * 86400 + 0.5);
+    static timeStr(jd: number){ //提取jd中的时间(去除日期)
+        let h, m, s;
+        jd += 0.5;
+        jd = (jd - Math.floor(jd));
+        s = Math.floor(jd * 86400 + 0.5);
         h = Math.floor( s / 3600);
         s -= h * 3600;
         m = Math.floor(s / 60);
@@ -134,6 +134,17 @@ export class JDate {
         m = "0" + m;
         s = "0" + s;
         return h.substr(h.length-2,2) + ':' + m.substr(m.length-2,2) + ':' + s.substr(s.length-2,2);
+    }
+
+    static getTime(mjd: number) {
+        let jd = mjd + 0.5;
+        jd = (jd - Math.floor(jd));
+        let s = Math.floor(jd * 86400 + 0.5);
+        let h = Math.floor(s / 3600);
+        s -= h * 3600;
+        let m = Math.floor(s / 60);
+        s -= m * 60;
+        return h.toString().padStart(2,'0') + ':' + m.toString().padStart(2,'0') + ':' + m.toString().padStart(2, '0');
     }
 
     static fromUTC(Y: number, M: number, D: number, h?: number, m?: number, s?: number) {

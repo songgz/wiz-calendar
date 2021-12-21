@@ -63,7 +63,7 @@ export class LunarDate {
     hasLeapMonth(): boolean {
         let nextNewMoon;
         let w = (this.year - 2000 + (this.month + 10.5) / 12) * Angle.PI2; //节气
-        let majorSolarTerm = Sun.jd(w);
+        let majorSolarTerm = Sun.mjd(w);
         let solarTermRad24 = Angle.PI2 / 24;
         let ms = MoonPhase.aLongD(majorSolarTerm / 36525, 10, 3);
         ms = Math.floor((ms + 2) / Angle.PI2) * Angle.PI2; //朔日
@@ -77,13 +77,13 @@ export class LunarDate {
             nextNewMoon = MoonPhase.mjd(ms);
         }
 
-        if (Math.floor(newMoon + 0.5) > Math.floor(Sun.jd(w - solarTermRad24) + 0.5) && Math.floor(nextNewMoon + 0.5) <= Math.floor(Sun.jd(w + solarTermRad24) + 0.5)) {
+        if (Math.floor(newMoon + 0.5) > Math.floor(Sun.mjd(w - solarTermRad24) + 0.5) && Math.floor(nextNewMoon + 0.5) <= Math.floor(Sun.mjd(w + solarTermRad24) + 0.5)) {
             let solarTermRad12 = Angle.PI2 / 12;
             w += solarTermRad24;
             for (let j = 0; j <= 5; j++) {
                 w += solarTermRad12; //下一个中气
                 ms += Angle.PI2; //下一个朔日
-                if (Math.floor(MoonPhase.mjd(ms) + 0.5) > Math.floor(Sun.jd(w) + 0.5)) {
+                if (Math.floor(MoonPhase.mjd(ms) + 0.5) > Math.floor(Sun.mjd(w) + 0.5)) {
                     return this.leap = false;
                 }
             }
@@ -102,7 +102,7 @@ export class LunarDate {
     calcMJD() {
         let nextNewMoon;
         let w = (this.year - 2000 + (this.month + 10) / 12) * Angle.PI2; //中气
-        let minorSolarTerm = Sun.jd(w);
+        let minorSolarTerm = Sun.mjd(w);
         let ms = MoonPhase.aLongD(minorSolarTerm / 36525, 10, 3);
         ms = Math.floor((ms + 2) / Angle.PI2) * Angle.PI2; //合朔
         let newMoon = MoonPhase.mjd(ms);
@@ -115,10 +115,10 @@ export class LunarDate {
         }
         let solarTermRad24 = Angle.PI2 / 24;
         let solarTermRad12 = Angle.PI2 / 12;
-        if (Math.floor(newMoon + 0.5) > Math.floor(Sun.jd(w - solarTermRad24) + 0.5) && Math.floor(nextNewMoon + 0.5) > Math.floor(Sun.jd(w + solarTermRad24) + 0.5)) {
+        if (Math.floor(newMoon + 0.5) > Math.floor(Sun.mjd(w - solarTermRad24) + 0.5) && Math.floor(nextNewMoon + 0.5) > Math.floor(Sun.mjd(w + solarTermRad24) + 0.5)) {
             w += solarTermRad12;
             for (let j = 0; j <= 5; j++) {
-                if (Math.floor(MoonPhase.mjd(ms + j * Angle.PI2) + 0.5) > Math.floor(Sun.jd(w + j * Angle.PI2 / 12) + 0.5)) {
+                if (Math.floor(MoonPhase.mjd(ms + j * Angle.PI2) + 0.5) > Math.floor(Sun.mjd(w + j * Angle.PI2 / 12) + 0.5)) {
                     nextNewMoon = newMoon;
                     newMoon = MoonPhase.mjd(ms - 2 * Angle.PI2);
                     break;
@@ -156,11 +156,11 @@ export class LunarDate {
 
         w1 = Sun.aLong(newMoon / 36525, 3);
         w1 = Math.floor(w1 / solarTermRad24) * solarTermRad24; //节气
-        while (Math.floor(Sun.jd(w1) + 0.5) < Math.floor(newMoon + 0.5)) {
+        while (Math.floor(Sun.mjd(w1) + 0.5) < Math.floor(newMoon + 0.5)) {
             w1 += solarTermRad24;
         }
         w2 = w1;
-        while (Math.floor(Sun.jd(w2 + solarTermRad24) + 0.5) < Math.floor(nextNewMoon + 0.5)) {
+        while (Math.floor(Sun.mjd(w2 + solarTermRad24) + 0.5) < Math.floor(nextNewMoon + 0.5)) {
             w2 += solarTermRad24;
         }
         wn = Math.floor((w2 + 0.1) / solarTermRad24) + 4; //节气数
@@ -174,7 +174,7 @@ export class LunarDate {
         ms += Angle.PI2;
         w2 += 1.5 * solarTermRad12;
         for (let j = 0; fd && j <= 5; j++) {
-            if (Math.floor(Sun.jd(w2 + j * solarTermRad12) + 0.5) < Math.floor(MoonPhase.mjd(ms + j * Angle.PI2) + 0.5)) {
+            if (Math.floor(Sun.mjd(w2 + j * solarTermRad12) + 0.5) < Math.floor(MoonPhase.mjd(ms + j * Angle.PI2) + 0.5)) {
                 m++;
                 ry = 0;
                 if (m > 12) {
@@ -230,6 +230,10 @@ export class LunarDate {
         };
     }
 
+    getDate() {
+        return this.year.toString();
+    }
+
     getSixtyYearCycle() {
         return this.sixtyYearCycle = this.sixtyYearCycle || this.year - 1984 + 12000;
     }
@@ -246,29 +250,38 @@ export class LunarDate {
         return LunarDate.Animals[this.getSixtyYearCycle() % 12];
     }
 
-    calcMonth() {
-        let ms = MoonPhase.aLongD((this.jd - this.day + 1 - JDate.J2000) / 36525, 10, 3);
-        ms = Math.floor((ms + 2) / Angle.PI2) * Angle.PI2; //定朔计算得出一个历月
-        let first = MoonPhase.mjd(ms);
-        if (Math.floor(first + 0.5) > Math.floor(first + 0.5)) {
-            ms -= Angle.PI2;
-            first = MoonPhase.mjd(ms);
-        }
-        this.firstOfMonth = Math.floor(first + JDate.J2000 + 0.5);
-        this.lastOfMonth = Math.floor(MoonPhase.mjd(ms + Angle.PI2) + 0.5);
-        this.daysOfMonth = this.lastOfMonth - this.firstOfMonth + 1;
+    getMonthStem() {
+        return LunarDate.Stems[((this.year % 5 + 7) % 5 * 2 + (this.month + 11) % 12) % 10];
+    }
 
-        //计算月相
+    getMonthBranch() {
+        return LunarDate.Branchs[(this.month + 1) % 12];
+    }
+
+    getDayStem() {
+        return LunarDate.Stems[(this.jd % 10 + 19) % 10];
+    }
+
+    getDayBranch() {
+        return LunarDate.Branchs[(this.jd % 12 + 13) % 12];
+    }
+
+    calcMoonPhase() {
+        let ms = MoonPhase.aLongD((this.getFirstOfMonth() - JDate.J2000) / 36525, 10, 3);
+        ms = Math.floor((ms + 2) / Angle.PI2) * Angle.PI2; //定朔计算月初
         let phaseRad = Angle.PI2 / 4;
+        let signs = ['●', '☽', '○', '☾'];
         let phase = 0;
         for (let j = 0; j < 4; j++) {
             phase = MoonPhase.mjd(ms + phaseRad * j);
-            this.moonPhases[Math.floor(phase + 0.5) - this.firstOfMonth] = {
-                jd: phase,
+            this.moonPhases[Math.floor(phase + 0.5 + JDate.J2000) - this.getFirstOfMonth() + 1] = {
+                mjd: phase,
                 phase: j + 1,
-                sign: ''
+                sign: signs[j],
+                time: JDate.timeStr(phase)
             };
         }
+        return this.moonPhases;
     }
 
     getFirstOfMonth(): number {
@@ -276,48 +289,53 @@ export class LunarDate {
     }
 
     getLastOfMonth() {
-        let ms = MoonPhase.aLongD(this.getFirstOfMonth() / 36525, 10, 3);
+        let ms = MoonPhase.aLongD((this.getFirstOfMonth() - JDate.J2000) / 36525, 10, 3);
         ms = Math.floor((ms + 2) / Angle.PI2) * Angle.PI2;
-        return Math.floor(MoonPhase.mjd(ms + Angle.PI2) + JDate.J2000 + 0.5);
+        return Math.floor(MoonPhase.mjd(ms + Angle.PI2)  + 0.5 + JDate.J2000) - 1;
     }
 
     calcPentads() {
         let first = this.getFirstOfMonth();
-        let w = Sun.aLong(first / 36525, 3);
+        let w = Sun.aLong((first - JDate.J2000) / 36525, 3);
         //nCF = int2(w / pi2 + 0.01);
         let pentadRad = Angle.PI2 / 72;
         w = Math.floor(w / pentadRad) * pentadRad;
-        while (Math.floor(Sun.jd(w) + 0.5) < Math.floor(first + 0.5)) {
+        while (Math.floor(Sun.mjd(w) + JDate.J2000 + 0.5) < Math.floor(first + 0.5)) {
             w += pentadRad;
         }
         let wn = (Math.floor((w + 0.02) / pentadRad) % 72 + 72) % 72;
         for (let j = 0; j <= 6; j++) {
+            let mjd = Sun.mjd(w + j * pentadRad);
             let pentad = {
-                jd: Sun.jd(w + j * pentadRad),
-                idx:  (wn + j) % 72 + 1,
+                mjd: mjd,
+                idx:  (wn + j) % 72,
                 name: '',
                 sign: '',
-                style: 0
+                style: 0,
+                time: JDate.timeStr(mjd)
             };
             switch (pentad.idx % 3) {
-                case 0:
+                case 2:
                     pentad.name = '三候';
                     pentad.style = 3
                     pentad.sign = '▲';
                     break;
-                case 1:
-                    pentad.name = LunarDate.SolarTerms[(((wn + j) / 3) % 24 + 24) % 24];
-                    pentad.style = ((((wn + j) / 3) % 24 + 6) % 24) % 2;
+                case 0:
+                    //pentad.name = LunarDate.SolarTerms[(((wn + j) / 3) % 24 + 24) % 24];
+                    //pentad.style = ((((wn + j) / 3) % 24 + 6) % 24) % 2;
+                    pentad.name = LunarDate.SolarTerms[(pentad.idx / 3) % 24];
+                    pentad.style = (pentad.idx / 3) % 24 % 2;
                     pentad.sign = '◆';
                     break;
-                case 2:
+                case 1:
                     pentad.name = '二候';
                     pentad.style = 2
                     pentad.sign = '▲';
                     break;
             }
-            this.pentads[Math.floor(pentad.jd + 0.5) - first] = pentad;
+            this.pentads[Math.floor(pentad.mjd + JDate.J2000 + 0.5) - first + 1] = pentad;
         }
+        return this.pentads;
     }
 
     //年号

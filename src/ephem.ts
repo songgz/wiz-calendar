@@ -96,8 +96,9 @@ export class Sun {
     /**
      * 根据太阳视黄经，求时间，单位为儒略世纪数
      * @param aLong - 太阳视黄经
+     * @return - J2000.0算起的儒略世纪数
      */
-    static jc(aLong: number) {
+    static mjc(aLong: number) {
         let t = this.approxJC(aLong); //近似儒略世纪数
         let v = Earth.v(t); //v的精度0.03%，详见原文
         t += (aLong - Sun.aLong(t, 10)) / v;
@@ -112,8 +113,8 @@ export class Sun {
      * @param aLong - 太阳视黄经
      * @return - mjd 东八区儒略日
      */
-    static jd(aLong: number): number {
-        const t = Sun.jc(aLong) * 36525;
+    static mjd(aLong: number): number {
+        const t = Sun.mjc(aLong) * 36525;
         return t - JDate.dt_T(t) + 8 / 24;
     }
 
@@ -134,7 +135,7 @@ export class Sun {
         t = t - JDate.dt_T(t) + 8 / 24;
         var v = ( (t + 0.5) % 1 ) * 86400;
         if (v < 1200 || v > 86400 - 1200) {
-            t = Sun.jc(W) * 36525 - JDate.dt_T(t) + 8 / 24;
+            t = Sun.mjc(W) * 36525 - JDate.dt_T(t) + 8 / 24;
         }
         return  t;
     }
@@ -164,9 +165,9 @@ export class SolarTerm {
     static closestJD(jd: number) { //精气
         const d = Math.PI / 12;
         const w = Math.floor((jd + 293) / 365.2422 * 24) * d;
-        const a = Sun.jd(w);
-        if (a - jd > 5) return Sun.jd(w - d);
-        if (a - jd < -5) return Sun.jd(w + d);
+        const a = Sun.mjd(w);
+        if (a - jd > 5) return Sun.mjd(w - d);
+        if (a - jd < -5) return Sun.mjd(w + d);
         return a;
     }
 
@@ -189,21 +190,21 @@ export class Moon {
 
     /**
      * 根据时间，计算月球速度
-     * @param jc - 儒略世纪数
+     * @param mjc - J2000.0算起的儒略世纪数
      */
-    static v(jc: number) {
-        let v = 8399.71 - 914 * Math.sin(0.7848 + 8328.691425 * jc + 0.0001523 * jc * jc); //误差小于5%
-        v -= 179 * Math.sin(2.543 + 15542.7543 * jc)  //误差小于0.3%
-            + 160 * Math.sin(0.1874 + 7214.0629 * jc)
-            + 62 * Math.sin(3.14 + 16657.3828 * jc)
-            + 34 * Math.sin(4.827 + 16866.9323 * jc)
-            + 22 * Math.sin(4.9 + 23871.4457 * jc)
-            + 12 * Math.sin(2.59 + 14914.4523 * jc)
-            + 7 * Math.sin(0.23 + 6585.7609 * jc)
-            + 5 * Math.sin(0.9 + 25195.624 * jc)
-            + 5 * Math.sin(2.32 - 7700.3895 * jc)
-            + 5 * Math.sin(3.88 + 8956.9934 * jc)
-            + 5 * Math.sin(0.49 + 7771.3771 * jc);
+    static v(mjc: number) {
+        let v = 8399.71 - 914 * Math.sin(0.7848 + 8328.691425 * mjc + 0.0001523 * mjc * mjc); //误差小于5%
+        v -= 179 * Math.sin(2.543 + 15542.7543 * mjc)  //误差小于0.3%
+            + 160 * Math.sin(0.1874 + 7214.0629 * mjc)
+            + 62 * Math.sin(3.14 + 16657.3828 * mjc)
+            + 34 * Math.sin(4.827 + 16866.9323 * mjc)
+            + 22 * Math.sin(4.9 + 23871.4457 * mjc)
+            + 12 * Math.sin(2.59 + 14914.4523 * mjc)
+            + 7 * Math.sin(0.23 + 6585.7609 * mjc)
+            + 5 * Math.sin(0.9 + 25195.624 * mjc)
+            + 5 * Math.sin(2.32 - 7700.3895 * mjc)
+            + 5 * Math.sin(3.88 + 8956.9934 * mjc)
+            + 5 * Math.sin(0.49 + 7771.3771 * mjc);
         return v;
     }
 
@@ -247,10 +248,11 @@ export class MoonPhase {
      * 根据月日视黄经差，求时间，单位儒略世纪数
      * 高精度，低速度
      * @param aLongD - 月日视黄经差
+     * @return - J2000.0算起的儒略世纪数
      */
-    static jc(aLongD: number) {
+    static mjc(aLongD: number) {
         let t, v = 7771.37714500204;
-        t = MoonPhase.meanJC(aLongD);
+        t = MoonPhase.meanMJC(aLongD);
         t += ( aLongD - MoonPhase.aLongD(t, 3, 3) ) / v;
         v = Moon.v(t) - Earth.v(t);  //v的精度0.5%，详见原文
         t += ( aLongD - MoonPhase.aLongD(t, 20, 10) ) / v;
@@ -266,7 +268,7 @@ export class MoonPhase {
     static jc2(aLongD: number) {
         let t, v = 7771.37714500204;
 
-        t = MoonPhase.meanJC(aLongD);
+        t = MoonPhase.meanMJC(aLongD);
         let L, t2 = t * t;
         t -= ( -0.00003309 * t2 + 0.10976 * Math.cos(0.784758 + 8328.6914246 * t + 0.000152292 * t2) + 0.02224 * Math.cos(0.18740 + 7214.0628654 * t - 0.00021848 * t2) - 0.03342 * Math.cos(4.669257 + 628.307585 * t) ) / v;
         L = Moon.long(t, 20) - (4.8950632 + 628.3319653318 * t + 0.000005297 * t2 + 0.0334166 * Math.cos(4.669257 + 628.307585 * t) + 0.0002061 * Math.cos(2.67823 + 628.307585 * t) * t + 0.000349 * Math.cos(4.6261 + 1256.61517 * t) - 20.5 / Angle.R2A);
@@ -282,16 +284,16 @@ export class MoonPhase {
      * @return - J2000.0算起的儒略日
      */
     static mjd(aLongD: number): number {
-        const t = MoonPhase.jc(aLongD) * 36525;
+        const t = MoonPhase.mjc(aLongD) * 36525;
         return t - JDate.dt_T(t) + 8 / 24;
     }
 
     /**
      * 根据月日黄经差，求平时间
      * @param aLongD - 月日黄经差
-     * @return - 儒略世纪数
+     * @return - J2000.0算起的儒略世纪数
      */
-    static meanJC(aLongD: number) {
+    static meanMJC(aLongD: number) {
         return (aLongD + 1.08472) / 7771.37714500204;
     }
 
@@ -300,7 +302,7 @@ export class MoonPhase {
         t = t - JDate.dt_T(t) + 8 / 24;
         const v = ((t + 0.5) % 1) * 86400;
         if (v < 1800 || v > 86400 - 1800){
-            t = MoonPhase.jc(W) * 36525 - JDate.dt_T(t) + 8 / 24;
+            t = MoonPhase.mjc(W) * 36525 - JDate.dt_T(t) + 8 / 24;
         }
         return  t;
     }
