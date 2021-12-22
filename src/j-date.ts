@@ -1,4 +1,7 @@
 // Julian Date
+import {Angle} from "./angle";
+import {Sun} from "./ephem";
+
 export class JDate {
     static J2000: number = 2451545.0; //2000年前儒略日数(2000-1-1 12:00:00格林威治平时)
     static DTS: number[] = [ // TD - UT1 世界时与原子时之差计算表
@@ -145,6 +148,25 @@ export class JDate {
         let m = Math.floor(s / 60);
         s -= m * 60;
         return h.toString().padStart(2,'0') + ':' + m.toString().padStart(2,'0') + ':' + m.toString().padStart(2, '0');
+    }
+
+    static llrConv(JW: number[], E: number) {
+        var r = [], J = JW[0], W = JW[1];
+        r[0] = Math.atan2(Math.sin(J) * Math.cos(E) - Math.tan(W) * Math.sin(E), Math.cos(J));
+        r[1] = Math.asin(Math.cos(E) * Math.sin(W) + Math.sin(E) * Math.cos(W) * Math.sin(J));
+        r[2] = JW[2];
+        r[0] = Angle.rad2mrad(r[0]);
+        return r;
+    }
+
+    static pty_zty2(mjd: number) {
+        var L = (1753470142 + 628331965331.8 * mjd + 5296.74 * mjd * mjd) / 1000000000 + Math.PI;
+        var z = [];
+        var E = (84381.4088 - 46.836051 * mjd) / Angle.R2A;
+        z[0] = Sun.long(mjd, 5), z[1] = 0;
+        z = JDate.llrConv(z, E);
+        L = Angle.rad2rrad(L - z[0]);
+        return L / Angle.PI2;
     }
 
     static fromUTC(Y: number, M: number, D: number, h?: number, m?: number, s?: number) {

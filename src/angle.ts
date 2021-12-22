@@ -17,6 +17,19 @@ export class Angle {
         return new Angle(v / Angle.R2A);
     }
 
+    static rad2mrad(v: number) {
+        v = v % (2 * Math.PI);
+        if (v < 0) return v + 2 * Math.PI;
+        return v;
+    }
+
+    static rad2rrad(v: number) {
+        v = v % (2 * Math.PI);
+        if (v <= -Math.PI) return v + 2 * Math.PI;
+        if (v > Math.PI) return v - 2 * Math.PI;
+        return v;
+    }
+
     private theta: number = 0.0;
 
     constructor(theta: number){

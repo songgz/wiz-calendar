@@ -65,6 +65,15 @@ describe('LunarDate Class', () => {
         expect(l3.getDayStem() + l3.getDayBranch()).toBe('壬辰');
     });
 
+    test('hour Stem  Branch method', () => {
+        let l1 = new LunarDate(1977,4,1);
+        let l2 = new LunarDate(1075,4,1);
+        let l3 = new LunarDate(1075,4,1,true);
+        expect(l1.getHourStem() + l1.getHourBranch()).toBe('丙子');
+        expect(l2.getHourStem() + l2.getHourBranch()).toBe('庚子');
+        expect(l3.getHourStem() + l3.getHourBranch()).toBe('庚子');
+    });
+
     test('getFirstOfMonth method', () => {
         let l1 = new LunarDate(1977,4,1);
         let l2 = new LunarDate(1075,4,1);
@@ -96,5 +105,6 @@ describe('LunarDate Class', () => {
         expect(l2.calcPentads()).toStrictEqual({"13": {"idx": 9, "mjd": -337723.72590414487, "name": "立夏", "sign": "◆", "style": 1, "time": "18:34:42"}, "18": {"idx": 10, "mjd": -337718.5175525063, "name": "二候", "sign": "▲", "style": 2, "time": "23:34:43"}, "24": {"idx": 11, "mjd": -337713.3009869755, "name": "三候", "sign": "▲", "style": 3, "time": "04:46:35"}, "29": {"idx": 12, "mjd": -337708.07782516006, "name": "小满", "sign": "◆", "style": 0, "time": "10:07:56"}, "3": {"idx": 7, "mjd": -337734.10560091044, "name": "二候", "sign": "▲", "style": 2, "time": "09:27:56"}, "34": {"idx": 13, "mjd": -337702.8482978428, "name": "二候", "sign": "▲", "style": 2, "time": "15:38:27"}, "8": {"idx": 8, "mjd": -337728.9225275461, "name": "三候", "sign": "▲", "style": 3, "time": "13:51:34"}});
 
     });
+
 
 });

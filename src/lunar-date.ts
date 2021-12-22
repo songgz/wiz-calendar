@@ -20,8 +20,8 @@ export class LunarDate {
     sixtyYearCycle: number | undefined;
     firstOfMonth: number | undefined;
     lastOfMonth: number | undefined;
-    moonPhases: {[key: number]: any} = {};
-    pentads: {[key: number]: any} = {};
+    moonPhases: { [key: number]: any } = {};
+    pentads: { [key: number]: any } = {};
 
     constructor(...options: any[]) {
         switch (options.length) {
@@ -129,7 +129,7 @@ export class LunarDate {
             this.leap = this.hasLeapMonth();
         }
         if (!this.leap) {
-            return this.mjd = Math.floor(newMoon + this.day - 1 + 0.5) ;
+            return this.mjd = Math.floor(newMoon + this.day - 1 + 0.5);
         } else {
             return this.mjd = Math.floor(nextNewMoon + this.day - 1 + 0.5);
         }
@@ -266,6 +266,14 @@ export class LunarDate {
         return LunarDate.Branchs[(this.jd % 12 + 13) % 12];
     }
 
+    getHourStem(hour?: number) {
+        return LunarDate.Stems[((this.jd % 5 + 7) % 5 * 2 + 4 + Math.floor(((hour || this.hour) + 1) % 24 / 2)) % 10];
+    }
+
+    getHourBranch(hour?: number) {
+        return LunarDate.Branchs[Math.floor(((hour || this.hour) + 1) % 24 / 2)];
+    }
+
     calcMoonPhase() {
         let ms = MoonPhase.aLongD((this.getFirstOfMonth() - JDate.J2000) / 36525, 10, 3);
         ms = Math.floor((ms + 2) / Angle.PI2) * Angle.PI2; //定朔计算月初
@@ -291,7 +299,7 @@ export class LunarDate {
     getLastOfMonth() {
         let ms = MoonPhase.aLongD((this.getFirstOfMonth() - JDate.J2000) / 36525, 10, 3);
         ms = Math.floor((ms + 2) / Angle.PI2) * Angle.PI2;
-        return Math.floor(MoonPhase.mjd(ms + Angle.PI2)  + 0.5 + JDate.J2000) - 1;
+        return Math.floor(MoonPhase.mjd(ms + Angle.PI2) + 0.5 + JDate.J2000) - 1;
     }
 
     calcPentads() {
@@ -308,7 +316,7 @@ export class LunarDate {
             let mjd = Sun.mjd(w + j * pentadRad);
             let pentad = {
                 mjd: mjd,
-                idx:  (wn + j) % 72,
+                idx: (wn + j) % 72,
                 name: '',
                 sign: '',
                 style: 0,
@@ -317,7 +325,7 @@ export class LunarDate {
             switch (pentad.idx % 3) {
                 case 2:
                     pentad.name = '三候';
-                    pentad.style = 3
+                    pentad.style = 3;
                     pentad.sign = '▲';
                     break;
                 case 0:
@@ -329,7 +337,7 @@ export class LunarDate {
                     break;
                 case 1:
                     pentad.name = '二候';
-                    pentad.style = 2
+                    pentad.style = 2;
                     pentad.sign = '▲';
                     break;
             }
@@ -348,6 +356,32 @@ export class LunarDate {
             s += (s ? ';' : '') + '[' + ob[i + 3] + ']' + ob[i + 4] + ' ' + ob[i + 5] + ' ' + c;
         }
         return s;
+    }
+
+    mingLiBaZi(mjd: number, J:number) {
+        var i, c, v, ob: any = {};
+        var jd2 = mjd + JDate.dt_T(mjd);
+        var w = Sun.aLong(jd2 / 36525, -1);
+        var k = Math.floor((w * Angle.R2D + 45 + 15 * 360) / 30);
+        mjd += JDate.pty_zty2(jd2 / 36525) + J / Math.PI / 2;
+        ob.bz_zty = JDate.timeStr(mjd);
+        mjd += 13 / 24;
+        var D = Math.floor(mjd), SC = Math.floor((mjd - D) * 12);
+        v = Math.floor(k / 12 + 6000000);
+        ob.bz_jn = LunarDate.Stems[v % 10] + LunarDate.Branchs[v % 12];
+        v = k + 2 + 60000000;
+        ob.bz_jy = LunarDate.Stems[v % 10] + LunarDate.Branchs[v % 12];
+        v = D - 6 + 9000000;
+        ob.bz_jr = LunarDate.Stems[v % 10] + LunarDate.Branchs[v % 12];
+        v = (D - 1) * 12 + 90000000 + SC;
+        ob.bz_js = LunarDate.Stems[v % 10] + LunarDate.Branchs[v % 12];
+        v -= SC, ob.bz_JS = ''; //纪时
+        for (i = 0; i < 13; i++) {
+            c = LunarDate.Stems[(v + i) % 10] + LunarDate.Branchs[(v + i) % 12];
+            if (SC == i) ob.bz_js = c, c = '<font color=red>' + c + '</font>';
+            ob.bz_JS += (i ? ' ' : '') + c;
+        }
+        return ob;
     }
 
     static Stems = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"];
@@ -437,7 +471,7 @@ export class LunarDate {
         1450, 7, 0, '明', '代宗', '朱祁钰', '景泰', 1457, 8, 0, '明', '英宗', '朱祁镇', '天顺', 1465, 23, 0, '明', '宪宗', '朱见深', '成化', 1488, 18, 0, '明', '孝宗', '朱祐樘', '弘治', 1506, 16, 0, '明', '武宗', '朱厚照', '正德', 1522, 45, 0, '明', '世宗', '朱厚熜', '嘉靖', 1567, 6, 0, '明', '穆宗', '朱载贺', '隆庆',
         1573, 48, 0, '明', '神宗', '朱翊钧', '万历', 1620, 1, 0, '明', '光宗', '朱常洛', '泰昌', 1621, 7, 0, '明', '熹宗', '朱同校', '天启', 1628, 17, 0, '明', '毅宗', '朱由检', '崇祯', 1644, 18, 0, '清', '世祖', '爱新觉罗福临', '顺治', 1662, 61, 0, '清', '圣祖', '爱新觉罗玄烨', '康熙', 1723, 13, 0, '清', '世宗', '爱新觉罗胤禛', '雍正',
         1736, 60, 0, '清', '高宗', '爱新觉罗弘历', '乾隆', 1796, 25, 0, '清', '仁宗', '爱新觉罗颙琰', '嘉庆', 1821, 30, 0, '清', '宣宗', '爱新觉罗旻宁', '道光', 1851, 11, 0, '清', '文宗', '爱新觉罗奕詝', '咸丰', 1862, 13, 0, '清', '穆宗', '爱新觉罗载淳', '同治', 1875, 34, 0, '清', '德宗', '爱新觉罗载湉', '光绪',
-        1909, 3, 0, '清', '无朝', '爱新觉罗溥仪', '宣统', 1912, 37, 0, '近、现代', '中华民国', '', '民国', 1949, 9999, 1948, '当代', '中国', '', '公历纪元']
+        1909, 3, 0, '清', '无朝', '爱新觉罗溥仪', '宣统', 1912, 37, 0, '近、现代', '中华民国', '', '民国', 1949, 9999, 1948, '当代', '中国', '', '公历纪元'];
 
     // static PI2: number = Math.PI * 2;
 }
