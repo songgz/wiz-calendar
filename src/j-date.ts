@@ -54,10 +54,13 @@ export class JDate {
         return dt;
     }
 
-    //jd = mjd+2400000.5;
-    //return day
+    /**
+     *
+     * @param mjd - J2000.0算起的儒略日
+     * @return - 单位天
+     */
     static dt_T(mjd: number) {
-        return JDate.deltaT(mjd / 365.2425 + 2000) / 86400.0;
+        return JDate.deltaT((mjd + JDate.J2000) / 365.2425) / 86400.0;
     }
 
     static gd2jd(Y: number, M: number, D: number, h?: number, m?: number, s?: number) {
@@ -159,10 +162,10 @@ export class JDate {
         return r;
     }
 
-    static pty_zty2(mjd: number) {
-        var L = (1753470142 + 628331965331.8 * mjd + 5296.74 * mjd * mjd) / 1000000000 + Math.PI;
-        var z = [];
-        var E = (84381.4088 - 46.836051 * mjd) / Angle.R2A;
+    static apparentSolarTime(mjd: number) {
+        let L = (1753470142 + 628331965331.8 * mjd + 5296.74 * mjd * mjd) / 1000000000 + Math.PI;
+        let z = [];
+        let E = (84381.4088 - 46.836051 * mjd) / Angle.R2A;
         z[0] = Sun.long(mjd, 5), z[1] = 0;
         z = JDate.llrConv(z, E);
         L = Angle.rad2rrad(L - z[0]);

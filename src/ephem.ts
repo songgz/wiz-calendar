@@ -76,13 +76,20 @@ export class Sun {
      * 章动计算很耗时
      * @param mjc - J2000.0算起的儒略世纪数
      * @param n - 计算项数，项数越大精度越高
+     * @return - 返回太阳视黄经，单位弧度
      */
     static aLong(mjc: number, n: number): number {
         return Sun.long(mjc, n) + Nutation.long(mjc) + Sun.longAberration(mjc);
     }
 
-    static long(jc: number, n: number) {
-        return Earth.long(jc, n) + Math.PI;
+    /**
+     * 求某时刻，太阳黄经
+     * @param mjc - J2000.0算起的儒略世纪数，动力学时
+     * @param n - 计算项数，项数越大精度越高
+     * @return - 返回太阳黄经，单位弧度
+     */
+    static long(mjc: number, n: number) {
+        return Earth.long(mjc, n) + Math.PI;
     }
 
     /**
@@ -98,7 +105,7 @@ export class Sun {
      * @param aLong - 太阳视黄经
      * @return - J2000.0算起的儒略世纪数
      */
-    static mjc(aLong: number) {
+    static mjcTT(aLong: number) {
         let t = this.approxJC(aLong); //近似儒略世纪数
         let v = Earth.v(t); //v的精度0.03%，详见原文
         t += (aLong - Sun.aLong(t, 10)) / v;
@@ -113,8 +120,8 @@ export class Sun {
      * @param aLong - 太阳视黄经
      * @return - mjd 东八区儒略日
      */
-    static mjd(aLong: number): number {
-        const t = Sun.mjc(aLong) * 36525;
+    static mjdUTC(aLong: number): number {
+        const t = Sun.mjcTT(aLong) * 36525;
         return t - JDate.dt_T(t) + 8 / 24;
     }
 
@@ -135,7 +142,7 @@ export class Sun {
         t = t - JDate.dt_T(t) + 8 / 24;
         var v = ( (t + 0.5) % 1 ) * 86400;
         if (v < 1200 || v > 86400 - 1200) {
-            t = Sun.mjc(W) * 36525 - JDate.dt_T(t) + 8 / 24;
+            t = Sun.mjcTT(W) * 36525 - JDate.dt_T(t) + 8 / 24;
         }
         return  t;
     }
@@ -165,9 +172,9 @@ export class SolarTerm {
     static closestJD(jd: number) { //精气
         const d = Math.PI / 12;
         const w = Math.floor((jd + 293) / 365.2422 * 24) * d;
-        const a = Sun.mjd(w);
-        if (a - jd > 5) return Sun.mjd(w - d);
-        if (a - jd < -5) return Sun.mjd(w + d);
+        const a = Sun.mjdUTC(w);
+        if (a - jd > 5) return Sun.mjdUTC(w - d);
+        if (a - jd < -5) return Sun.mjdUTC(w + d);
         return a;
     }
 
@@ -222,14 +229,14 @@ export class Moon {
      */
     static closestNewMoon(jd: number) {
         let w = Math.floor((jd + 8) / 29.5306) * Angle.PI2; //合朔时的日月黄经差
-        return MoonPhase.mjd(w);
+        return MoonPhase.mjdUTC(w);
     }
 
     static closestNewMoon2(jd: number) {
         let ms = MoonPhase.aLongD(jd / 36525, 10, 3);
         ms = Math.floor((ms + 2) / Angle.PI2) * Angle.PI2; //合朔时的日月黄经差
         //console.log(ms);
-        return MoonPhase.mjd(ms);
+        return MoonPhase.mjdUTC(ms);
     }
 }
 
@@ -248,9 +255,9 @@ export class MoonPhase {
      * 根据月日视黄经差，求时间，单位儒略世纪数
      * 高精度，低速度
      * @param aLongD - 月日视黄经差
-     * @return - J2000.0算起的儒略世纪数
+     * @return - J2000.0算起的儒略世纪数，动力学时
      */
-    static mjc(aLongD: number) {
+    static mjcTT(aLongD: number) {
         let t, v = 7771.37714500204;
         t = MoonPhase.meanMJC(aLongD);
         t += ( aLongD - MoonPhase.aLongD(t, 3, 3) ) / v;
@@ -283,8 +290,8 @@ export class MoonPhase {
      * @param aLongD - 月日视黄经差
      * @return - J2000.0算起的儒略日
      */
-    static mjd(aLongD: number): number {
-        const t = MoonPhase.mjc(aLongD) * 36525;
+    static mjdUTC(aLongD: number): number {
+        const t = MoonPhase.mjcTT(aLongD) * 36525;
         return t - JDate.dt_T(t) + 8 / 24;
     }
 
@@ -302,7 +309,7 @@ export class MoonPhase {
         t = t - JDate.dt_T(t) + 8 / 24;
         const v = ((t + 0.5) % 1) * 86400;
         if (v < 1800 || v > 86400 - 1800){
-            t = MoonPhase.mjc(W) * 36525 - JDate.dt_T(t) + 8 / 24;
+            t = MoonPhase.mjcTT(W) * 36525 - JDate.dt_T(t) + 8 / 24;
         }
         return  t;
     }

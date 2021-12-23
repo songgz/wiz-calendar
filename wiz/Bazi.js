@@ -39,7 +39,7 @@ var Lunisolar = (function (global) {
         this.zone = -8; //timezone || (new Date()).getTimezoneOffset() / 60;
         this.J =  116.383333 / global.Angle.R2D;
         this.jde = jde;
-        this.mjd = jde + this.zone / 24 - global.JDate.J2000;
+        this.mjd = jde + this.zone / 24  - global.JDate.J2000;
 
         var c, v;
         var jd2 = this.mjd + global.JDate.dt_T(this.mjd); //力学时

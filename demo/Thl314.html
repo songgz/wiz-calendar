@@ -1686,7 +1686,7 @@
             calc: function (T, L, fa, high) {
                 this.T = T, this.L = L, this.fa = fa;
                 this.dt = dt_T(T);
-                this.mjd = T - this.dt;
+                this.jd = T - this.dt;
                 T /= 36525;
                 var zd = nutation2(T);
                 this.dL = zd[0];
@@ -2817,7 +2817,6 @@
                 if (u.cur_mz >= 0 && u.cur_mz < 10 && w == '丙') r.B += '入梅 ';
                 if (u.cur_xs >= 0 && u.cur_xs < 12 && w2 == '未') r.B += '出梅 ';
             },
-            //jd为mjd,J为地球经度
             mingLiBaZi: function (jd, J, ob) {
                 var i, c, v;
                 var jd2 = jd + dt_T(jd);

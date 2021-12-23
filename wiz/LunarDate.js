@@ -114,7 +114,7 @@ var Lunisolar = (function (global) {
     };
 
     var date = global.LunarDate = global.LunarDate || function () {
-        this.mjd = 0;
+        this.jd = 0;
         this.year = 0;
         this.month = 0;
         this.day = 0;
@@ -122,14 +122,14 @@ var Lunisolar = (function (global) {
         this.minute = 0;
         this.second = 0;
         this.leap = 0;
-        this.daysOfMonth = 0;
+        this.days = 0;
 
         switch (arguments.length) {
             case 0:
-                this.mjd = 0;
+                this.jd = 0;
                 break;
             case 1:
-                this.mjd = arguments[0] - global.JDate.J2000;
+                this.jd = arguments[0] - global.JDate.J2000;
                 var d = jdYmd(arguments[0]);
                 this.year = d.Y;
                 this.month = d.M;
@@ -138,14 +138,14 @@ var Lunisolar = (function (global) {
                 this.hour = d.h;
                 this.minute = d.m;
                 this.second = d.s;
-                this.daysOfMonth = d.N;
+                this.days = d.N;
                 break;
             case 4:
                 this.year = arguments[0];
                 this.month = arguments[1];
                 this.leap = arguments[2];
                 this.day = arguments[3];
-                this.mjd = ymdJd(this.year, this.month, this.leap, this.day);
+                this.jd = ymdJd(this.year, this.month, this.leap, this.day);
                 var t = this.day;
                 this.day = Math.floor(this.day)
                 t =  (t -this.day) * 24;

@@ -129,7 +129,7 @@
 
   //---JDate------------------------------------------------------------------
   var JDate = this.WC.JDate = function (jd) {
-    this.mjd = jd;
+    this.jd = jd;
   };
 
   JDate.J2000 = 2451545.0; //2000年前儒略日数(2000-1-1 12:00:00格林威治平时)
@@ -281,19 +281,19 @@
       return this.jd + "";
     },
     add: function (jd) {
-      this.mjd = this.jd + jd;
+      this.jd = this.jd + jd;
       return this;
     },
     sub: function (jd) {
-      this.mjd = this.jd - jd;
+      this.jd = this.jd - jd;
       return this;
     },
     mul: function (jd) {
-      this.mjd = this.jd * jd;
+      this.jd = this.jd * jd;
       return this;
     },
     div: function (jd) {
-      this.mjd = this.jd / jd;
+      this.jd = this.jd / jd;
       return this;
     },
     toStr: function () {//日期转为串
