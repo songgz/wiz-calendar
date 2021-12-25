@@ -106,33 +106,33 @@ describe('LunarDate Class', () => {
 
     });
 
-    test('getSpringEquinoxes method', () => {
+    test('getFirstDogdays method', () => {
         let l1 = new LunarDate(1977,4,1);
         let l2 = new LunarDate(1075,4,1);
-        expect(l1.getSpringEquinoxes()).toBe(-22);
-        expect(l2.getSpringEquinoxes()).toBe(-924);
+        expect(l1.getFirstDogdays()).toBe(-8208);
+        expect(l2.getFirstDogdays()).toBe(-337648);
     });
 
 
-    test('getWinterSolstice method', () => {
+    test('getLastDogdays method', () => {
         let l1 = new LunarDate(1977,4,1);
         let l2 = new LunarDate(1075,4,1);
-        expect(l1.getWinterSolstice()).toBe(-8045);
-        expect(l2.getWinterSolstice()).toBe(-337494);
+        expect(l1.getLastDogdays()).toBe(-8178);
+        expect(l2.getLastDogdays()).toBe(-337628);
     });
 
-    test('getSummerSolstice method', () => {
+    test('getIntoPlum method', () => {
         let l1 = new LunarDate(1977,4,1);
         let l2 = new LunarDate(1075,4,1);
-        expect(l1.getSummerSolstice()).toBe(-8229);
-        expect(l2.getSummerSolstice()).toBe(-337677);
+        expect(l1.getIntoPlum()).toBe(-8242);
+        expect(l2.getIntoPlum()).toBe(-337692);
     });
 
-    test('getBeginOfAutumn method', () => {
+    test('getOutPlum method', () => {
         let l1 = new LunarDate(1977,4,1);
         let l2 = new LunarDate(1075,4,1);
-        expect(l1.getBeginOfAutumn()).toBe(-8182);
-        expect(l2.getBeginOfAutumn()).toBe(-337630);
+        expect(l1.getOutPlum()).toBe(-8207);
+        expect(l2.getOutPlum()).toBe(-337655);
     });
 
 
