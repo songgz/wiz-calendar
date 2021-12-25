@@ -60,7 +60,7 @@ export class JDate {
      * @return - 单位天
      */
     static dt_T(mjd: number) {
-        return JDate.deltaT((mjd + JDate.J2000) / 365.2425) / 86400.0;
+        return JDate.deltaT(mjd / 365.2425 + 2000) / 86400.0;
     }
 
     static gd2jd(Y: number, M: number, D: number, h?: number, m?: number, s?: number) {

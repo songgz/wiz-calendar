@@ -106,5 +106,34 @@ describe('LunarDate Class', () => {
 
     });
 
+    test('getSpringEquinoxes method', () => {
+        let l1 = new LunarDate(1977,4,1);
+        let l2 = new LunarDate(1075,4,1);
+        expect(l1.getSpringEquinoxes()).toBe(-22);
+        expect(l2.getSpringEquinoxes()).toBe(-924);
+    });
+
+
+    test('getWinterSolstice method', () => {
+        let l1 = new LunarDate(1977,4,1);
+        let l2 = new LunarDate(1075,4,1);
+        expect(l1.getWinterSolstice()).toBe(-8045);
+        expect(l2.getWinterSolstice()).toBe(-337494);
+    });
+
+    test('getSummerSolstice method', () => {
+        let l1 = new LunarDate(1977,4,1);
+        let l2 = new LunarDate(1075,4,1);
+        expect(l1.getSummerSolstice()).toBe(-8229);
+        expect(l2.getSummerSolstice()).toBe(-337677);
+    });
+
+    test('getBeginOfAutumn method', () => {
+        let l1 = new LunarDate(1977,4,1);
+        let l2 = new LunarDate(1075,4,1);
+        expect(l1.getBeginOfAutumn()).toBe(-8182);
+        expect(l2.getBeginOfAutumn()).toBe(-337630);
+    });
+
 
 });

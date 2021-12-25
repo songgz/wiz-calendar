@@ -26,6 +26,7 @@ describe('Sun Class', () => {
     });
 
     test('jc method', () => {
+        //console.log(Sun.mjcTT(-133.5176877775662));-0.22027447076688794
         expect(Sun.mjcTT(2443259.9)).toBeCloseTo(3850.507554298232, 8);
     });
 

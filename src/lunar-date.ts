@@ -1,6 +1,7 @@
 import {JDate} from "./j-date";
-import {MoonPhase, SolarTerm, Sun} from "./ephem";
+import {MoonPhase, Sun} from "./ephem";
 import {Angle} from "./angle";
+import {SolarTerm, SolarTermName} from "./solar-term";
 
 // let int2 = function (v: number) {
 //     return Math.floor(v);
@@ -22,6 +23,22 @@ export class LunarDate {
     lastOfMonth: number | undefined;
     moonPhases: { [key: number]: any } = {};
     pentads: { [key: number]: any } = {};
+    private winterSolstice: number | undefined;
+    private summerSolstice: number | undefined;
+    private springEquinox: number | undefined;
+    private autumnEquinox: number | undefined;
+    private beginOfAutumn: number | undefined;
+
+    private springEquinoxes: number | undefined;
+    private firstDogdays: number | undefined;
+    private lastDogdays: number | undefined;
+    private grainInBeard: number | undefined;
+    private lesserHeat: number | undefined;
+    private intoPlum: number | undefined;
+    private outPlum: number | undefined;
+    private solarTerm: SolarTerm | undefined;
+
+
 
     constructor(...options: any[]) {
         switch (options.length) {
@@ -243,7 +260,7 @@ export class LunarDate {
     }
 
     getYearBranch() {
-        return LunarDate.Branchs[this.getSixtyYearCycle() % 12];
+        return LunarDate.Branches[this.getSixtyYearCycle() % 12];
     }
 
     getYearAnimal() {
@@ -255,7 +272,7 @@ export class LunarDate {
     }
 
     getMonthBranch() {
-        return LunarDate.Branchs[(this.month + 1) % 12];
+        return LunarDate.Branches[(this.month + 1) % 12];
     }
 
     getDayStem() {
@@ -263,7 +280,7 @@ export class LunarDate {
     }
 
     getDayBranch() {
-        return LunarDate.Branchs[(this.jd % 12 + 13) % 12];
+        return LunarDate.Branches[(this.jd % 12 + 13) % 12];
     }
 
     getHourStem(hour?: number) {
@@ -271,7 +288,7 @@ export class LunarDate {
     }
 
     getHourBranch(hour?: number) {
-        return LunarDate.Branchs[Math.floor(((hour || this.hour) + 1) % 24 / 2)];
+        return LunarDate.Branches[Math.floor(((hour || this.hour) + 1) % 24 / 2)];
     }
 
     calcMoonPhase() {
@@ -346,6 +363,50 @@ export class LunarDate {
         return this.pentads;
     }
 
+    getSolarTerm(term: SolarTermName) {
+        if(this.solarTerm === undefined) {
+            this.solarTerm = new SolarTerm(this.getFirstOfMonth());
+        }
+        return this.solarTerm.getSolarTerm(term);
+    }
+
+    //初伏，从夏至后的第三个庚日这天算初伏的第一天
+    getFirstDogdays() {
+        if(this.firstDogdays === undefined) {
+            this.firstDogdays = Math.floor((this.getSolarTerm(SolarTermName.SummerSolstice) + 7.5) / 10) * 10 + 22;
+        }
+        return this.firstDogdays;
+    }
+
+    //末伏，立秋后的第一个庚日这天算是末伏的第一天
+    getLastDogdays() {
+        if(this.lastDogdays === undefined) {
+            this.lastDogdays = Math.floor((this.getSolarTerm(SolarTermName.StartOfAutumn) + 7.5) / 10) * 10 + 2;
+        }
+        return this.lastDogdays;
+    }
+
+    //入梅，芒种后的第一个丙日是入梅的日期，约在6月中上旬。
+    getIntoPlum() {
+        if(this.intoPlum === undefined) {
+            this.intoPlum = Math.floor((this.getSolarTerm(SolarTermName.GrainInEar) + 1.5) / 10) * 10 + 8;
+        }
+        return this.intoPlum;
+    }
+
+    //出梅，小暑后的第一个末日是出梅的日期，约在7月中下旬。
+    getOutPlum() {
+        if(this.outPlum === undefined) {
+            this.outPlum = Math.floor((this.getSolarTerm(SolarTermName.SlightHeat) + 10.5) / 12) * 12 + 1;
+        }
+        return this.outPlum;
+    }
+
+    //数九，从冬至当天算起
+    getColdestDays() {
+        return this.getSolarTerm(SolarTermName.WinterSolstice);
+    }
+
     //年号
     getReignTitle() {
         let j, c, s = '', ob = LunarDate.JNB;
@@ -358,34 +419,8 @@ export class LunarDate {
         return s;
     }
 
-    mingLiBaZi(mjd: number, J:number) {
-        var i, c, v, ob: any = {};
-        var jd2 = mjd + JDate.dt_T(mjd);
-        var w = Sun.aLong(jd2 / 36525, -1);
-        var k = Math.floor((w * Angle.R2D + 45 + 15 * 360) / 30);
-        mjd += JDate.apparentSolarTime(jd2 / 36525) + J / Math.PI / 2;
-        ob.bz_zty = JDate.timeStr(mjd);
-        mjd += 13 / 24;
-        var D = Math.floor(mjd), SC = Math.floor((mjd - D) * 12);
-        v = Math.floor(k / 12 + 6000000);
-        ob.bz_jn = LunarDate.Stems[v % 10] + LunarDate.Branchs[v % 12];
-        v = k + 2 + 60000000;
-        ob.bz_jy = LunarDate.Stems[v % 10] + LunarDate.Branchs[v % 12];
-        v = D - 6 + 9000000;
-        ob.bz_jr = LunarDate.Stems[v % 10] + LunarDate.Branchs[v % 12];
-        v = (D - 1) * 12 + 90000000 + SC;
-        ob.bz_js = LunarDate.Stems[v % 10] + LunarDate.Branchs[v % 12];
-        v -= SC, ob.bz_JS = ''; //纪时
-        for (i = 0; i < 13; i++) {
-            c = LunarDate.Stems[(v + i) % 10] + LunarDate.Branchs[(v + i) % 12];
-            if (SC == i) ob.bz_js = c, c = '<font color=red>' + c + '</font>';
-            ob.bz_JS += (i ? ' ' : '') + c;
-        }
-        return ob;
-    }
-
     static Stems = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"];
-    static Branchs = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"];
+    static Branches = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"];
     static Animals = ["鼠", "牛", "虎", "兔", "龙", "蛇", "马", "羊", "猴", "鸡", "狗", "猪"];
     static SolarTerms = ['春分', '清明', '谷雨', '立夏', '小满', '芒种', '夏至', '小暑', '大暑', '立秋', '处暑', '白露', '秋分', '寒露', '霜降', '立冬', '小雪', '大雪', '冬至', '小寒', '大寒', '立春', '雨水', '惊蛰'];
 

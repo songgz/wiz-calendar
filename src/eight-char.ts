@@ -50,18 +50,18 @@ export class EightChar {
     }
 
     getYear() {
-        return LunarDate.Stems[this.yearStem] + LunarDate.Branchs[this.yearBranch];
+        return LunarDate.Stems[this.yearStem] + LunarDate.Branches[this.yearBranch];
     }
 
     getMonth() {
-        return LunarDate.Stems[this.monthStem] + LunarDate.Branchs[this.monthBranch];
+        return LunarDate.Stems[this.monthStem] + LunarDate.Branches[this.monthBranch];
     }
 
     getDay() {
-        return LunarDate.Stems[this.dayStem] + LunarDate.Branchs[this.dayBranch];
+        return LunarDate.Stems[this.dayStem] + LunarDate.Branches[this.dayBranch];
     }
 
     getHour() {
-        return LunarDate.Stems[this.hourStem] + LunarDate.Branchs[this.hourBranch];
+        return LunarDate.Stems[this.hourStem] + LunarDate.Branches[this.hourBranch];
     }
 }

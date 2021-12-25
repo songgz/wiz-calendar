@@ -2842,6 +2842,7 @@
                 }
             },
             qi_accurate: function (W) {
+                console.log(XL.S_aLon_t(W));
                 var t = XL.S_aLon_t(W) * 36525;
                 return t - dt_T(t) + 8 / 24;
             },
@@ -5357,6 +5358,9 @@
                 dFu1 = int2((dXZ + 7.5) / 10) * 10 + 22;
                 dLQ = int2(obb.qi_accurate((nCF + 0.375) * pi2) + 0.5);
                 dFu3 = int2((dLQ + 7.5) / 10) * 10 + 2;
+                console.log(nCF);
+                console.log('============================');
+                console.log(dLQ);
             }
             if (y > 3 && y < 7) {
                 dMZ = int2(obb.qi_accurate((nCF + 5 / 24) * pi2) + 0.5);
