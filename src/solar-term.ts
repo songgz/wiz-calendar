@@ -52,10 +52,12 @@ export enum SolarTermName {
     //惊蛰
     InsectsAwaken = 23,
 }
+
+
 export class SolarTerm {
     private readonly jd: number;
     private springEquinoxes: number | undefined;
-    private solarTerms: {[key: number]: number} = {};
+    private solarTerms: {[key: number]: JulianDate} = {};
 
 
     constructor(jd: number) {
@@ -71,11 +73,17 @@ export class SolarTerm {
         return this.springEquinoxes;
     }
 
-    getSolarTerm(solarTermName: SolarTermName) {
+    getSolarTerm(solarTermName: SolarTermName): JulianDate {
         if(this.solarTerms[solarTermName] === undefined) {
-            this.solarTerms[solarTermName] = Math.floor(Sun.mjdUTC((this.getSpringEquinoxes() + solarTermName / 24) * Angle.PI2) + 0.5);
+            this.solarTerms[solarTermName] = new JulianDate(Sun.mjdUTC((this.getSpringEquinoxes() + solarTermName / 24) * Angle.PI2) + JulianDate.J2000);
         }
         return this.solarTerms[solarTermName];
+    }
+
+    getSolarTerm2(solarTermName: SolarTermName) {
+
+        return  new JulianDate(Sun.mjdUTC((this.getSpringEquinoxes() + solarTermName / 24) * Angle.PI2) + JulianDate.J2000);
+
     }
 
     /**

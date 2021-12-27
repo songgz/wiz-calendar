@@ -172,7 +172,7 @@ export class JulianDate {
         s -= h * 3600;
         let m = Math.floor(s / 60);
         s -= m * 60;
-        return h.toString().padStart(2, '0') + ':' + m.toString().padStart(2, '0') + ':' + m.toString().padStart(2, '0');
+        return h.toString().padStart(2, '0') + ':' + m.toString().padStart(2, '0') + ':' + s.toString().padStart(2, '0');
     }
 
     static llrConv(JW: number[], E: number) {
@@ -195,9 +195,9 @@ export class JulianDate {
     }
 
 
-    static fromUTC(Y: number, M: number, D: number, h?: number, m?: number, s?: number) {
-        return new JulianDate(JulianDate.gd2jd(Y, M, D, h, m, s));
-    }
+    // static fromUTC(Y: number, M: number, D: number, h?: number, m?: number, s?: number) {
+    //     return new JulianDate(JulianDate.gd2jd(Y, M, D, h, m, s));
+    // }
 
     static fromMJD(mjd: number) {
         return new JulianDate(mjd + JulianDate.J2000);
@@ -332,6 +332,18 @@ export class JulianDate {
             this.solarTerm = new SolarTerm(this.jd());
         }
         return this.solarTerm.getSolarTerm(solarTermName);
+    }
+
+    formatTime() {
+        return JulianDate.timeStr(this.mjd);
+    }
+
+    mjdn() {
+        return Math.floor(this.mjd + 0.5);
+    }
+
+    jdn() {
+        return Math.floor(this.jd() + 0.5);
     }
 
 

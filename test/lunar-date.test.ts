@@ -142,5 +142,12 @@ describe('LunarDate Class', () => {
         expect(l2.getSolarDate().toHash()).toStrictEqual({"day": 18, "hour": 0, "minute": 0, "month": 4, "second": 0, "year": 1075});
     });
 
+    test('formatDate method', () => {
+        let l1 = new LunarDate(1977,4,1);
+        let l2 = new LunarDate(1075,4,1);
+        expect(l1.formatDate()).toBe('1977-04-01+0');
+        expect(l2.formatDate()).toBe('1075-04-01+0');
+    });
+
 
 });

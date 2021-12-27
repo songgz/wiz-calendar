@@ -400,7 +400,7 @@ export class LunarDate {
     //初伏，从夏至后的第三个庚日这天算初伏的第一天
     getFirstDogdays() {
         if(this.firstDogdays === undefined) {
-            this.firstDogdays = Math.floor((this.getSolarTerm(SolarTermName.SummerSolstice) + 7.5) / 10) * 10 + 22;
+            this.firstDogdays = Math.floor((this.getSolarTerm(SolarTermName.SummerSolstice).mjdn() + 7.5) / 10) * 10 + 22;
         }
         return this.firstDogdays;
     }
@@ -408,7 +408,7 @@ export class LunarDate {
     //末伏，立秋后的第一个庚日这天算是末伏的第一天
     getLastDogdays() {
         if(this.lastDogdays === undefined) {
-            this.lastDogdays = Math.floor((this.getSolarTerm(SolarTermName.StartOfAutumn) + 7.5) / 10) * 10 + 2;
+            this.lastDogdays = Math.floor((this.getSolarTerm(SolarTermName.StartOfAutumn).mjdn() + 7.5) / 10) * 10 + 2;
         }
         return this.lastDogdays;
     }
@@ -416,7 +416,7 @@ export class LunarDate {
     //入梅，芒种后的第一个丙日是入梅的日期，约在6月中上旬。
     getIntoPlum() {
         if(this.intoPlum === undefined) {
-            this.intoPlum = Math.floor((this.getSolarTerm(SolarTermName.GrainInEar) + 1.5) / 10) * 10 + 8;
+            this.intoPlum = Math.floor((this.getSolarTerm(SolarTermName.GrainInEar).mjdn() + 1.5) / 10) * 10 + 8;
         }
         return this.intoPlum;
     }
@@ -424,7 +424,7 @@ export class LunarDate {
     //出梅，小暑后的第一个末日是出梅的日期，约在7月中下旬。
     getOutPlum() {
         if(this.outPlum === undefined) {
-            this.outPlum = Math.floor((this.getSolarTerm(SolarTermName.SlightHeat) + 10.5) / 12) * 12 + 1;
+            this.outPlum = Math.floor((this.getSolarTerm(SolarTermName.SlightHeat).mjdn() + 10.5) / 12) * 12 + 1;
         }
         return this.outPlum;
     }
@@ -446,11 +446,11 @@ export class LunarDate {
         return s;
     }
 
-    date() {
-        return this.year + '-' + this.month.toString().padStart(2, '0') + '-' + this.day.toString().padStart(2, '0');
+    formatDate() {
+        return this.year + '-' + this.month.toString().padStart(2, '0') + '-' + this.day.toString().padStart(2, '0') + '+' + (this.leap ? '1' : '0');
     }
 
-    time() {
+    formatTime() {
         return this.hour.toString().padStart(2, '0') + ':' + this.minute.toString().padStart(2, '0') + ':' + this.second.toString().padStart(2, '0');
     }
 
@@ -458,13 +458,13 @@ export class LunarDate {
         let str = '';
         switch (form) {
             case 'date':
-                str = this.date();
+                str = this.formatDate();
                 break
             case 'time':
-                str = this.time();
+                str = this.formatTime();
                 break;
             case 'datetime':
-                str = this.date() + ' ' + this.time();
+                str = this.formatDate() + ' ' + this.formatTime();
                 break;
         }
         return str;
