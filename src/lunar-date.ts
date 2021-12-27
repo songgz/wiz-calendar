@@ -70,7 +70,7 @@ export class LunarDate {
 
     getJulianDate() {
         if(this.JulianDate === undefined){
-            this.JulianDate = new JulianDate(this.calcMJD() + this.getTimeToJD() - 0.5);
+            this.JulianDate = new JulianDate(this.calcMJD() + this.getTimeToJD() + JulianDate.J2000 - 0.5);
         }
         return this.JulianDate;
     }
@@ -386,7 +386,11 @@ export class LunarDate {
         return this.pentads;
     }
 
-    getSolarTerm(term: SolarTermName) {
+    getSolarTerm(solarTermName: SolarTermName) {
+        return this.getJulianDate().getSolarTerm(solarTermName);
+    }
+
+    getSolarTerm222(term: SolarTermName) {
         if(this.solarTerm === undefined) {
             this.solarTerm = new SolarTerm(this.getFirstOfMonth());
         }

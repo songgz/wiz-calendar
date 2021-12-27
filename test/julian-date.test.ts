@@ -1,6 +1,7 @@
 import {JulianDate} from "../src/julian-date";
 import {SolarDate} from "../src/solar-date";
 import {LunarDate} from "../src/lunar-date";
+import {SolarTermName} from "../src/solar-term";
 
 describe('JDate Class', () => {
     test('fromUTC method', () => {
@@ -47,13 +48,9 @@ describe('JDate Class', () => {
         expect(s21.toHash()).toStrictEqual(s11.toHash());
     });
 
-    test('q method', () => {
-        let julian = new JulianDate(2456770.942824074);
-        let solar = julian.getSolarDate();
-        //solar.format('datetime'); //2014-04-23 10:37:40
-
-        //lunar.format('datetime'); //1977-04-01 12:00:00
-        expect(solar.format('datetime')).toBe('2014-04-23 10:37:40'); //2014-04-23 10:37:40
+    test('getSolarTerm method', () => {
+        let julian = new JulianDate(2443282); //阴历1977-04-01 12:00:00
+        expect(julian.getSolarTerm(SolarTermName.WinterSolstice)).toBe(-8045);
     });
 
 });

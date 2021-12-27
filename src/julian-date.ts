@@ -3,6 +3,7 @@ import {Angle} from "./angle";
 import {MoonPhase, Sun} from "./ephem";
 import {SolarDate} from "./solar-date";
 import {LunarDate} from "./lunar-date";
+import {SolarTerm, SolarTermName} from "./solar-term";
 
 export class JulianDate {
     static J2000: number = 2451545.0; //2000年前儒略日数(2000-1-1 12:00:00格林威治平时)
@@ -209,6 +210,7 @@ export class JulianDate {
     private deltaT: number | undefined;
     private solarDate: SolarDate | undefined;
     private lunarDate: LunarDate | undefined;
+    private solarTerm: SolarTerm | undefined;
 
     constructor(jd: number = JulianDate.J2000) {
         this.mjd = jd - JulianDate.J2000;
@@ -323,6 +325,13 @@ export class JulianDate {
             this.lunarDate.setJulianDate(this);
         }
         return this.lunarDate;
+    }
+
+    getSolarTerm(solarTermName: SolarTermName) {
+        if (this.solarTerm === undefined) {
+            this.solarTerm = new SolarTerm(this.jd());
+        }
+        return this.solarTerm.getSolarTerm(solarTermName);
     }
 
 

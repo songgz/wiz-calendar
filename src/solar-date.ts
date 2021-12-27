@@ -1,5 +1,6 @@
 import {LunarDate} from "./lunar-date";
 import {JulianDate} from "./julian-date";
+import {SolarTerm, SolarTermName} from "./solar-term";
 
 export class SolarDate {
     private jde: number | undefined;
@@ -67,6 +68,10 @@ export class SolarDate {
             this.lunarDate = this.getJulianDate().getLunarDate();
         }
         return this.lunarDate;
+    }
+
+    getSolarTerm(solarTermName: SolarTermName) {
+        return this.getJulianDate().getSolarTerm(solarTermName);
     }
 
     fromJDE(jde: number){
