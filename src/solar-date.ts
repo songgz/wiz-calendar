@@ -53,7 +53,7 @@ export class SolarDate {
 
     getJulianDate() {
         if(this.julianDate === undefined){
-            this.julianDate = JulianDate.fromJdTT(JulianDate.gd2jd(this.year, this.month, this.day, this.hour, this.minute, this.second));
+            this.julianDate = JulianDate.fromMJD(JulianDate.gd2jd(this.year, this.month, this.day, this.hour, this.minute, this.second));
         }
         return this.julianDate;
     }

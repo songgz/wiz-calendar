@@ -48,10 +48,12 @@ describe('JDate Class', () => {
     });
 
     test('q method', () => {
-        let julian = JulianDate.fromJdTT(2443282);
-        let lunar = julian.getLunarDate();
+        let julian = new JulianDate(2456770.942824074);
+        let solar = julian.getSolarDate();
+        //solar.format('datetime'); //2014-04-23 10:37:40
+
         //lunar.format('datetime'); //1977-04-01 12:00:00
-        expect(lunar.format('datetime')).toBe('1977-04-01 12:00:00'); //2014-04-23 10:37:40
+        expect(solar.format('datetime')).toBe('2014-04-23 10:37:40'); //2014-04-23 10:37:40
     });
 
 });

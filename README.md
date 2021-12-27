@@ -29,13 +29,13 @@ WizCalendar（巫师万年历）
     ```
 5. 儒略日转阳历
     ```typescript
-    let julian = JulianDate.fromJdTT(2456770.942824074);
+    let julian = new JulianDate(2456770.942824074);
     let solar = julian.getSolarDate();
     solar.format('datetime'); //2014-04-23 10:37:40
     ```
 6. 儒略日转阴历
    ```typescript
-   let julian = JulianDate.fromJdTT(2443282);
+   let julian = new JulianDate(2443282);
    let lunar = julian.getLunarDate();
    lunar.format('datetime'); //1977-04-01 12:00:00
     ```

@@ -198,8 +198,8 @@ export class JulianDate {
         return new JulianDate(JulianDate.gd2jd(Y, M, D, h, m, s));
     }
 
-    static fromJdTT(jd: number) {
-        return new JulianDate(jd - JulianDate.J2000);
+    static fromMJD(mjd: number) {
+        return new JulianDate(mjd + JulianDate.J2000);
     }
 
     //UTC 时间和本地时间之间的时差，以天为单位。
@@ -210,8 +210,8 @@ export class JulianDate {
     private solarDate: SolarDate | undefined;
     private lunarDate: LunarDate | undefined;
 
-    constructor(mjd: number = 0) {
-        this.mjd = mjd;
+    constructor(jd: number = JulianDate.J2000) {
+        this.mjd = jd - JulianDate.J2000;
     }
 
     valueOf() {
