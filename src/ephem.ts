@@ -1,5 +1,5 @@
 import {Vsop87} from "./vsop-87";
-import {JDate} from "./j-date";
+import {JulianDate} from "./julian-date";
 import {Mpp02} from "./mpp-02";
 import {Angle} from "./angle";
 
@@ -120,7 +120,7 @@ export class Sun {
      */
     static mjdUTC(aLong: number): number {
         const t = Sun.mjcTT(aLong) * 36525;
-        return t - JDate.dt_T(t) - (0 - JDate.Timezone) / 24;
+        return t - JulianDate.dt_T(t) - (0 - JulianDate.Timezone) / 24;
     }
 
     /**
@@ -137,10 +137,10 @@ export class Sun {
 
     static term_high(W: number) { //较高精度气（已知太阳视黄经反求时间）
         var t = Sun.jc2(W) * 36525;
-        t = t - JDate.dt_T(t) + 8 / 24;
+        t = t - JulianDate.dt_T(t) + 8 / 24;
         var v = ( (t + 0.5) % 1 ) * 86400;
         if (v < 1200 || v > 86400 - 1200) {
-            t = Sun.mjcTT(W) * 36525 - JDate.dt_T(t) + 8 / 24;
+            t = Sun.mjcTT(W) * 36525 - JulianDate.dt_T(t) + 8 / 24;
         }
         return  t;
     }
@@ -266,7 +266,7 @@ export class MoonPhase {
      */
     static mjdUTC(aLongD: number): number {
         const t = MoonPhase.mjcTT(aLongD) * 36525;
-        return t - JDate.dt_T(t) - (0 - JDate.Timezone) / 24;
+        return t - JulianDate.dt_T(t) - (0 - JulianDate.Timezone) / 24;
     }
 
     /**
@@ -280,10 +280,10 @@ export class MoonPhase {
 
     static phases_high(W: number) { //较高精度朔
         let t = MoonPhase.jc2(W) * 36525;
-        t = t - JDate.dt_T(t) + 8 / 24;
+        t = t - JulianDate.dt_T(t) + 8 / 24;
         const v = ((t + 0.5) % 1) * 86400;
         if (v < 1800 || v > 86400 - 1800){
-            t = MoonPhase.mjcTT(W) * 36525 - JDate.dt_T(t) + 8 / 24;
+            t = MoonPhase.mjcTT(W) * 36525 - JulianDate.dt_T(t) + 8 / 24;
         }
         return  t;
     }

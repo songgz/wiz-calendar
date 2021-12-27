@@ -1,4 +1,4 @@
-import {JDate} from "./j-date";
+import {JulianDate} from "./julian-date";
 import {MoonPhase, Sun} from "./ephem";
 import {Angle} from "./angle";
 import {SolarTerm, SolarTermName} from "./solar-term";
@@ -6,7 +6,7 @@ import {SolarDate} from "./solar-date";
 
 export class LunarDate {
     private jd = 0.0;
-    private jDate: JDate | undefined;
+    private JulianDate: JulianDate | undefined;
     mjd = 0;
     year = 0;
     month = 0;
@@ -43,7 +43,7 @@ export class LunarDate {
                 this.day = options[2];
                 this.leap = options[3] || false;
                 this.mjd = this.calcMJD();
-                this.jd = this.mjd + JDate.J2000;
+                this.jd = this.mjd + JulianDate.J2000;
                 let t = this.day;
                 this.day = Math.floor(this.day);
                 t = (t - this.day) * 24;
@@ -68,20 +68,20 @@ export class LunarDate {
         return (this.hour * 3600 + this.minute * 60 + this.second) / 86400.0
     }
 
-    getJDate() {
-        if(this.jDate === undefined){
-            this.jDate = new JDate(this.calcMJD() + this.getTimeToJD() - 0.5);
+    getJulianDate() {
+        if(this.JulianDate === undefined){
+            this.JulianDate = new JulianDate(this.calcMJD() + this.getTimeToJD() - 0.5);
         }
-        return this.jDate;
+        return this.JulianDate;
     }
 
-    setJDate(value: JDate) {
-        this.jDate = value;
+    setJulianDate(value: JulianDate) {
+        this.JulianDate = value;
     }
 
     getSolarDate() {
         if(this.solarDate === undefined){
-            this.solarDate = this.getJDate().getSolarDate();
+            this.solarDate = this.getJulianDate().getSolarDate();
         }
         return this.solarDate;
     }
@@ -165,7 +165,7 @@ export class LunarDate {
     calcLunar11() {
         let nextNewMoon, w1, w2, wn, y, m, d, n, fd, ry;
         let F = this.jd + 0.5 - Math.floor(this.jd + 0.5);
-        let mjd = Math.floor(this.jd + 0.5) - JDate.J2000;
+        let mjd = Math.floor(this.jd + 0.5) - JulianDate.J2000;
         let ms = MoonPhase.aLongD(mjd / 36525, 10, 3);
         ms = Math.floor((ms + 2) / Angle.PI2) * Angle.PI2; //合朔
         let newMoon = MoonPhase.mjdUTC(ms);
@@ -314,18 +314,18 @@ export class LunarDate {
     }
 
     calcMoonPhase() {
-        let ms = MoonPhase.aLongD((this.getFirstOfMonth() - JDate.J2000) / 36525, 10, 3);
+        let ms = MoonPhase.aLongD((this.getFirstOfMonth() - JulianDate.J2000) / 36525, 10, 3);
         ms = Math.floor((ms + 2) / Angle.PI2) * Angle.PI2; //定朔计算月初
         let phaseRad = Angle.PI2 / 4;
         let signs = ['●', '☽', '○', '☾'];
         let phase = 0;
         for (let j = 0; j < 4; j++) {
             phase = MoonPhase.mjdUTC(ms + phaseRad * j);
-            this.moonPhases[Math.floor(phase + 0.5 + JDate.J2000) - this.getFirstOfMonth() + 1] = {
+            this.moonPhases[Math.floor(phase + 0.5 + JulianDate.J2000) - this.getFirstOfMonth() + 1] = {
                 mjd: phase,
                 phase: j + 1,
                 sign: signs[j],
-                time: JDate.timeStr(phase)
+                time: JulianDate.timeStr(phase)
             };
         }
         return this.moonPhases;
@@ -337,18 +337,18 @@ export class LunarDate {
     }
 
     getLastOfMonth() {
-        let ms = MoonPhase.aLongD((this.getFirstOfMonth() - JDate.J2000) / 36525, 10, 3);
+        let ms = MoonPhase.aLongD((this.getFirstOfMonth() - JulianDate.J2000) / 36525, 10, 3);
         ms = Math.floor((ms + 2) / Angle.PI2) * Angle.PI2;
-        return Math.floor(MoonPhase.mjdUTC(ms + Angle.PI2) + 0.5 + JDate.J2000) - 1;
+        return Math.floor(MoonPhase.mjdUTC(ms + Angle.PI2) + 0.5 + JulianDate.J2000) - 1;
     }
 
     calcPentads() {
         let first = this.getFirstOfMonth();
-        let w = Sun.aLong((first - JDate.J2000) / 36525, 3);
+        let w = Sun.aLong((first - JulianDate.J2000) / 36525, 3);
         //nCF = int2(w / pi2 + 0.01);
         let pentadRad = Angle.PI2 / 72;
         w = Math.floor(w / pentadRad) * pentadRad;
-        while (Math.floor(Sun.mjdUTC(w) + JDate.J2000 + 0.5) < Math.floor(first + 0.5)) {
+        while (Math.floor(Sun.mjdUTC(w) + JulianDate.J2000 + 0.5) < Math.floor(first + 0.5)) {
             w += pentadRad;
         }
         let wn = (Math.floor((w + 0.02) / pentadRad) % 72 + 72) % 72;
@@ -360,7 +360,7 @@ export class LunarDate {
                 name: '',
                 sign: '',
                 style: 0,
-                time: JDate.timeStr(mjd)
+                time: JulianDate.timeStr(mjd)
             };
             switch (pentad.idx % 3) {
                 case 2:
@@ -381,7 +381,7 @@ export class LunarDate {
                     pentad.sign = '▲';
                     break;
             }
-            this.pentads[Math.floor(pentad.mjd + JDate.J2000 + 0.5) - first + 1] = pentad;
+            this.pentads[Math.floor(pentad.mjd + JulianDate.J2000 + 0.5) - first + 1] = pentad;
         }
         return this.pentads;
     }
@@ -440,6 +440,30 @@ export class LunarDate {
             s += (s ? ';' : '') + '[' + ob[i + 3] + ']' + ob[i + 4] + ' ' + ob[i + 5] + ' ' + c;
         }
         return s;
+    }
+
+    date() {
+        return this.year + '-' + this.month.toString().padStart(2, '0') + '-' + this.day.toString().padStart(2, '0');
+    }
+
+    time() {
+        return this.hour.toString().padStart(2, '0') + ':' + this.minute.toString().padStart(2, '0') + ':' + this.second.toString().padStart(2, '0');
+    }
+
+    format(form: string) {
+        let str = '';
+        switch (form) {
+            case 'date':
+                str = this.date();
+                break
+            case 'time':
+                str = this.time();
+                break;
+            case 'datetime':
+                str = this.date() + ' ' + this.time();
+                break;
+        }
+        return str;
     }
 
     static Stems = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"];

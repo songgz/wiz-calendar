@@ -4,7 +4,7 @@ import {MoonPhase, Sun} from "./ephem";
 import {SolarDate} from "./solar-date";
 import {LunarDate} from "./lunar-date";
 
-export class JDate {
+export class JulianDate {
     static J2000: number = 2451545.0; //2000年前儒略日数(2000-1-1 12:00:00格林威治平时)
     static DTS: number[] = [ // TD - UT1 世界时与原子时之差计算表
         -4000, 108371.7, -13036.80, 392.000, 0.0000,
@@ -31,7 +31,7 @@ export class JDate {
 
     //输入公历年，返回秒Delta Time
     static deltaT(year: number) { //力学时和世界时之间的精确差值 ΔT = TD - UT
-        let dts = JDate.DTS, i, t1, t2, t3, dt = 0;
+        let dts = JulianDate.DTS, i, t1, t2, t3, dt = 0;
         if ((year >= -4000) && (year < 2015)) {
             for (i = 0; i < dts.length; i += 5) {
                 if (year < dts[i + 5]) {
@@ -63,7 +63,7 @@ export class JDate {
      * @return - 单位天
      */
     static dt_T(mjd: number) {
-        return JDate.deltaT(mjd / 365.2425 + 2000) / 86400.0;
+        return JulianDate.deltaT(mjd / 365.2425 + 2000) / 86400.0;
     }
 
     static gd2jd(y: number, m: number, d: number, h1: number = 0, m1: number = 0, s1: number = 0) {
@@ -188,18 +188,18 @@ export class JDate {
         let z = [];
         let E = (84381.4088 - 46.836051 * mjd) / Angle.R2A;
         z[0] = Sun.long(mjd, 5), z[1] = 0;
-        z = JDate.llrConv(z, E);
+        z = JulianDate.llrConv(z, E);
         L = Angle.rad2rrad(L - z[0]);
         return L / Angle.PI2;
     }
 
 
     static fromUTC(Y: number, M: number, D: number, h?: number, m?: number, s?: number) {
-        return new JDate(JDate.gd2jd(Y, M, D, h, m, s));
+        return new JulianDate(JulianDate.gd2jd(Y, M, D, h, m, s));
     }
 
-    static fromJd(jd: number) {
-        return new JDate(jd - JDate.J2000);
+    static fromJdTT(jd: number) {
+        return new JulianDate(jd - JulianDate.J2000);
     }
 
     //UTC 时间和本地时间之间的时差，以天为单位。
@@ -218,13 +218,17 @@ export class JDate {
         return this.mjd;
     }
 
-    toJD() {
-        return this.mjd + JDate.J2000;
+    jdTT() {
+        return this.mjd + JulianDate.J2000;
+    }
+
+    jdnTT() {
+        return Math.floor(this.mjd + JulianDate.J2000 + 0.5);
     }
 
     getDeltaT(): number {
         if (this.deltaT === undefined) {
-            this.deltaT = JDate.dt_T(this.mjd);
+            this.deltaT = JulianDate.dt_T(this.mjd);
         }
         return this.deltaT;
     }
@@ -234,14 +238,14 @@ export class JDate {
     }
 
     toJdUtc() {
-        return this.toMjdUtc() + JDate.J2000;
+        return this.toMjdUtc() + JulianDate.J2000;
     }
 
     getSolarDate() {
         if (this.solarDate === undefined){
-            let d = JDate.DD(this.toJD());
+            let d = JulianDate.DD(this.jdTT());
             this.solarDate = new SolarDate(d.Y, d.M, d.D, d.h, d.m, d.s);
-            this.solarDate.setJDate(this);
+            this.solarDate.setJulianDate(this);
         }
         return this.solarDate;
     }
@@ -249,9 +253,9 @@ export class JDate {
     getLunarDate() {
         if (this.lunarDate === undefined) {
             let nextNewMoon, w1, w2, wn, y, m, d, n, fd, ry;
-            let jd = this.toJD();
+            let jd = this.jdTT();
             let F = jd + 0.5 - Math.floor(jd + 0.5);
-            let mjd = Math.floor(jd + 0.5) - JDate.J2000;
+            let mjd = Math.floor(jd + 0.5) - JulianDate.J2000;
             let ms = MoonPhase.aLongD(mjd / 36525, 10, 3);
             ms = Math.floor((ms + 2) / Angle.PI2) * Angle.PI2; //合朔
             let newMoon = MoonPhase.mjdUTC(ms);
@@ -316,7 +320,7 @@ export class JDate {
             F *= 60;
             ri.s = Math.round(F);
             this.lunarDate = new LunarDate(ri.Y, ri.M, ri.D, ri.R!==0, ri.h, ri.m, ri.s);
-            this.lunarDate.setJDate(this);
+            this.lunarDate.setJulianDate(this);
         }
         return this.lunarDate;
     }

@@ -12,8 +12,8 @@ describe('LunarDate Class', () => {
     test('calcJD method', () => {
         let l1 = new LunarDate(1977,4,1);
         let l2 = new LunarDate(2009,5,1,true);
-        expect(l1.getJDate().toJD()).toBe(2443282);
-        expect(l2.getJDate().toJD()).toBe(2455006);
+        expect(l1.getJulianDate().jdTT()).toBe(2443282);
+        expect(l2.getJulianDate().jdTT()).toBe(2455006);
     });
 
     test('calcLunar method', () => {

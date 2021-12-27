@@ -1,5 +1,5 @@
 import {LunarDate} from "./lunar-date";
-import {JDate} from "./j-date";
+import {JulianDate} from "./julian-date";
 
 export class SolarDate {
     private jde: number | undefined;
@@ -10,7 +10,7 @@ export class SolarDate {
     minute = 0;
     second = 0;
     firsDay = 0;
-    private jDate: JDate | undefined;
+    private julianDate: JulianDate | undefined;
     private lunarDate: LunarDate | undefined;
 
     constructor(year: number, month: number, day: number, hr?: number, min?: number, sec?: number);
@@ -48,23 +48,23 @@ export class SolarDate {
     }
 
     getJD() {
-        return this.getJDate().toJD();
+        return this.getJulianDate().jdTT();
     }
 
-    getJDate() {
-        if(this.jDate === undefined){
-            this.jDate = JDate.fromJd(JDate.gd2jd(this.year, this.month, this.day, this.hour, this.minute, this.second));
+    getJulianDate() {
+        if(this.julianDate === undefined){
+            this.julianDate = JulianDate.fromJdTT(JulianDate.gd2jd(this.year, this.month, this.day, this.hour, this.minute, this.second));
         }
-        return this.jDate;
+        return this.julianDate;
     }
 
-    setJDate(value: JDate) {
-        this.jDate = value;
+    setJulianDate(value: JulianDate) {
+        this.julianDate = value;
     }
 
     getLunarDate() {
         if(this.lunarDate === undefined) {
-            this.lunarDate = this.getJDate().getLunarDate();
+            this.lunarDate = this.getJulianDate().getLunarDate();
         }
         return this.lunarDate;
     }
@@ -82,7 +82,27 @@ export class SolarDate {
         return (this.getJD() + 1 + 7000000) % 7;
     }
 
-    toLD(){
-        return new LunarDate(this.jde);
+    date() {
+        return this.year + '-' + this.month.toString().padStart(2, '0') + '-' + this.day.toString().padStart(2, '0');
+    }
+
+    time() {
+        return this.hour.toString().padStart(2, '0') + ':' + this.minute.toString().padStart(2, '0') + ':' + this.second.toString().padStart(2, '0');
+    }
+
+    format(form: string) {
+        let str = '';
+        switch (form) {
+            case 'date':
+                str = this.date();
+                break
+            case 'time':
+                str = this.time();
+                break;
+            case 'datetime':
+                str = this.date() + ' ' + this.time();
+                break;
+        }
+        return str;
     }
 }

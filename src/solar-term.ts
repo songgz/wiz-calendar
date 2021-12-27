@@ -1,4 +1,4 @@
-import {JDate} from "./j-date";
+import {JulianDate} from "./julian-date";
 import {Angle} from "./angle";
 import {Sun} from "./ephem";
 
@@ -65,7 +65,7 @@ export class SolarTerm {
     //春分周期数，春分太阳位于黄经0度
     getSpringEquinoxes() {
         if(this.springEquinoxes === undefined){
-            let w = Sun.aLong((this.jd - JDate.J2000) / 36525, 3);
+            let w = Sun.aLong((this.jd - JulianDate.J2000) / 36525, 3);
             this.springEquinoxes = Math.floor(w / Angle.PI2 + 0.01);
         }
         return this.springEquinoxes;
