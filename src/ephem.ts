@@ -3,11 +3,6 @@ import {JDate} from "./j-date";
 import {Mpp02} from "./mpp-02";
 import {Angle} from "./angle";
 
-
-//let PI2: number = Math.PI * 2;
-//let R2A: number = 180 * 3600 / Math.PI;  //3600.0 * (180 / Math.PI); //每弧度的角秒数
-
-
 export class Nutation {
     /**
      * 求黄经章动
@@ -60,6 +55,7 @@ export class Sun {
      * 太阳黄经平速度，单位为弧度/儒略世纪
      */
     static MeanV = 628.3319653318;
+
     /***
      * 求太阳的黄经光行差
      * @param mjc - J2000.0算起的儒略世纪数
@@ -103,7 +99,7 @@ export class Sun {
     /**
      * 根据太阳视黄经，求时间，单位为儒略世纪数
      * @param aLong - 太阳视黄经
-     * @return - J2000.0算起的儒略世纪数
+     * @return - J2000.0算起的儒略世纪数，0时区
      */
     static mjcTT(aLong: number) {
         let t = this.approxJC(aLong); //近似儒略世纪数
@@ -119,10 +115,12 @@ export class Sun {
      * 高精度
      * @param aLong - 太阳视黄经
      * @return - mjd 东八区儒略日
+     * TT=UTC+64.184s
+     * 计算的区时=已知区时－（已知区时的时区-要计算区时的时区）。（注：东时区为正，西时区为负）
      */
     static mjdUTC(aLong: number): number {
         const t = Sun.mjcTT(aLong) * 36525;
-        return t - JDate.dt_T(t) + 8 / 24;
+        return t - JDate.dt_T(t) - (0 - JDate.Timezone) / 24;
     }
 
     /**
@@ -161,10 +159,6 @@ export class Sun {
     }
 }
 
-
-
-
-
 export class Moon {
     /**
      * 根据时间，计算月球黄经
@@ -173,10 +167,6 @@ export class Moon {
      */
     static long(jc: number, n: number) {
         return Mpp02.moon.orbit(0, jc, n);
-    }
-
-    static along(jc: number, n: number) {
-        return Moon.long(jc, n) + Nutation.long(jc) + Moon.aberrationLong(jc);
     }
 
     /**
@@ -201,9 +191,9 @@ export class Moon {
 
     /**
      * 求月球黄经光行差，误差0.07
-     * @param jc - 儒略世纪数
+     * @param mjc - J2000.0算起的儒略世纪数
      */
-    static aberrationLong(jc: number) {
+    static longAberration(mjc: number) {
         return -3.4E-6;
     }
 
@@ -232,7 +222,7 @@ export class MoonPhase {
      * @param sn - 日的精度计算项数
      */
     static aLongD(mjc: number, mn: number, sn: number) {
-        return Moon.long(mjc, mn) + Moon.aberrationLong(mjc) - (Sun.long(mjc, sn) + Sun.longAberration(mjc));
+        return Moon.long(mjc, mn) + Moon.longAberration(mjc) - (Sun.long(mjc, sn) + Sun.longAberration(mjc));
     }
 
     /**
@@ -276,7 +266,7 @@ export class MoonPhase {
      */
     static mjdUTC(aLongD: number): number {
         const t = MoonPhase.mjcTT(aLongD) * 36525;
-        return t - JDate.dt_T(t) + 8 / 24;
+        return t - JDate.dt_T(t) - (0 - JDate.Timezone) / 24;
     }
 
     /**

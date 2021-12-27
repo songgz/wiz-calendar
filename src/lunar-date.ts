@@ -2,13 +2,11 @@ import {JDate} from "./j-date";
 import {MoonPhase, Sun} from "./ephem";
 import {Angle} from "./angle";
 import {SolarTerm, SolarTermName} from "./solar-term";
-
-// let int2 = function (v: number) {
-//     return Math.floor(v);
-// };
+import {SolarDate} from "./solar-date";
 
 export class LunarDate {
-    jd = 0.0;
+    private jd = 0.0;
+    private jDate: JDate | undefined;
     mjd = 0;
     year = 0;
     month = 0;
@@ -18,27 +16,16 @@ export class LunarDate {
     second = 0;
     leap = false;
     daysOfMonth = 0;
-    sixtyYearCycle: number | undefined;
-    firstOfMonth: number | undefined;
-    lastOfMonth: number | undefined;
+    //六十年花甲周期
+    private sixtyYearCycle: number | undefined;
     moonPhases: { [key: number]: any } = {};
     pentads: { [key: number]: any } = {};
-    private winterSolstice: number | undefined;
-    private summerSolstice: number | undefined;
-    private springEquinox: number | undefined;
-    private autumnEquinox: number | undefined;
-    private beginOfAutumn: number | undefined;
-
-    private springEquinoxes: number | undefined;
     private firstDogdays: number | undefined;
     private lastDogdays: number | undefined;
-    private grainInBeard: number | undefined;
-    private lesserHeat: number | undefined;
     private intoPlum: number | undefined;
     private outPlum: number | undefined;
     private solarTerm: SolarTerm | undefined;
-
-
+    private solarDate: SolarDate | undefined;
 
     constructor(...options: any[]) {
         switch (options.length) {
@@ -47,7 +34,7 @@ export class LunarDate {
                 break;
             case 1:
                 this.jd = options[0];
-                this.calcLunar();
+                //this.calcLunar();
                 break;
             case 3:
             case 4:
@@ -75,6 +62,28 @@ export class LunarDate {
                 this.second = options[6];
                 break;
         }
+    }
+
+    getTimeToJD() {
+        return (this.hour * 3600 + this.minute * 60 + this.second) / 86400.0
+    }
+
+    getJDate() {
+        if(this.jDate === undefined){
+            this.jDate = new JDate(this.calcMJD() + this.getTimeToJD() - 0.5);
+        }
+        return this.jDate;
+    }
+
+    setJDate(value: JDate) {
+        this.jDate = value;
+    }
+
+    getSolarDate() {
+        if(this.solarDate === undefined){
+            this.solarDate = this.getJDate().getSolarDate();
+        }
+        return this.solarDate;
     }
 
     hasLeapMonth(): boolean {
@@ -135,7 +144,7 @@ export class LunarDate {
         if (Math.floor(newMoon + 0.5) > Math.floor(Sun.mjdUTC(w - solarTermRad24) + 0.5) && Math.floor(nextNewMoon + 0.5) > Math.floor(Sun.mjdUTC(w + solarTermRad24) + 0.5)) {
             w += solarTermRad12;
             for (let j = 0; j <= 5; j++) {
-                if (Math.floor(MoonPhase.mjdUTC(ms + j * Angle.PI2) + 0.5) > Math.floor(Sun.mjdUTC(w + j * Angle.PI2 / 12) + 0.5)) {
+                if (Math.floor(MoonPhase.mjdUTC(ms + j * Angle.PI2) + 0.5) > Math.floor(Sun.mjdUTC(w + j * solarTermRad12) + 0.5)) {
                     nextNewMoon = newMoon;
                     newMoon = MoonPhase.mjdUTC(ms - 2 * Angle.PI2);
                     break;
@@ -152,7 +161,8 @@ export class LunarDate {
         }
     }
 
-    calcLunar() {
+    //儒略日转阴历
+    calcLunar11() {
         let nextNewMoon, w1, w2, wn, y, m, d, n, fd, ry;
         let F = this.jd + 0.5 - Math.floor(this.jd + 0.5);
         let mjd = Math.floor(this.jd + 0.5) - JDate.J2000;
@@ -231,10 +241,22 @@ export class LunarDate {
         this.minute = Math.floor(F);
         F -= this.minute;
         F *= 60;
-        this.second = F;
+        this.second = Math.round(F);
     }
 
     toHash() {
+        return {
+            year: this.year,
+            month: this.month,
+            day: this.day,
+            leap: this.leap,
+            hour: this.hour,
+            minute: this.minute,
+            second: this.second
+        };
+    }
+
+    toHash2() {
         return {
             D: this.day,
             M: this.month,
@@ -309,6 +331,7 @@ export class LunarDate {
         return this.moonPhases;
     }
 
+    //返回jdUTC
     getFirstOfMonth(): number {
         return this.jd - this.day + 1;
     }

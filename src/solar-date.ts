@@ -2,7 +2,7 @@ import {LunarDate} from "./lunar-date";
 import {JDate} from "./j-date";
 
 export class SolarDate {
-    jde = 0;
+    private jde: number | undefined;
     year = 0;
     month = 0;
     day = 0;
@@ -10,8 +10,8 @@ export class SolarDate {
     minute = 0;
     second = 0;
     firsDay = 0;
-
-
+    private jDate: JDate | undefined;
+    private lunarDate: LunarDate | undefined;
 
     constructor(year: number, month: number, day: number, hr?: number, min?: number, sec?: number);
     constructor(...options: any[]) {
@@ -30,11 +30,43 @@ export class SolarDate {
                 this.hour = options[3] || 0;
                 this.minute = options[4] || 0;
                 this.second = options[5] || 0;
-                this.jde = Math.floor(JDate.gd2jd(this.year, this.month, this.day, this.hour, this.minute, this.day));
                 break;
 
         }
 
+    }
+
+    toHash() {
+        return {
+            year: this.year,
+            month: this.month,
+            day: this.day,
+            hour: this.hour,
+            minute: this.minute,
+            second: this.second
+        };
+    }
+
+    getJD() {
+        return this.getJDate().toJD();
+    }
+
+    getJDate() {
+        if(this.jDate === undefined){
+            this.jDate = JDate.fromJd(JDate.gd2jd(this.year, this.month, this.day, this.hour, this.minute, this.second));
+        }
+        return this.jDate;
+    }
+
+    setJDate(value: JDate) {
+        this.jDate = value;
+    }
+
+    getLunarDate() {
+        if(this.lunarDate === undefined) {
+            this.lunarDate = this.getJDate().getLunarDate();
+        }
+        return this.lunarDate;
     }
 
     fromJDE(jde: number){
@@ -43,11 +75,11 @@ export class SolarDate {
     }
 
     valueOf() {
-        return this.jde;
+        return this.getJD();
     }
 
     getWeek(){
-        return (this.jde + 1 + 7000000) % 7;
+        return (this.getJD() + 1 + 7000000) % 7;
     }
 
     toLD(){
