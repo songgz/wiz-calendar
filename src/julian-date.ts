@@ -218,7 +218,7 @@ export class JulianDate {
         return this.mjd;
     }
 
-    jdTT() {
+    jd() {
         return this.mjd + JulianDate.J2000;
     }
 
@@ -243,7 +243,7 @@ export class JulianDate {
 
     getSolarDate() {
         if (this.solarDate === undefined){
-            let d = JulianDate.DD(this.jdTT());
+            let d = JulianDate.DD(this.jd());
             this.solarDate = new SolarDate(d.Y, d.M, d.D, d.h, d.m, d.s);
             this.solarDate.setJulianDate(this);
         }
@@ -253,7 +253,7 @@ export class JulianDate {
     getLunarDate() {
         if (this.lunarDate === undefined) {
             let nextNewMoon, w1, w2, wn, y, m, d, n, fd, ry;
-            let jd = this.jdTT();
+            let jd = this.jd();
             let F = jd + 0.5 - Math.floor(jd + 0.5);
             let mjd = Math.floor(jd + 0.5) - JulianDate.J2000;
             let ms = MoonPhase.aLongD(mjd / 36525, 10, 3);

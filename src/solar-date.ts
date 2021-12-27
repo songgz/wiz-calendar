@@ -48,7 +48,7 @@ export class SolarDate {
     }
 
     getJD() {
-        return this.getJulianDate().jdTT();
+        return this.getJulianDate().jd();
     }
 
     getJulianDate() {
