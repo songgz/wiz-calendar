@@ -1,7 +1,7 @@
 {
   "name": "wiz-calendar",
   "version": "1.0.1",
-  "description": "巫师万年历是一款采用天文算法的高精度万年历模块。提供了方便易用的API，可以很容易的开发一个万年历和进行历法研究。",
+  "description": "巫师万年历是一款采用天文算法实现的高精度万年历模块。提供了方便易用的API，可以很容易地开发一个万年历和进行历法研究。",
   "main": "index.js",
   "directories": {
     "doc": "doc",

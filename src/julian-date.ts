@@ -1,4 +1,3 @@
-// Julian Date
 import {Angle} from "./angle";
 import {MoonPhase, Sun} from "./ephem";
 import {SolarDate} from "./solar-date";
@@ -6,6 +5,184 @@ import {LunarDate} from "./lunar-date";
 import {SolarTerm, SolarTermName} from "./solar-term";
 
 export class JulianDate {
+    /**
+     * 当前时区，东时区为正，西时区为负。
+     */
+    static Timezone = -(new Date()).getTimezoneOffset() / 60;
+
+    /**
+     * 当前儒略日，J2000.0算起的儒略日
+     * @private
+     */
+    private readonly mjd: number;
+
+    /**
+     * 当前世界时与力学时的差值，单位为天。
+     * @private
+     */
+    private deltaT: number | undefined;
+
+    /**
+     * 当前阳历日期对像
+     * @private
+     */
+    private solarDate: SolarDate | undefined;
+
+    /**
+     * 当前阴历日期对像
+     * @private
+     */
+    private lunarDate: LunarDate | undefined;
+
+    /**
+     * 当前节气对像
+     * @private
+     */
+    private solarTerm: SolarTerm | undefined;
+
+    /**
+     * 初始化儒略日期
+     * @param jd - 儒略日
+     */
+    constructor(jd: number = JulianDate.J2000) {
+        this.mjd = jd - JulianDate.J2000;
+    }
+
+    valueOf() {
+        return this.mjd;
+    }
+
+    jd() {
+        return this.mjd + JulianDate.J2000;
+    }
+
+    mjdn() {
+        return Math.floor(this.mjd + 0.5);
+    }
+
+    jdn() {
+        return Math.floor(this.jd() + 0.5);
+    }
+
+    getDeltaT(): number {
+        if (this.deltaT === undefined) {
+            this.deltaT = JulianDate.dt_T(this.mjd);
+        }
+        return this.deltaT;
+    }
+
+    toMjdUtc() {
+        return this.mjd - this.getDeltaT();
+    }
+
+    toJdUtc() {
+        return this.toMjdUtc() + JulianDate.J2000;
+    }
+
+    getSolarDate() {
+        if (this.solarDate === undefined){
+            let d = JulianDate.DD(this.jd());
+            this.solarDate = new SolarDate(d.Y, d.M, d.D, d.h, d.m, d.s);
+            this.solarDate.setJulianDate(this);
+        }
+        return this.solarDate;
+    }
+
+    setSolarDate(value: SolarDate) {
+        this.solarDate = value;
+    }
+
+    getLunarDate() {
+        if (this.lunarDate === undefined) {
+            let nextNewMoon, w1, w2, wn, y, m, d, n, fd, ry;
+            let jd = this.jd();
+            let F = jd + 0.5 - Math.floor(jd + 0.5);
+            let mjd = Math.floor(jd + 0.5) - JulianDate.J2000;
+            let ms = MoonPhase.aLongD(mjd / 36525, 10, 3);
+            ms = Math.floor((ms + 2) / Angle.PI2) * Angle.PI2; //合朔
+            let newMoon = MoonPhase.mjdUTC(ms);
+
+            if (Math.floor(newMoon + 0.5) > mjd) {
+                nextNewMoon = newMoon;
+                newMoon = MoonPhase.mjdUTC(ms - Angle.PI2);
+            } else {
+                ms += Angle.PI2;
+                nextNewMoon = MoonPhase.mjdUTC(ms);
+            }
+
+            let solarTermRad24 = Angle.PI2 / 24;
+            let solarTermRad12 = Angle.PI2 / 12;
+
+            w1 = Sun.aLong(newMoon / 36525, 3);
+            w1 = Math.floor(w1 / solarTermRad24) * solarTermRad24; //节气
+            while (Math.floor(Sun.mjdUTC(w1) + 0.5) < Math.floor(newMoon + 0.5)) {
+                w1 += solarTermRad24;
+            }
+            w2 = w1;
+            while (Math.floor(Sun.mjdUTC(w2 + solarTermRad24) + 0.5) < Math.floor(nextNewMoon + 0.5)) {
+                w2 += solarTermRad24;
+            }
+            wn = Math.floor((w2 + 0.1) / solarTermRad24) + 4; //节气数
+            y = Math.floor(wn / 24) + 2000 - 1;
+            wn = (wn % 24 + 24) % 24;
+            m = Math.floor(wn / 2);
+            d = mjd - Math.floor(newMoon + 0.5) + 1;
+            n = Math.floor(nextNewMoon + 0.5) - Math.floor(newMoon + 0.5);
+            fd = w2 - w1 < Angle.PI2 / 20 ? wn % 2 : 0;
+            ry = w2 == w1 ? fd : 0;
+            ms += Angle.PI2;
+            w2 += 1.5 * solarTermRad12;
+            for (let j = 0; fd && j <= 5; j++) {
+                if (Math.floor(Sun.mjdUTC(w2 + j * solarTermRad12) + 0.5) < Math.floor(MoonPhase.mjdUTC(ms + j * Angle.PI2) + 0.5)) {
+                    m++;
+                    ry = 0;
+                    if (m > 12) {
+                        m = 1;
+                        y++;
+                    }
+                    break;
+                }
+            }
+            if (m == 0) {
+                m = 12;
+                y--;
+            }
+            var ri: any = {};
+            ri.Y = y;
+            ri.M = m;
+            ri.R = ry;
+            ri.D = d;
+            ri.N = n;
+            F *= 24;
+            ri.h = Math.floor(F);
+            F -= ri.h;
+            F *= 60;
+            ri.m = Math.floor(F);
+            F -= ri.m;
+            F *= 60;
+            ri.s = Math.round(F);
+            this.lunarDate = new LunarDate(ri.Y, ri.M, ri.D, ri.R!==0, ri.h, ri.m, ri.s);
+            this.lunarDate.setJulianDate(this);
+        }
+        return this.lunarDate;
+    }
+
+    setLunarDate(value: LunarDate) {
+        this.lunarDate = value;
+    }
+
+    getSolarTerm(solarTermName: SolarTermName) {
+        if (this.solarTerm === undefined) {
+            this.solarTerm = new SolarTerm(this.jd());
+        }
+        return this.solarTerm.getSolarTerm(solarTermName);
+    }
+
+    formatTime() {
+        return JulianDate.timeStr(this.mjd);
+    }
+
+
     static J2000: number = 2451545.0; //2000年前儒略日数(2000-1-1 12:00:00格林威治平时)
     static DTS: number[] = [ // TD - UT1 世界时与原子时之差计算表
         -4000, 108371.7, -13036.80, 392.000, 0.0000,
@@ -203,148 +380,6 @@ export class JulianDate {
         return new JulianDate(mjd + JulianDate.J2000);
     }
 
-    //UTC 时间和本地时间之间的时差，以天为单位。
-    static Timezone = -(new Date()).getTimezoneOffset() / 60;
-
-    private readonly mjd: number;
-    private deltaT: number | undefined;
-    private solarDate: SolarDate | undefined;
-    private lunarDate: LunarDate | undefined;
-    private solarTerm: SolarTerm | undefined;
-
-    constructor(jd: number = JulianDate.J2000) {
-        this.mjd = jd - JulianDate.J2000;
-    }
-
-    valueOf() {
-        return this.mjd;
-    }
-
-    jd() {
-        return this.mjd + JulianDate.J2000;
-    }
-
-    jdnTT() {
-        return Math.floor(this.mjd + JulianDate.J2000 + 0.5);
-    }
-
-    getDeltaT(): number {
-        if (this.deltaT === undefined) {
-            this.deltaT = JulianDate.dt_T(this.mjd);
-        }
-        return this.deltaT;
-    }
-
-    toMjdUtc() {
-        return this.mjd - this.getDeltaT();
-    }
-
-    toJdUtc() {
-        return this.toMjdUtc() + JulianDate.J2000;
-    }
-
-    getSolarDate() {
-        if (this.solarDate === undefined){
-            let d = JulianDate.DD(this.jd());
-            this.solarDate = new SolarDate(d.Y, d.M, d.D, d.h, d.m, d.s);
-            this.solarDate.setJulianDate(this);
-        }
-        return this.solarDate;
-    }
-
-    getLunarDate() {
-        if (this.lunarDate === undefined) {
-            let nextNewMoon, w1, w2, wn, y, m, d, n, fd, ry;
-            let jd = this.jd();
-            let F = jd + 0.5 - Math.floor(jd + 0.5);
-            let mjd = Math.floor(jd + 0.5) - JulianDate.J2000;
-            let ms = MoonPhase.aLongD(mjd / 36525, 10, 3);
-            ms = Math.floor((ms + 2) / Angle.PI2) * Angle.PI2; //合朔
-            let newMoon = MoonPhase.mjdUTC(ms);
-
-            if (Math.floor(newMoon + 0.5) > mjd) {
-                nextNewMoon = newMoon;
-                newMoon = MoonPhase.mjdUTC(ms - Angle.PI2);
-            } else {
-                ms += Angle.PI2;
-                nextNewMoon = MoonPhase.mjdUTC(ms);
-            }
-
-            let solarTermRad24 = Angle.PI2 / 24;
-            let solarTermRad12 = Angle.PI2 / 12;
-
-            w1 = Sun.aLong(newMoon / 36525, 3);
-            w1 = Math.floor(w1 / solarTermRad24) * solarTermRad24; //节气
-            while (Math.floor(Sun.mjdUTC(w1) + 0.5) < Math.floor(newMoon + 0.5)) {
-                w1 += solarTermRad24;
-            }
-            w2 = w1;
-            while (Math.floor(Sun.mjdUTC(w2 + solarTermRad24) + 0.5) < Math.floor(nextNewMoon + 0.5)) {
-                w2 += solarTermRad24;
-            }
-            wn = Math.floor((w2 + 0.1) / solarTermRad24) + 4; //节气数
-            y = Math.floor(wn / 24) + 2000 - 1;
-            wn = (wn % 24 + 24) % 24;
-            m = Math.floor(wn / 2);
-            d = mjd - Math.floor(newMoon + 0.5) + 1;
-            n = Math.floor(nextNewMoon + 0.5) - Math.floor(newMoon + 0.5);
-            fd = w2 - w1 < Angle.PI2 / 20 ? wn % 2 : 0;
-            ry = w2 == w1 ? fd : 0;
-            ms += Angle.PI2;
-            w2 += 1.5 * solarTermRad12;
-            for (let j = 0; fd && j <= 5; j++) {
-                if (Math.floor(Sun.mjdUTC(w2 + j * solarTermRad12) + 0.5) < Math.floor(MoonPhase.mjdUTC(ms + j * Angle.PI2) + 0.5)) {
-                    m++;
-                    ry = 0;
-                    if (m > 12) {
-                        m = 1;
-                        y++;
-                    }
-                    break;
-                }
-            }
-            if (m == 0) {
-                m = 12;
-                y--;
-            }
-            var ri: any = {};
-            ri.Y = y;
-            ri.M = m;
-            ri.R = ry;
-            ri.D = d;
-            ri.N = n;
-            F *= 24;
-            ri.h = Math.floor(F);
-            F -= ri.h;
-            F *= 60;
-            ri.m = Math.floor(F);
-            F -= ri.m;
-            F *= 60;
-            ri.s = Math.round(F);
-            this.lunarDate = new LunarDate(ri.Y, ri.M, ri.D, ri.R!==0, ri.h, ri.m, ri.s);
-            this.lunarDate.setJulianDate(this);
-        }
-        return this.lunarDate;
-    }
-
-    getSolarTerm(solarTermName: SolarTermName) {
-        if (this.solarTerm === undefined) {
-            this.solarTerm = new SolarTerm(this.jd());
-        }
-        return this.solarTerm.getSolarTerm(solarTermName);
-    }
-
-    formatTime() {
-        return JulianDate.timeStr(this.mjd);
-    }
-
-    mjdn() {
-        return Math.floor(this.mjd + 0.5);
-    }
-
-    jdn() {
-        return Math.floor(this.jd() + 0.5);
-    }
 
 
 }

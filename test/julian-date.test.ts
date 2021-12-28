@@ -50,7 +50,7 @@ describe('JDate Class', () => {
 
     test('getSolarTerm method', () => {
         let julian = new JulianDate(2443282); //阴历1977-04-01 12:00:00
-        expect(julian.getSolarTerm(SolarTermName.WinterSolstice)).toBe(-8045);
+        expect(julian.getSolarTerm(SolarTermName.WinterSolstice).mjdn()).toBe(-8045);
     });
 
 });
