@@ -1,6 +1,6 @@
 {
   "name": "wiz-calendar",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "巫师万年历是一款采用天文算法实现的高精度万年历模块。提供了简便易用的API，清晰易读的面向对像代码设计，可以很容易地开发一个万年历和进行历法研究。",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -18,14 +18,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/songgz/wizcalendar.git"
+    "url": "git+https://github.com/songgz/wiz-calendar.git"
   },
   "author": "songgz",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/songgz/wizcalendar/issues"
+    "url": "https://github.com/songgz/wiz-calendar/issues"
   },
-  "homepage": "https://github.com/songgz/wizcalendar#readme",
+  "homepage": "https://github.com/songgz/wiz-calendar#readme",
   "devDependencies": {
     "@types/jest": "^27.0.3",
     "clean-webpack-plugin": "^4.0.0-alpha.0",
