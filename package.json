@@ -5,8 +5,8 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "directories": {
-    "doc": "doc",
-    "lib": "lib"
+    "dist": "dist",
+    "doc": "doc"
   },
   "scripts": {
     "test": "jest --coverage",
