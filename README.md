@@ -3,7 +3,7 @@ WizCalendar（巫师万年历）
 巫师万年历是一款采用天文算法实现的高精度万年历模块。提供了简便易用的API，清晰易读的面向对像代码设计，可以很容易地开发一个万年历和进行历法研究。
 主要参考了寿星万年历。
 
-###如何使用：
+### 如何使用：
 同时支持javascript和typescript两种语言。
 1. 通过npm安装
    ```
@@ -20,7 +20,7 @@ WizCalendar（巫师万年历）
    ```typescript
    import {SolarDate, LunarDate, JulianDate} from 'wiz-calendar';
    ```
-###基本用法：
+### 基本用法：
 1. 阳历转阴历
     ```typescript
    let solar = new SolarDate(1977, 5, 18);
