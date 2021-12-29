@@ -10,7 +10,7 @@ describe('JDate Class', () => {
     //     expect(JulianDate.fromUTC(1987, 1, 27.0).valueOf()).toBe(2446822.5);
     // });
 
-    it("test gd2jd", function() {
+    test("test gd2jd", () => {
         //dj = 2456770.942824074 //2014-4-23 10:37:40   //甲午年 戊辰月 甲子日 己巳时 真太阳 10:24:48
         let j = JulianDate.gd2jd(2014, 4, 23, 10, 37, 40);
         expect(j).toBeCloseTo(2456770.942824074, 8);
@@ -19,7 +19,7 @@ describe('JDate Class', () => {
 
     });
 
-    it("test DD", function() {
+    test("test DD", () => {
         //dj = 2456770.942824074 //2014-4-23 10:37:40   //甲午年 戊辰月 甲子日 己巳时 真太阳 10:24:48
         let d = JulianDate.DD(2456770.942824074);
         expect(d).toEqual({Y:2014,M:4,D:23,h:10,m:37,s:40});

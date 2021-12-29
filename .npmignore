@@ -12,3 +12,4 @@ wiz/
 xjw/
 .idea/
 webpack.config.js
+jest.config.js

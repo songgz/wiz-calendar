@@ -129,12 +129,8 @@ export class Angle {
 
 }
 
-export class Rad extends Angle {
+//export class Rad extends Angle {}
 
-}
-
-export class Deg extends Angle {
-
-}
+//export class Deg extends Angle {}
 
 

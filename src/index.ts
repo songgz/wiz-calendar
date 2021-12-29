@@ -1,23 +1,7 @@
-import {SolarDate} from "./solar-date";
-import {Angle} from "./angle";
-import {Earth, Moon, MoonPhase, Nutation, Sun} from "./ephem";
-import {SolarTerm} from "./solar-term";
-import {EightChar} from "./eight-char";
-import {LunarDate} from "./lunar-date";
-import {JulianDate} from "./julian-date";
-
-module.exports = {
-    Angle,
-    Nutation,
-    Earth,
-    Sun,
-    Moon,
-    MoonPhase,
-    SolarTerm,
-    EightChar,
-    SolarDate,
-    LunarDate,
-    JulianDate
-};
-
-
+export {Angle} from "./angle";
+export {Earth, Sun, Moon, MoonPhase} from "./ephem";
+export {SolarTerm, SolarTermName} from "./solar-term";
+export {JulianDate} from "./julian-date";
+export {SolarDate} from "./solar-date";
+export {LunarDate} from "./lunar-date";
+export {EightChar} from "./eight-char";
