@@ -1,4 +1,5 @@
 import {LunarDate} from "../src/lunar-date";
+import {JulianDate} from "../src";
 
 
 describe('LunarDate Class', () => {
@@ -9,18 +10,20 @@ describe('LunarDate Class', () => {
         expect(l2.hasLeapMonth()).toBe(true);
     });
 
-    test('calcJD method', () => {
+    test('getJulianDate method', () => {
         let l1 = new LunarDate(1977,4,1);
         let l2 = new LunarDate(2009,5,1,true);
-        expect(l1.getJulianDate().jd()).toBe(2443282);
-        expect(l2.getJulianDate().jd()).toBe(2455006);
+        expect(l1.getJulianDate().jd()).toBe(2443281.5); //2443281.5
+        expect(l2.getJulianDate().jd()).toBe(2455005.5);
     });
 
     test('calcLunar method', () => {
-        let l1 = new LunarDate(2443282);
-        let l2 = new LunarDate(2455006);
-        expect(l1.toHash2()).toStrictEqual({D:1,M:4,N:30,R:false,Y:1977,h:12,m:0,s:0});
-        expect(l2.toHash2()).toStrictEqual({D:1,M:5,N:29,R:true,Y:2009,h:12,m:0,s:0});
+        let j1 = JulianDate.fromJD(2443282);
+        let l1 = j1.getLunarDate();
+        let j2 = JulianDate.fromJD(2455006);
+        let l2 = j2.getLunarDate();
+        expect(l1.toHash2()).toStrictEqual({D:1,M:4,N:0,R:false,Y:1977,h:12,m:0,s:0});
+        expect(l2.toHash2()).toStrictEqual({D:1,M:5,N:0,R:true,Y:2009,h:12,m:0,s:0});
     });
 
     test('getReignTitle method', () => {
@@ -77,24 +80,24 @@ describe('LunarDate Class', () => {
     test('getFirstOfMonth method', () => {
         let l1 = new LunarDate(1977,4,1);
         let l2 = new LunarDate(1075,4,1);
-        expect(l1.getFirstOfMonth()).toBe(2443282);
-        expect(l2.getFirstOfMonth()).toBe(2113809);
+        expect(l1.getFirstOfMonth()).toBe(2443282 - JulianDate.J2000);
+        expect(l2.getFirstOfMonth()).toBe(2113809 - JulianDate.J2000);
 
     });
 
     test('getLastOfMonth method', () => {
         let l1 = new LunarDate(1977,4,1);
         let l2 = new LunarDate(1075,4,1);
-        expect(l1.getLastOfMonth()).toBe(2443311);
-        expect(l2.getLastOfMonth()).toBe(2113838);
+        expect(l1.getLastOfMonth()).toBe(2443311 - JulianDate.J2000);
+        expect(l2.getLastOfMonth()).toBe(2113838 - JulianDate.J2000);
 
     });
 
     test('calcMoonPhase method', () => {
         let l1 = new LunarDate(1977,4,1);
         let l2 = new LunarDate(1075,4,1);
-        expect(l1.calcMoonPhase()).toStrictEqual({"1": {"mjd": -8263.047660221844, "phase": 1, "sign": "●", "time": "10:51:22"}, "16": {"mjd": -8248.311906536072, "phase": 3, "sign": "○", "time": "04:30:51"}, "22": {"mjd": -8241.536798262809, "phase": 4, "sign": "☾", "time": "23:07:01"}, "9": {"mjd": -8255.027719730515, "phase": 2, "sign": "☽", "time": "11:20:05"}});
-        expect(l2.calcMoonPhase()).toStrictEqual({"1": {"mjd": -337736.06617712503, "phase": 1, "sign": "●", "time": "10:24:42"}, "16": {"mjd": -337720.8234802974, "phase": 3, "sign": "○", "time": "16:14:11"}, "23": {"mjd": -337714.23680114903, "phase": 4, "sign": "☾", "time": "06:19:00"}, "9": {"mjd": -337727.9089751736, "phase": 2, "sign": "☽", "time": "14:11:05"}});
+        expect(l1.calcMoonPhase111()).toStrictEqual({"1": {"mjd": -8263.047660221844, "phase": 1, "sign": "●", "time": "10:51:22"}, "16": {"mjd": -8248.311906536072, "phase": 3, "sign": "○", "time": "04:30:51"}, "22": {"mjd": -8241.536798262809, "phase": 4, "sign": "☾", "time": "23:07:01"}, "9": {"mjd": -8255.027719730515, "phase": 2, "sign": "☽", "time": "11:20:05"}});
+        expect(l2.calcMoonPhase111()).toStrictEqual({"1": {"mjd": -337736.06617712503, "phase": 1, "sign": "●", "time": "10:24:42"}, "16": {"mjd": -337720.8234802974, "phase": 3, "sign": "○", "time": "16:14:11"}, "23": {"mjd": -337714.23680114903, "phase": 4, "sign": "☾", "time": "06:19:00"}, "9": {"mjd": -337727.9089751736, "phase": 2, "sign": "☽", "time": "14:11:05"}});
 
     });
 

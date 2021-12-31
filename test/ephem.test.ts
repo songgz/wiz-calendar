@@ -1,4 +1,4 @@
-import {Earth, Moon, MoonPhase, Nutation, Sun} from "../src/ephem";
+import {Earth, Moon, SunMoon, Nutation, Sun} from "../src/ephem";
 
 describe('Nutation Class', () => {
     test('long method', () => {
@@ -47,14 +47,14 @@ describe('Moon Class', () => {
 
 describe('MoonPhase Class', () => {
     test('aLongD method', () => {
-        expect(MoonPhase.aLongD(2443259.9, 20, 10)).toBeCloseTo(1620980256488352800, 8);
+        expect(SunMoon.aLongD(2443259.9, 20, 10)).toBeCloseTo(1620980256488352800, 8);
     });
 
     test('jc method', () => {
-        expect(MoonPhase.mjcTT(2443259.9)).toBeCloseTo(314.39281238895694, 8);
+        expect(SunMoon.mjcTT(2443259.9)).toBeCloseTo(314.39281238895694, 8);
     });
 
     test('jc2 method', () => {
-        expect(MoonPhase.jc2(2443259.9)).toBeCloseTo(314.39299994517637, 8);
+        expect(SunMoon.jc2(2443259.9)).toBeCloseTo(314.39299994517637, 8);
     });
 });

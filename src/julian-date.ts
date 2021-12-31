@@ -1,5 +1,5 @@
 import {Angle} from "./angle";
-import {MoonPhase, Sun} from "./ephem";
+import {SunMoon, Sun} from "./ephem";
 import {SolarDate} from "./solar-date";
 import {LunarDate} from "./lunar-date";
 import {SolarTerm, SolarTermName} from "./solar-term";
@@ -42,13 +42,17 @@ export class JulianDate {
 
     /**
      * 初始化儒略日期
-     * @param jd - 儒略日
+     * @param mjd - 儒略日
      */
-    constructor(jd: number = JulianDate.J2000) {
-        this.mjd = jd - JulianDate.J2000;
+    constructor(mjd: number = 0) {
+        this.mjd = mjd;
     }
 
     valueOf() {
+        return this.mjd;
+    }
+
+    mjdTT() {
         return this.mjd;
     }
 
@@ -98,16 +102,16 @@ export class JulianDate {
             let jd = this.jd();
             let F = jd + 0.5 - Math.floor(jd + 0.5);
             let mjd = Math.floor(jd + 0.5) - JulianDate.J2000;
-            let ms = MoonPhase.aLongD(mjd / 36525, 10, 3);
+            let ms = SunMoon.aLongD(mjd / 36525, 10, 3);
             ms = Math.floor((ms + 2) / Angle.PI2) * Angle.PI2; //合朔
-            let newMoon = MoonPhase.mjdUTC(ms);
+            let newMoon = SunMoon.mjdUTC(ms);
 
             if (Math.floor(newMoon + 0.5) > mjd) {
                 nextNewMoon = newMoon;
-                newMoon = MoonPhase.mjdUTC(ms - Angle.PI2);
+                newMoon = SunMoon.mjdUTC(ms - Angle.PI2);
             } else {
                 ms += Angle.PI2;
-                nextNewMoon = MoonPhase.mjdUTC(ms);
+                nextNewMoon = SunMoon.mjdUTC(ms);
             }
 
             let solarTermRad24 = Angle.PI2 / 24;
@@ -133,7 +137,7 @@ export class JulianDate {
             ms += Angle.PI2;
             w2 += 1.5 * solarTermRad12;
             for (let j = 0; fd && j <= 5; j++) {
-                if (Math.floor(Sun.mjdUTC(w2 + j * solarTermRad12) + 0.5) < Math.floor(MoonPhase.mjdUTC(ms + j * Angle.PI2) + 0.5)) {
+                if (Math.floor(Sun.mjdUTC(w2 + j * solarTermRad12) + 0.5) < Math.floor(SunMoon.mjdUTC(ms + j * Angle.PI2) + 0.5)) {
                     m++;
                     ry = 0;
                     if (m > 12) {
@@ -173,7 +177,7 @@ export class JulianDate {
 
     getSolarTerm(solarTermName: SolarTermName) {
         if (this.solarTerm === undefined) {
-            this.solarTerm = new SolarTerm(this.jd());
+            this.solarTerm = new SolarTerm(this.mjdTT());
         }
         return this.solarTerm.getSolarTerm(solarTermName);
     }
@@ -376,8 +380,8 @@ export class JulianDate {
     //     return new JulianDate(JulianDate.gd2jd(Y, M, D, h, m, s));
     // }
 
-    static fromMJD(mjd: number) {
-        return new JulianDate(mjd + JulianDate.J2000);
+    static fromJD(jd: number) {
+        return new JulianDate(jd - JulianDate.J2000);
     }
 
 

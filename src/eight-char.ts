@@ -26,10 +26,10 @@ export class EightChar {
 
 
     //TT=UTC+64.184s
-    constructor(jdUTC: number, long?: number, timezone?: number) {
+    constructor(mjdUTC: number, long?: number, timezone?: number) {
         this.long = (long || 116.383333) * Angle.D2R
         this.timezone = timezone || (new Date()).getTimezoneOffset() / 60;
-        this.mjd = jdUTC + this.timezone / 24  - JulianDate.J2000;
+        this.mjd = mjdUTC + this.timezone / 24;
         this.mjdTT = this.mjd + JulianDate.dt_T(this.mjd);
         this.apparentSolarTime = this.mjd + JulianDate.apparentSolarTime(this.mjdTT / 36525) + this.long / Angle.PI2;
 

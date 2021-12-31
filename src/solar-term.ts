@@ -2,6 +2,57 @@ import {JulianDate} from "./julian-date";
 import {Angle} from "./angle";
 import {Sun} from "./ephem";
 
+export class SolarTerm {
+    private readonly mjd: number;
+    private springEquinoxes: number | undefined;
+    private solarTerms: {[key: number]: JulianDate} = {};
+
+
+    constructor(mjd: number) {
+        this.mjd = mjd;
+    }
+
+    //春分周期数，春分太阳位于黄经0度
+    getSpringEquinoxes() {
+        if(this.springEquinoxes === undefined){
+            let w = Sun.aLong((this.mjd) / 36525.0, 3);
+            this.springEquinoxes = Math.floor(w / Angle.PI2 + 0.01);
+        }
+        return this.springEquinoxes;
+    }
+
+    getSolarTerm(solarTermName: SolarTermName): JulianDate {
+        if(this.solarTerms[solarTermName] === undefined) {
+            this.solarTerms[solarTermName] = new JulianDate(Sun.mjdUTC((this.getSpringEquinoxes() + solarTermName / 24) * Angle.PI2));
+        }
+        return this.solarTerms[solarTermName];
+    }
+
+    getSolarTerm2(solarTermName: SolarTermName) {
+
+        return  new JulianDate(Sun.mjdUTC((this.getSpringEquinoxes() + solarTermName / 24) * Angle.PI2));
+
+    }
+
+    /**
+     * 求某时刻临近的节气，返回东八区的儒略日时间
+     * 高精度
+     * @param jd - 儒略日时间
+     * @return - 东八区儒略日
+     */
+    static closestJD(jd: number) { //精气
+        const d = Math.PI / 12;
+        const w = Math.floor((jd + 293) / 365.2422 * 24) * d;
+        const a = Sun.mjdUTC(w);
+        if (a - jd > 5) return Sun.mjdUTC(w - d);
+        if (a - jd < -5) return Sun.mjdUTC(w + d);
+        return a;
+    }
+
+
+}
+
+
 export enum SolarTermName {
     //春分
     SpringEquinox = 0,
@@ -51,55 +102,4 @@ export enum SolarTermName {
     RainWater = 22,
     //惊蛰
     InsectsAwaken = 23,
-}
-
-
-export class SolarTerm {
-    private readonly jd: number;
-    private springEquinoxes: number | undefined;
-    private solarTerms: {[key: number]: JulianDate} = {};
-
-
-    constructor(jd: number) {
-        this.jd = jd;
-    }
-
-    //春分周期数，春分太阳位于黄经0度
-    getSpringEquinoxes() {
-        if(this.springEquinoxes === undefined){
-            let w = Sun.aLong((this.jd - JulianDate.J2000) / 36525, 3);
-            this.springEquinoxes = Math.floor(w / Angle.PI2 + 0.01);
-        }
-        return this.springEquinoxes;
-    }
-
-    getSolarTerm(solarTermName: SolarTermName): JulianDate {
-        if(this.solarTerms[solarTermName] === undefined) {
-            this.solarTerms[solarTermName] = new JulianDate(Sun.mjdUTC((this.getSpringEquinoxes() + solarTermName / 24) * Angle.PI2) + JulianDate.J2000);
-        }
-        return this.solarTerms[solarTermName];
-    }
-
-    getSolarTerm2(solarTermName: SolarTermName) {
-
-        return  new JulianDate(Sun.mjdUTC((this.getSpringEquinoxes() + solarTermName / 24) * Angle.PI2) + JulianDate.J2000);
-
-    }
-
-    /**
-     * 求某时刻临近的节气，返回东八区的儒略日时间
-     * 高精度
-     * @param jd - 儒略日时间
-     * @return - 东八区儒略日
-     */
-    static closestJD(jd: number) { //精气
-        const d = Math.PI / 12;
-        const w = Math.floor((jd + 293) / 365.2422 * 24) * d;
-        const a = Sun.mjdUTC(w);
-        if (a - jd > 5) return Sun.mjdUTC(w - d);
-        if (a - jd < -5) return Sun.mjdUTC(w + d);
-        return a;
-    }
-
-
 }

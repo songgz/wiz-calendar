@@ -190,7 +190,7 @@ export class Moon {
     }
 
     /**
-     * 求月球黄经光行差，误差0.07
+     * 求某时刻月球黄经光行差，误差0.07
      * @param mjc - J2000.0算起的儒略世纪数
      */
     static longAberration(mjc: number) {
@@ -203,20 +203,20 @@ export class Moon {
      */
     static closestNewMoon(jd: number) {
         let w = Math.floor((jd + 8) / 29.5306) * Angle.PI2; //合朔时的日月黄经差
-        return MoonPhase.mjdUTC(w);
+        return SunMoon.mjdUTC(w);
     }
 
     static closestNewMoon2(jd: number) {
-        let ms = MoonPhase.aLongD(jd / 36525, 10, 3);
+        let ms = SunMoon.aLongD(jd / 36525, 10, 3);
         ms = Math.floor((ms + 2) / Angle.PI2) * Angle.PI2; //合朔时的日月黄经差
         //console.log(ms);
-        return MoonPhase.mjdUTC(ms);
+        return SunMoon.mjdUTC(ms);
     }
 }
 
-export class MoonPhase {
+export class SunMoon {
     /**
-     * 计算月日视黄经的差值
+     * 求某时刻月日视黄经的差值
      * @param mjc - J2000.0算起的儒略世纪数
      * @param mn - 月的精度计算项数
      * @param sn - 日的精度计算项数
@@ -233,11 +233,11 @@ export class MoonPhase {
      */
     static mjcTT(aLongD: number) {
         let t, v = 7771.37714500204;
-        t = MoonPhase.meanMJC(aLongD);
-        t += ( aLongD - MoonPhase.aLongD(t, 3, 3) ) / v;
+        t = SunMoon.meanMJC(aLongD);
+        t += ( aLongD - SunMoon.aLongD(t, 3, 3) ) / v;
         v = Moon.v(t) - Earth.v(t);  //v的精度0.5%，详见原文
-        t += ( aLongD - MoonPhase.aLongD(t, 20, 10) ) / v;
-        t += ( aLongD - MoonPhase.aLongD(t, -1, 60) ) / v;
+        t += ( aLongD - SunMoon.aLongD(t, 20, 10) ) / v;
+        t += ( aLongD - SunMoon.aLongD(t, -1, 60) ) / v;
         return t;
     }
 
@@ -249,7 +249,7 @@ export class MoonPhase {
     static jc2(aLongD: number) {
         let t, v = 7771.37714500204;
 
-        t = MoonPhase.meanMJC(aLongD);
+        t = SunMoon.meanMJC(aLongD);
         let L, t2 = t * t;
         t -= ( -0.00003309 * t2 + 0.10976 * Math.cos(0.784758 + 8328.6914246 * t + 0.000152292 * t2) + 0.02224 * Math.cos(0.18740 + 7214.0628654 * t - 0.00021848 * t2) - 0.03342 * Math.cos(4.669257 + 628.307585 * t) ) / v;
         L = Moon.long(t, 20) - (4.8950632 + 628.3319653318 * t + 0.000005297 * t2 + 0.0334166 * Math.cos(4.669257 + 628.307585 * t) + 0.0002061 * Math.cos(2.67823 + 628.307585 * t) * t + 0.000349 * Math.cos(4.6261 + 1256.61517 * t) - 20.5 / Angle.R2A);
@@ -265,7 +265,7 @@ export class MoonPhase {
      * @return - J2000.0算起的儒略日
      */
     static mjdUTC(aLongD: number): number {
-        const t = MoonPhase.mjcTT(aLongD) * 36525;
+        const t = SunMoon.mjcTT(aLongD) * 36525;
         return t - JulianDate.dt_T(t) - (0 - JulianDate.Timezone) / 24;
     }
 
@@ -279,11 +279,11 @@ export class MoonPhase {
     }
 
     static phases_high(W: number) { //较高精度朔
-        let t = MoonPhase.jc2(W) * 36525;
+        let t = SunMoon.jc2(W) * 36525;
         t = t - JulianDate.dt_T(t) + 8 / 24;
         const v = ((t + 0.5) % 1) * 86400;
         if (v < 1800 || v > 86400 - 1800){
-            t = MoonPhase.mjcTT(W) * 36525 - JulianDate.dt_T(t) + 8 / 24;
+            t = SunMoon.mjcTT(W) * 36525 - JulianDate.dt_T(t) + 8 / 24;
         }
         return  t;
     }

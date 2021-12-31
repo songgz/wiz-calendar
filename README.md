@@ -47,13 +47,15 @@ WizCalendar（巫师万年历）
     ```
 5. 儒略日转阳历
     ```typescript
-    let julian = new JulianDate(2456770.942824074);
+    let mjd = 5225.942824074067; //J2000算起的儒略日
+    let julian = new JulianDate();
     let solar: SolarDate = julian.getSolarDate();
     solar.format('datetime'); //2014-04-23 10:37:40
     ```
 6. 儒略日转阴历
    ```typescript
-   let julian = new JulianDate(2443282);
+   let mjd = -8263; //J2000算起的儒略日
+   let julian = new JulianDate(mjd);
    let lunar: LunarDate = julian.getLunarDate();
    lunar.format('datetime'); //1977-04-01+0 12:00:00
     ```
@@ -73,7 +75,7 @@ WizCalendar（巫师万年历）
    ```typescript
    //2014-4-23 10:37:40   
    //甲午年 戊辰月 甲子日 己巳时 真太阳 10:24:48
-   let eight = new EightChar(2456770.942824074);
+   let eight = new EightChar(5225.942824074067);
    eight.getYear(); //甲午
    eight.getMonth(); //戊辰
    eight.getDay(); //甲子
