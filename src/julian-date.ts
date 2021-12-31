@@ -104,14 +104,14 @@ export class JulianDate {
             let mjd = Math.floor(jd + 0.5) - JulianDate.J2000;
             let ms = SunMoon.aLongD(mjd / 36525, 10, 3);
             ms = Math.floor((ms + 2) / Angle.PI2) * Angle.PI2; //合朔
-            let newMoon = SunMoon.mjdUTC(ms);
+            let newMoon = SunMoon.mjd(ms);
 
             if (Math.floor(newMoon + 0.5) > mjd) {
                 nextNewMoon = newMoon;
-                newMoon = SunMoon.mjdUTC(ms - Angle.PI2);
+                newMoon = SunMoon.mjd(ms - Angle.PI2);
             } else {
                 ms += Angle.PI2;
-                nextNewMoon = SunMoon.mjdUTC(ms);
+                nextNewMoon = SunMoon.mjd(ms);
             }
 
             let solarTermRad24 = Angle.PI2 / 24;
@@ -119,11 +119,11 @@ export class JulianDate {
 
             w1 = Sun.aLong(newMoon / 36525, 3);
             w1 = Math.floor(w1 / solarTermRad24) * solarTermRad24; //节气
-            while (Math.floor(Sun.mjdUTC(w1) + 0.5) < Math.floor(newMoon + 0.5)) {
+            while (Math.floor(Sun.mjd(w1) + 0.5) < Math.floor(newMoon + 0.5)) {
                 w1 += solarTermRad24;
             }
             w2 = w1;
-            while (Math.floor(Sun.mjdUTC(w2 + solarTermRad24) + 0.5) < Math.floor(nextNewMoon + 0.5)) {
+            while (Math.floor(Sun.mjd(w2 + solarTermRad24) + 0.5) < Math.floor(nextNewMoon + 0.5)) {
                 w2 += solarTermRad24;
             }
             wn = Math.floor((w2 + 0.1) / solarTermRad24) + 4; //节气数
@@ -137,7 +137,7 @@ export class JulianDate {
             ms += Angle.PI2;
             w2 += 1.5 * solarTermRad12;
             for (let j = 0; fd && j <= 5; j++) {
-                if (Math.floor(Sun.mjdUTC(w2 + j * solarTermRad12) + 0.5) < Math.floor(SunMoon.mjdUTC(ms + j * Angle.PI2) + 0.5)) {
+                if (Math.floor(Sun.mjd(w2 + j * solarTermRad12) + 0.5) < Math.floor(SunMoon.mjd(ms + j * Angle.PI2) + 0.5)) {
                     m++;
                     ry = 0;
                     if (m > 12) {
@@ -187,7 +187,10 @@ export class JulianDate {
     }
 
 
-    static J2000: number = 2451545.0; //2000年前儒略日数(2000-1-1 12:00:00格林威治平时)
+    /**
+     * 儒略日期TT时2451545.0，即TT时2000年1月1日12时
+     */
+    static J2000: number = 2451545.0;
     static DTS: number[] = [ // TD - UT1 世界时与原子时之差计算表
         -4000, 108371.7, -13036.80, 392.000, 0.0000,
         -500, 17201.0, -627.82, 16.170, -0.3413,
@@ -249,9 +252,9 @@ export class JulianDate {
     }
 
     static gd2jd(y: number, m: number, d: number, h1: number = 0, m1: number = 0, s1: number = 0) {
-        let time = (h1 * 3600 + m1 * 60 + s1) / 86400;
+        let time = (h1 * 3600 + m1 * 60 + s1) / 86400.0;
         d += time;
-        var n = 0, G = 0;
+        let n = 0, G = 0;
         if (y * 372 + m * 31 + Math.floor(d) >= 588829) {
             G = 1;
         }
@@ -288,15 +291,25 @@ export class JulianDate {
 
     static DD(jd: number) {
         let r: any = {};
-        var D = Math.floor(jd + 0.5), F = jd + 0.5 - D, c;
-        if (D >= 2299161) c = Math.floor((D - 1867216.25) / 36524.25), D += 1 + c - Math.floor(c / 4);
+        let D = Math.floor(jd + 0.5), F = jd + 0.5 - D, c;
+        //从-4713-1-1到1582-10-4日中间只有2299161天
+        if (D >= 2299161) {
+            c = Math.floor((D - 1867216.25) / 36524.25);
+            D += 1 + c - Math.floor(c / 4);
+        }
         D += 1524;
         r.Y = Math.floor((D - 122.1) / 365.25);
         D -= Math.floor(365.25 * r.Y);
         r.M = Math.floor(D / 30.601);
         D -= Math.floor(30.601 * r.M);
         r.D = D;
-        if (r.M > 13) r.M -= 13, r.Y -= 4715; else r.M -= 1, r.Y -= 4716;
+        if (r.M > 13) {
+            r.M -= 13;
+            r.Y -= 4715;
+        }else{
+            r.M -= 1;
+            r.Y -= 4716;
+        }
         F *= 24;
         r.h = Math.floor(F);
         F -= r.h;
@@ -326,7 +339,7 @@ export class JulianDate {
     }
 
     static JD2str(jd: number) {
-        var r = this.DD(jd);
+        const r = this.DD(jd);
         return this.DD2str(r);
     }
 
@@ -357,7 +370,7 @@ export class JulianDate {
     }
 
     static llrConv(JW: number[], E: number) {
-        var r = [], J = JW[0], W = JW[1];
+        const r = [], J = JW[0], W = JW[1];
         r[0] = Math.atan2(Math.sin(J) * Math.cos(E) - Math.tan(W) * Math.sin(E), Math.cos(J));
         r[1] = Math.asin(Math.cos(E) * Math.sin(W) + Math.sin(E) * Math.cos(W) * Math.sin(J));
         r[2] = JW[2];

@@ -21,9 +21,7 @@ export class MoonPhase {
 
     getMoonPhase(moonphaseName: MoonPhaseName) {
         if (this.moonPhases[moonphaseName] === undefined) {
-            let mjd = SunMoon.mjdUTC((this.getNewMoons() + moonphaseName / 4.0) * Angle.PI2);
-            //console.log(n);
-            //console.log(n + JulianDate.J2000 - JulianDate.J2000);
+            let mjd = SunMoon.mjd((this.getNewMoons() + moonphaseName / 4.0) * Angle.PI2);
             this.moonPhases[moonphaseName] = new JulianDate(mjd);
         }
         return this.moonPhases[moonphaseName];

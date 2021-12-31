@@ -23,14 +23,14 @@ export class SolarTerm {
 
     getSolarTerm(solarTermName: SolarTermName): JulianDate {
         if(this.solarTerms[solarTermName] === undefined) {
-            this.solarTerms[solarTermName] = new JulianDate(Sun.mjdUTC((this.getSpringEquinoxes() + solarTermName / 24) * Angle.PI2));
+            this.solarTerms[solarTermName] = new JulianDate(Sun.mjd((this.getSpringEquinoxes() + solarTermName / 24) * Angle.PI2));
         }
         return this.solarTerms[solarTermName];
     }
 
     getSolarTerm2(solarTermName: SolarTermName) {
 
-        return  new JulianDate(Sun.mjdUTC((this.getSpringEquinoxes() + solarTermName / 24) * Angle.PI2));
+        return  new JulianDate(Sun.mjd((this.getSpringEquinoxes() + solarTermName / 24) * Angle.PI2));
 
     }
 
@@ -40,12 +40,12 @@ export class SolarTerm {
      * @param jd - 儒略日时间
      * @return - 东八区儒略日
      */
-    static closestJD(jd: number) { //精气
+    static closestJD(mjd: number) { //精气
         const d = Math.PI / 12;
-        const w = Math.floor((jd + 293) / 365.2422 * 24) * d;
-        const a = Sun.mjdUTC(w);
-        if (a - jd > 5) return Sun.mjdUTC(w - d);
-        if (a - jd < -5) return Sun.mjdUTC(w + d);
+        const w = Math.floor((mjd + 293) / 365.2422 * 24) * d;
+        const a = Sun.mjd(w);
+        if (a - mjd > 5) return Sun.mjd(w - d);
+        if (a - mjd < -5) return Sun.mjd(w + d);
         return a;
     }
 

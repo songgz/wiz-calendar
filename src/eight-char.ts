@@ -18,7 +18,7 @@ export class EightChar {
     /**
      * 力学时
      */
-    mjdTT = 0;
+    mjde = 0;
     /**
      * 本地真太阳时(使用低精度算法计算时差)
      */
@@ -26,14 +26,14 @@ export class EightChar {
 
 
     //TT=UTC+64.184s
-    constructor(mjdUTC: number, long?: number, timezone?: number) {
+    constructor(mjd: number, long?: number, timezone?: number) {
         this.long = (long || 116.383333) * Angle.D2R
         this.timezone = timezone || (new Date()).getTimezoneOffset() / 60;
-        this.mjd = mjdUTC + this.timezone / 24;
-        this.mjdTT = this.mjd + JulianDate.dt_T(this.mjd);
-        this.apparentSolarTime = this.mjd + JulianDate.apparentSolarTime(this.mjdTT / 36525) + this.long / Angle.PI2;
+        this.mjd = mjd + this.timezone / 24;
+        this.mjde = this.mjd + JulianDate.dt_T(this.mjd);
+        this.apparentSolarTime = this.mjd + JulianDate.apparentSolarTime(this.mjde / 36525) + this.long / Angle.PI2;
 
-        let w = Sun.aLong( this.mjdTT / 36525, -1 );
+        let w = Sun.aLong( this.mjde / 36525, -1 );
         let k = Math.floor((w / (2 * Math.PI) * 360 + 45 + 15 * 360) / 30); //1984年立春起算的节气数(不含中气)
         this.yearStem = Math.floor(k / 12 + 6000000) % 10;
         this.yearBranch = Math.floor(k / 12 + 6000000) % 12;

@@ -27,7 +27,7 @@ describe('Sun Class', () => {
 
     test('jc method', () => {
         //console.log(Sun.mjcTT(-133.5176877775662));-0.22027447076688794
-        expect(Sun.mjcTT(2443259.9)).toBeCloseTo(3850.507554298232, 8);
+        expect(Sun.mjce(2443259.9)).toBeCloseTo(3850.507554298232, 8);
     });
 
     test('jc2 method', () => {
@@ -51,7 +51,7 @@ describe('MoonPhase Class', () => {
     });
 
     test('jc method', () => {
-        expect(SunMoon.mjcTT(2443259.9)).toBeCloseTo(314.39281238895694, 8);
+        expect(SunMoon.mjce(2443259.9)).toBeCloseTo(314.39281238895694, 8);
     });
 
     test('jc2 method', () => {

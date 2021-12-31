@@ -26,7 +26,7 @@ export class LunarDate {
     private solarTerm: SolarTerm | undefined;
     private solarDate: SolarDate | undefined;
     private julianDate: JulianDate | undefined;
-    private moonphase: MoonPhase | undefined;
+    private moonPhase: MoonPhase | undefined;
 
     constructor(...options: any[]) {
         switch (options.length) {
@@ -103,27 +103,27 @@ export class LunarDate {
     hasLeapMonth(): boolean {
         let nextNewMoon;
         let w = (this.year - 2000 + (this.month + 10.5) / 12) * Angle.PI2; //节气
-        let majorSolarTerm = Sun.mjdUTC(w);
+        let majorSolarTerm = Sun.mjd(w);
         let solarTermRad24 = Angle.PI2 / 24;
         let ms = SunMoon.aLongD(majorSolarTerm / 36525, 10, 3);
         ms = Math.floor((ms + 2) / Angle.PI2) * Angle.PI2; //朔日
-        let newMoon = SunMoon.mjdUTC(ms);
+        let newMoon = SunMoon.mjd(ms);
 
         if (Math.floor(newMoon + 0.5) > Math.floor(majorSolarTerm + 0.5)) {
             nextNewMoon = newMoon;
-            newMoon = SunMoon.mjdUTC(ms - Angle.PI2);
+            newMoon = SunMoon.mjd(ms - Angle.PI2);
         } else {
             ms += Angle.PI2;
-            nextNewMoon = SunMoon.mjdUTC(ms);
+            nextNewMoon = SunMoon.mjd(ms);
         }
 
-        if (Math.floor(newMoon + 0.5) > Math.floor(Sun.mjdUTC(w - solarTermRad24) + 0.5) && Math.floor(nextNewMoon + 0.5) <= Math.floor(Sun.mjdUTC(w + solarTermRad24) + 0.5)) {
+        if (Math.floor(newMoon + 0.5) > Math.floor(Sun.mjd(w - solarTermRad24) + 0.5) && Math.floor(nextNewMoon + 0.5) <= Math.floor(Sun.mjd(w + solarTermRad24) + 0.5)) {
             let solarTermRad12 = Angle.PI2 / 12;
             w += solarTermRad24;
             for (let j = 0; j <= 5; j++) {
                 w += solarTermRad12; //下一个中气
                 ms += Angle.PI2; //下一个朔日
-                if (Math.floor(SunMoon.mjdUTC(ms) + 0.5) > Math.floor(Sun.mjdUTC(w) + 0.5)) {
+                if (Math.floor(SunMoon.mjd(ms) + 0.5) > Math.floor(Sun.mjd(w) + 0.5)) {
                     return this.leap = false;
                 }
             }
@@ -142,25 +142,25 @@ export class LunarDate {
     calcMJD() {
         let nextNewMoon;
         let w = (this.year - 2000 + (this.month + 10) / 12) * Angle.PI2; //中气
-        let minorSolarTerm = Sun.mjdUTC(w);
+        let minorSolarTerm = Sun.mjd(w);
         let ms = SunMoon.aLongD(minorSolarTerm / 36525, 10, 3);
         ms = Math.floor((ms + 2) / Angle.PI2) * Angle.PI2; //合朔
-        let newMoon = SunMoon.mjdUTC(ms);
+        let newMoon = SunMoon.mjd(ms);
         if (Math.floor(newMoon + 0.5) > Math.floor(minorSolarTerm + 0.5)) {
             nextNewMoon = newMoon;
-            newMoon = SunMoon.mjdUTC(ms - Angle.PI2);
+            newMoon = SunMoon.mjd(ms - Angle.PI2);
         } else {
             ms += Angle.PI2;
-            nextNewMoon = SunMoon.mjdUTC(ms);
+            nextNewMoon = SunMoon.mjd(ms);
         }
         let solarTermRad24 = Angle.PI2 / 24;
         let solarTermRad12 = Angle.PI2 / 12;
-        if (Math.floor(newMoon + 0.5) > Math.floor(Sun.mjdUTC(w - solarTermRad24) + 0.5) && Math.floor(nextNewMoon + 0.5) > Math.floor(Sun.mjdUTC(w + solarTermRad24) + 0.5)) {
+        if (Math.floor(newMoon + 0.5) > Math.floor(Sun.mjd(w - solarTermRad24) + 0.5) && Math.floor(nextNewMoon + 0.5) > Math.floor(Sun.mjd(w + solarTermRad24) + 0.5)) {
             w += solarTermRad12;
             for (let j = 0; j <= 5; j++) {
-                if (Math.floor(SunMoon.mjdUTC(ms + j * Angle.PI2) + 0.5) > Math.floor(Sun.mjdUTC(w + j * solarTermRad12) + 0.5)) {
+                if (Math.floor(SunMoon.mjd(ms + j * Angle.PI2) + 0.5) > Math.floor(Sun.mjd(w + j * solarTermRad12) + 0.5)) {
                     nextNewMoon = newMoon;
-                    newMoon = SunMoon.mjdUTC(ms - 2 * Angle.PI2);
+                    newMoon = SunMoon.mjd(ms - 2 * Angle.PI2);
                     break;
                 }
             }
@@ -354,10 +354,10 @@ export class LunarDate {
     }
 
     getMoonPhase(moonPhaseName: MoonPhaseName): JulianDate {
-        if (this.moonphase === undefined) {
-            this.moonphase = new MoonPhase(this.getFirstOfMonth());
+        if (this.moonPhase === undefined) {
+            this.moonPhase = new MoonPhase(this.getFirstOfMonth());
         }
-        return this.moonphase.getMoonPhase(moonPhaseName);
+        return this.moonPhase.getMoonPhase(moonPhaseName);
     }
 
     calcMoonPhase111() {
@@ -367,7 +367,7 @@ export class LunarDate {
         let signs = ['●', '☽', '○', '☾'];
         let phase = 0;
         for (let j = 0; j < 4; j++) {
-            phase = SunMoon.mjdUTC(ms + phaseRad * j);
+            phase = SunMoon.mjd(ms + phaseRad * j);
             this.moonPhases[Math.floor(phase + 0.5 + JulianDate.J2000) - this.getFirstOfMonth() + 1] = {
                 mjd: phase,
                 phase: j + 1,
@@ -386,7 +386,7 @@ export class LunarDate {
     getLastOfMonth() {
         let ms = SunMoon.aLongD((this.getFirstOfMonth()) / 36525, 10, 3);
         ms = Math.floor((ms + 2) / Angle.PI2) * Angle.PI2;
-        return Math.floor(SunMoon.mjdUTC(ms + Angle.PI2) + 0.5) - 1;
+        return Math.floor(SunMoon.mjd(ms + Angle.PI2) + 0.5) - 1;
     }
 
     calcPentads() {
@@ -395,12 +395,12 @@ export class LunarDate {
         //nCF = int2(w / pi2 + 0.01);
         let pentadRad = Angle.PI2 / 72;
         w = Math.floor(w / pentadRad) * pentadRad;
-        while (Math.floor(Sun.mjdUTC(w) + JulianDate.J2000 + 0.5) < Math.floor(first + 0.5)) {
+        while (Math.floor(Sun.mjd(w) + JulianDate.J2000 + 0.5) < Math.floor(first + 0.5)) {
             w += pentadRad;
         }
         let wn = (Math.floor((w + 0.02) / pentadRad) % 72 + 72) % 72;
         for (let j = 0; j <= 6; j++) {
-            let mjd = Sun.mjdUTC(w + j * pentadRad);
+            let mjd = Sun.mjd(w + j * pentadRad);
             let pentad = {
                 mjd: mjd,
                 idx: (wn + j) % 72,
