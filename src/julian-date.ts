@@ -256,7 +256,7 @@ export class JulianDate {
         d += time;
         let n = 0, G = 0;
         if (y * 372 + m * 31 + Math.floor(d) >= 588829) {
-            G = 1;
+            G = 1; //判断是否为格里高利历日1582*372+10*31+15
         }
         if (m <= 2) {
             m += 12;
@@ -264,7 +264,7 @@ export class JulianDate {
         }
         if (G) {
             n = Math.floor(y / 100);
-            n = 2 - n + Math.floor(n / 4);
+            n = 2 - n + Math.floor(n / 4); //加百年闰
         }
         return Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1)) + d + n - 1524.5;
     }
@@ -291,6 +291,7 @@ export class JulianDate {
 
     static DD(jd: number) {
         let r: any = {};
+        //取得日数的整数部份D及小数部分F
         let D = Math.floor(jd + 0.5), F = jd + 0.5 - D, c;
         //从-4713-1-1到1582-10-4日中间只有2299161天
         if (D >= 2299161) {
@@ -298,11 +299,11 @@ export class JulianDate {
             D += 1 + c - Math.floor(c / 4);
         }
         D += 1524;
-        r.Y = Math.floor((D - 122.1) / 365.25);
+        r.Y = Math.floor((D - 122.1) / 365.25); //年数
         D -= Math.floor(365.25 * r.Y);
-        r.M = Math.floor(D / 30.601);
+        r.M = Math.floor(D / 30.601); //月数
         D -= Math.floor(30.601 * r.M);
-        r.D = D;
+        r.D = D; //日数
         if (r.M > 13) {
             r.M -= 13;
             r.Y -= 4715;
