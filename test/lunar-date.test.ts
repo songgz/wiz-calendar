@@ -4,8 +4,8 @@ import {JulianDate} from "../src";
 
 describe('LunarDate Class', () => {
     test('hasLeapMonth method', () => {
-        let l1 = new LunarDate(1977,4,0,1);
-        let l2 = new LunarDate(2009,5,1,1);
+        let l1 = new LunarDate(1977,4,0,true);
+        let l2 = new LunarDate(2009,5,1,true);
         expect(l1.hasLeapMonth()).toBe(false);
         expect(l2.hasLeapMonth()).toBe(true);
     });
