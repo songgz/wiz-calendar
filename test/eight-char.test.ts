@@ -1,6 +1,4 @@
-import {EightChar} from "../src/eight-char";
-import {JulianDate} from "../src/julian-date";
-
+import {JulianDate,EightChar} from "../src";
 
 describe('EightChar Class', () => {
     test('new method', () => {

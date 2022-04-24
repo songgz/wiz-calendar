@@ -1,5 +1,4 @@
-import {WizCalendar} from "../src/wiz-calendar";
-import {SolarDate} from "../src";
+import {WizCalendar} from "../src";
 
 describe('WizCalendar Class', () => {
     test('julianDate method', () => {

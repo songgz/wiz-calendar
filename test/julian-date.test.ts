@@ -1,9 +1,8 @@
 import {JulianDate} from "../src/julian-date";
 import {SolarDate} from "../src/solar-date";
 import {LunarDate} from "../src/lunar-date";
-import {SolarTermName} from "../src/solar-term";
 
-describe('JDate Class', () => {
+describe('JulianDate Class', () => {
     // test('fromUTC method', () => {
     //     expect(JulianDate.fromUTC(1977, 4, 26.4).valueOf()).toBe(2443259.9);
     //     expect(JulianDate.fromUTC(2000, 1, 1.5).valueOf()).toBe(2451545.0);

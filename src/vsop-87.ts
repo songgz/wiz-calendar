@@ -1,5 +1,5 @@
 export class Vsop87 {
-    private xt:number;
+    private readonly xt: number;
 
     /**
      *
@@ -21,7 +21,9 @@ export class Vsop87 {
         let F = Vsop87.orbits[this.xt], n1, n2, N;
         let n0, pn = zn * 6 + 1, N0 = F[pn + 1] - F[pn]; //N0序列总数
         for (let i = 0; i < 6; i++) {
-            n1 = F[pn + i], n2 = F[pn + 1 + i], n0 = n2 - n1;
+            n1 = F[pn + i];
+            n2 = F[pn + 1 + i];
+            n0 = n2 - n1;
             if (!n0) continue;
             if (n < 0) {
                 N = n2;  //确定项数

@@ -1,5 +1,5 @@
 import '../src/extension'
-import {Angle} from '../src/angle';
+import {Angle} from '../src';
 
 describe('Angle Class', () => {
     test('valueOf method', () => {

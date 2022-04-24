@@ -415,9 +415,9 @@ export class LunarDate {
         return this.solarTerm.getSolarTerm(solarTermName);
     }
 
-    getSolarTerm33(solarTermName: SolarTermName) {
-        //return this.getJulianDate().getSolarTerm(solarTermName);
-    }
+    // getSolarTerm33(solarTermName: SolarTermName) {
+    //     return this.getJulianDate().getSolarTerm(solarTermName);
+    // }
 
     // getSolarTerm222(term: SolarTermName) {
     //     if(this.solarTerm === undefined) {

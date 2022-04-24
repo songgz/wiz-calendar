@@ -1,7 +1,4 @@
-
-import {LunarDate} from "../src/lunar-date";
-import {SolarTerm, SolarTermName} from "../src/solar-term";
-import {JulianDate} from "../src/julian-date";
+import {LunarDate, SolarTerm, SolarTermName, JulianDate} from "../src";
 
 describe('SolarTerm Class', () => {
     test('getSolarTerm method', () => {

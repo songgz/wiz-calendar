@@ -1,11 +1,11 @@
 import {LunarDate} from "../src";
-import {MoonPhase, MoonPhaseName} from "../src/MoonPhase";
+import {MoonPhaseName} from "../src/MoonPhase";
 
 
 describe('Moonphase Class', () => {
     test('getMoonphase method', () => {
         let l1 = new LunarDate(1977,4,1);
-        let m1 = new MoonPhase(l1.getFirstOfMonth());
+        //let m1 = new MoonPhase(l1.getFirstOfMonth());
         //m1.getMoonphase(MoonphaseName.NewMoon);
         //{"1": {"mjd": -8263.047660221844, "phase": 1, "sign": "●", "time": "10:51:22"}, "16": {"mjd": -8248.311906536072, "phase": 3, "sign": "○", "time": "04:30:51"}, "22": {"mjd": -8241.536798262809, "phase": 4, "sign": "☾", "time": "23:07:01"}, "9": {"mjd": -8255.027719730515, "phase": 2, "sign": "☽", "time": "11:20:05"}}
         expect(l1.getMoonPhase(MoonPhaseName.NewMoon).mjdTT()).toBeCloseTo(-8263.047660221844, 10);

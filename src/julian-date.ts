@@ -144,7 +144,7 @@ export class JulianDate {
                 m = 12;
                 y--;
             }
-            var ri: any = {};
+            const ri: any = {};
             ri.Y = y;
             ri.M = m;
             ri.R = ry;
@@ -226,9 +226,9 @@ export class JulianDate {
             if (year > 2015 + 100) {
                 dt = -20 + jsd * dy * dy;
             } else {
-                var v = -20 + jsd * dy * dy;
+                const v = -20 + jsd * dy * dy;
                 dy = (2015 - 1820) / 100;
-                var dv = -20 + jsd * dy * dy - 69;
+                const dv = -20 + jsd * dy * dy - 69;
                 dt = v - dv * (2015 + 100 - year) / 100;
             }
         }
@@ -318,18 +318,24 @@ export class JulianDate {
     static DD2str(r: any) {
         let Y = "     " + r.Y, M = "0" + r.M, D = "0" + r.D;
         let h = r.h, m = r.m, s = Math.floor(r.s + .5);
-        if (s >= 60) s -= 60, m++;
-        if (m >= 60) m -= 60, h++;
+        if (s >= 60) {
+            s -= 60;
+            m++;
+        }
+        if (m >= 60) {
+            m -= 60;
+            h++;
+        }
         h = "0" + h;
         m = "0" + m;
         let s2 = "0" + s;
-        Y = Y.substr(Y.length - 5, 5);
-        M = M.substr(M.length - 2, 2);
-        D = D.substr(D.length - 2, 2);
-        h = h.substr(h.length - 2, 2);
-        m = m.substr(m.length - 2, 2);
-        s2 = s2.substr(s2.length - 2, 2);
-        return Y + "-" + M + "-" + D + " " + h + ":" + m + ":" + s;
+        Y = Y.slice(-5);
+        M = M.slice(-2);
+        D = D.slice(-2);
+        h = h.slice(-2);
+        m = m.slice(-2);
+        s2 = s2.slice(-2);
+        return Y + "-" + M + "-" + D + " " + h + ":" + m + ":" + s2;
     }
 
     static JD2str(jd: number) {
@@ -349,7 +355,7 @@ export class JulianDate {
         h = "0" + h;
         m = "0" + m;
         s = "0" + s;
-        return h.substr(h.length - 2, 2) + ':' + m.substr(m.length - 2, 2) + ':' + s.substr(s.length - 2, 2);
+        return h.slice(-2) + ':' + m.slice(-2) + ':' + s.slice(-2);
     }
 
     static getTime(mjd: number) {
@@ -376,7 +382,8 @@ export class JulianDate {
         let L = (1753470142 + 628331965331.8 * mjd + 5296.74 * mjd * mjd) / 1000000000 + Math.PI;
         let z = [];
         let E = (84381.4088 - 46.836051 * mjd) / Angle.R2A;
-        z[0] = Sun.long(mjd, 5), z[1] = 0;
+        z[0] = Sun.long(mjd, 5);
+        z[1] = 0;
         z = JulianDate.llrConv(z, E);
         L = Angle.rad2rrad(L - z[0]);
         return L / Angle.PI2;

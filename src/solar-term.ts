@@ -37,7 +37,7 @@ export class SolarTerm {
     /**
      * 求某时刻临近的节气，返回东八区的儒略日时间
      * 高精度
-     * @param jd - 儒略日时间
+     * @param mjd - J2000.0算起的儒略日时间
      * @return - 东八区儒略日
      */
     static closestJD(mjd: number) { //精气

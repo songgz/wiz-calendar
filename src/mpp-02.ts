@@ -4,18 +4,20 @@ export class Mpp02 {
     }
 
     orbit(zn: number, t: number, n: number) { //计算月亮
-        var ob = Mpp02.orbits[zn];
-        var j, F, N, v = 0, tn = 1, c;
-        var t2 = t * t, t3 = t2 * t, t4 = t3 * t, t5 = t4 * t, tx = t - 10;
+        const ob = Mpp02.orbits[zn];
+        let j, F, N, v = 0, tn = 1, c;
+        let t2 = t * t, t3 = t2 * t, t4 = t3 * t, t5 = t4 * t, tx = t - 10;
         if (zn == 0) {
             v += (3.81034409 + 8399.684730072 * t - 3.319e-05 * t2 + 3.11e-08 * t3 - 2.033e-10 * t4) * Mpp02.R2A; //月球平黄经(弧度)
             v += 5028.792262 * t + 1.1124406 * t2 + 0.00007699 * t3 - 0.000023479 * t4 - 0.0000000178 * t5;  //岁差(角秒)
-            if (tx > 0) v += -0.866 + 1.43 * tx + 0.054 * tx * tx; //对公元3000年至公元5000年的拟合,最大误差小于10角秒
+            if (tx > 0) {v += -0.866 + 1.43 * tx + 0.054 * tx * tx;} //对公元3000年至公元5000年的拟合,最大误差小于10角秒
         }
-        t2 /= 1e4, t3 /= 1e8, t4 /= 1e8;
+        t2 /= 1e4;
+        t3 /= 1e8;
+        t4 /= 1e8;
         n *= 6;
         if (n < 0) n = ob[0].length;
-        for (var i = 0; i < ob.length; i++, tn *= t) {
+        for (let i = 0; i < ob.length; i++, tn *= t) {
             F = ob[i];
             N = Math.floor(n * F.length / ob[0].length + 0.5);
             if (i) N += 6;
