@@ -4,9 +4,9 @@ import {Angle} from "./angle";
 import {SolarTerm, SolarTermName} from "./solar-term";
 import {SolarDate} from "./solar-date";
 import {MoonPhase, MoonPhaseName} from "./MoonPhase";
+import {MonthlyCycle} from "./monthly-cycle";
 
 export class LunarDate {
-    private jd1 = 0.0;
     year = 0;
     month = 0;
     day = 0.0;
@@ -101,29 +101,18 @@ export class LunarDate {
      * 判断当前月份是否为闰月
      */
     hasLeapMonth(): boolean {
-        let nextNewMoon;
-        let w = (this.year - 2000 + (this.month + 10.5) / 12) * Angle.PI2; //节气
-        let majorSolarTerm = Sun.mjd(w);
+        let w = (this.year - 2000 + (this.month + 10.5) / 12) * Angle.PI2; //节气的太阳视黄经
+        let majorSolarTerm = Sun.mjd(w); //节气的时间
         let solarTermRad24 = Angle.PI2 / 24;
-        let ms = SunMoon.aLongD(majorSolarTerm / 36525, 10, 3);
-        ms = Math.floor((ms + 2) / Angle.PI2) * Angle.PI2; //朔日
-        let newMoon = SunMoon.mjd(ms);
+        let cycle = new MonthlyCycle(majorSolarTerm);
 
-        if (Math.floor(newMoon + 0.5) > Math.floor(majorSolarTerm + 0.5)) {
-            nextNewMoon = newMoon;
-            newMoon = SunMoon.mjd(ms - Angle.PI2);
-        } else {
-            ms += Angle.PI2;
-            nextNewMoon = SunMoon.mjd(ms);
-        }
-
-        if (Math.floor(newMoon + 0.5) > Math.floor(Sun.mjd(w - solarTermRad24) + 0.5) && Math.floor(nextNewMoon + 0.5) <= Math.floor(Sun.mjd(w + solarTermRad24) + 0.5)) {
+        if (Math.floor(cycle.newMoon + 0.5) > Math.floor(Sun.mjd(w - solarTermRad24) + 0.5) && Math.floor(cycle.nextNewMoon + 0.5) <= Math.floor(Sun.mjd(w + solarTermRad24) + 0.5)) {
             let solarTermRad12 = Angle.PI2 / 12;
             w += solarTermRad24;
             for (let j = 0; j <= 5; j++) {
                 w += solarTermRad12; //下一个中气
-                ms += Angle.PI2; //下一个朔日
-                if (Math.floor(SunMoon.mjd(ms) + 0.5) > Math.floor(Sun.mjd(w) + 0.5)) {
+                cycle.ms += Angle.PI2; //下一个朔日
+                if (Math.floor(SunMoon.mjd(cycle.ms) + 0.5) > Math.floor(Sun.mjd(w) + 0.5)) {
                     return this.leap = false;
                 }
             }
@@ -140,27 +129,18 @@ export class LunarDate {
      * @param day
      */
     calcMJD() {
-        let nextNewMoon;
-        let w = (this.year - 2000 + (this.month + 10) / 12) * Angle.PI2; //中气
-        let minorSolarTerm = Sun.mjd(w);
-        let ms = SunMoon.aLongD(minorSolarTerm / 36525, 10, 3);
-        ms = Math.floor((ms + 2) / Angle.PI2) * Angle.PI2; //合朔
-        let newMoon = SunMoon.mjd(ms);
-        if (Math.floor(newMoon + 0.5) > Math.floor(minorSolarTerm + 0.5)) {
-            nextNewMoon = newMoon;
-            newMoon = SunMoon.mjd(ms - Angle.PI2);
-        } else {
-            ms += Angle.PI2;
-            nextNewMoon = SunMoon.mjd(ms);
-        }
+        let w = (this.year - 2000 + (this.month + 10) / 12) * Angle.PI2; //中气的太阳视黄经
+        let minorSolarTerm = Sun.mjd(w); //中气的时间
+        let cycle = new MonthlyCycle(minorSolarTerm);
+
         let solarTermRad24 = Angle.PI2 / 24;
         let solarTermRad12 = Angle.PI2 / 12;
-        if (Math.floor(newMoon + 0.5) > Math.floor(Sun.mjd(w - solarTermRad24) + 0.5) && Math.floor(nextNewMoon + 0.5) > Math.floor(Sun.mjd(w + solarTermRad24) + 0.5)) {
+        if (Math.floor(cycle.newMoon + 0.5) > Math.floor(Sun.mjd(w - solarTermRad24) + 0.5) && Math.floor(cycle.nextNewMoon + 0.5) > Math.floor(Sun.mjd(w + solarTermRad24) + 0.5)) {
             w += solarTermRad12;
             for (let j = 0; j <= 5; j++) {
-                if (Math.floor(SunMoon.mjd(ms + j * Angle.PI2) + 0.5) > Math.floor(Sun.mjd(w + j * solarTermRad12) + 0.5)) {
-                    nextNewMoon = newMoon;
-                    newMoon = SunMoon.mjd(ms - 2 * Angle.PI2);
+                if (Math.floor(SunMoon.mjd(cycle.ms + j * Angle.PI2) + 0.5) > Math.floor(Sun.mjd(w + j * solarTermRad12) + 0.5)) {
+                    cycle.nextNewMoon = cycle.newMoon;
+                    cycle.newMoon = SunMoon.mjd(cycle.ms - 2 * Angle.PI2);
                     break;
                 }
             }
@@ -169,9 +149,9 @@ export class LunarDate {
             this.leap = this.hasLeapMonth();
         }
         if (!this.leap) {
-            return  Math.floor(newMoon + this.day - 1 + 0.5);
+            return  Math.floor(cycle.newMoon + this.day - 1 + 0.5);
         } else {
-            return  Math.floor(nextNewMoon + this.day - 1 + 0.5);
+            return  Math.floor(cycle.nextNewMoon + this.day - 1 + 0.5);
         }
     }
 

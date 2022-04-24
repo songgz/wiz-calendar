@@ -141,9 +141,9 @@ export class Sun {
     }
 
     static term_high(W: number) { //较高精度气（已知太阳视黄经反求时间）
-        var t = Sun.jc2(W) * 36525;
+        let t = Sun.jc2(W) * 36525;
         t = t - JulianDate.dt_T(t) + 8 / 24;
-        var v = ( (t + 0.5) % 1 ) * 86400;
+        const v = ((t + 0.5) % 1) * 86400;
         if (v < 1200 || v > 86400 - 1200) {
             t = Sun.mjce(W) * 36525 - JulianDate.dt_T(t) + 8 / 24;
         }
@@ -151,7 +151,7 @@ export class Sun {
     }
 
     static term_low(W: number) { //最大误差小于30分钟，平均5分（已知太阳视黄经反求时间）
-        var t, L, v = 628.3319653318;
+        let t, L, v = 628.3319653318;
         t = ( W - 4.895062166 ) / v; //第一次估算,误差2天以内
         t -= ( 53 * t * t + 334116 * Math.cos(4.67 + 628.307585 * t) + 2061 * Math.cos(2.678 + 628.3076 * t) * t ) / v / 10000000; //第二次估算,误差2小时以内
         L = 48950621.66 + 6283319653.318 * t + 53 * t * t //平黄经
@@ -296,8 +296,8 @@ export class SunMoon {
     }
 
     static phases_low(W: number) { //低精度定朔计算,在2000年至600，误差在2小时以内(仍比古代日历精准很多)
-        var v = 7771.37714500204;
-        var t = ( W + 1.08472 ) / v;
+        const v = 7771.37714500204;
+        let t = (W + 1.08472) / v;
         t -= ( -0.0000331 * t * t
                 + 0.10976 * Math.cos(0.785 + 8328.6914 * t)
                 + 0.02224 * Math.cos(0.187 + 7214.0629 * t)

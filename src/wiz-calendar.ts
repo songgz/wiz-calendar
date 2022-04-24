@@ -1,6 +1,7 @@
 import {SolarDate} from "./solar-date";
 import {LunarDate} from "./lunar-date";
 import {JulianDate} from "./julian-date";
+import {EightChar} from "./eight-char";
 
 export class WizCalendar {
 
@@ -14,5 +15,9 @@ export class WizCalendar {
 
     static julianDate(mjd: number): JulianDate {
         return new JulianDate(mjd);
+    }
+
+    static eightChar(mjd: number, long?: number, timezone?: number) {
+        return new EightChar(mjd);
     }
 }

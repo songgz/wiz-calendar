@@ -24,8 +24,12 @@ export class EightChar {
      */
     apparentSolarTime = 0;
 
-
     //TT=UTC+64.184s
+    /**
+     * @param mjd - J2000.0算起的儒略日
+     * @param long - 地球经度
+     * @param timezone - 时区
+    */
     constructor(mjd: number, long?: number, timezone?: number) {
         this.long = (long || 116.383333) * Angle.D2R
         this.timezone = timezone || (new Date()).getTimezoneOffset() / 60;
