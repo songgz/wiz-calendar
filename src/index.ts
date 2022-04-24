@@ -5,3 +5,4 @@ export {JulianDate} from "./julian-date";
 export {SolarDate} from "./solar-date";
 export {LunarDate} from "./lunar-date";
 export {EightChar} from "./eight-char";
+export {WizCalendar} from "./wiz-calendar";
