@@ -16,6 +16,7 @@ export class SolarDate {
 
     constructor(year: number, month: number, day: number, hr?: number, min?: number, sec?: number);
     constructor(...options: any[]) {
+        //console.log(options);
         switch (options.length) {
             case 0:
                 break;
@@ -96,7 +97,7 @@ export class SolarDate {
         return this.hour.toString().padStart(2, '0') + ':' + this.minute.toString().padStart(2, '0') + ':' + this.second.toString().padStart(2, '0');
     }
 
-    format(form: string) {
+    format(form: string): string {
         let str = '';
         switch (form) {
             case 'date':

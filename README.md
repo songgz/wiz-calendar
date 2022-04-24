@@ -23,24 +23,28 @@ WizCalendar（巫师万年历）
 ### 基本用法：
 1. 阳历转阴历
     ```typescript
+   //let solar = WizCalendar.solarDate(1977, 5, 18);
    let solar = new SolarDate(1977, 5, 18);
    let lunar: LunarDate = solar.getLunarDate();
-   lunar.format('formatDate'); //1977-04-01+0
+   lunar.format('date'); //1977-04-01+0
     ```
 2. 阴历转阳历
    ```typescript
+   //let lunar = WizCalendar.lunarDate(1977,4,1);
    let lunar = new LunarDate(1977,4,1);
    let solar: SolarDate = lunar.getSolarDate(); 
-   solar.format('formatDate'); //1977-05-18
+   solar.format('date'); //1977-05-18
     ```
 3. 阳历转儒略日
     ```typescript
+   //let solar = WizCalendar.solarDate(1977, 5, 18);
    let solar = new SolarDate(1977, 5, 18);
    let julian: JulianDate = solar.getJulianDate(); 
    julian.jd(); //2443282
     ```
 4. 阴历转儒略日
     ```typescript
+   //let lunar = WizCalendar.lunarDate(1977,4,1);
    let lunar = new LunarDate(1977, 4, 1, 12);
    let julian: JulianDate = lunar.getJulianDate(); 
    julian.jd(); //2443282
@@ -48,7 +52,7 @@ WizCalendar（巫师万年历）
 5. 儒略日转阳历
     ```typescript
     let mjd = 5225.942824074067; //J2000算起的儒略日
-    let julian = new JulianDate();
+    let julian = new JulianDate(mjd);
     let solar: SolarDate = julian.getSolarDate();
     solar.format('datetime'); //2014-04-23 10:37:40
     ```
@@ -61,11 +65,13 @@ WizCalendar（巫师万年历）
     ```
 7. 获取二十四节气
    ```typescript
+   //let lunar = WizCalendar.lunarDate(1977,4,1);
    let lunar = new LunarDate(1977,4,1);
    let julian: JulianDate = lunar.getSolarTerm(SolarTermName.WinterSolstice);
    ```
 8. 阴历干支纪历
    ```typescript
+   //let lunar = WizCalendar.lunarDate(1977,4,1);
    let lunar = new LunarDate(1977,4,1);
    lunar.getYearStem() + lunar.getYearBranch(); //丁巳
    lunar.getMonthStem() + lunar.getMonthBranch(); //乙巳
