@@ -2,7 +2,6 @@ import {Angle} from "./angle";
 import {SunMoon, Sun} from "./ephem";
 import {SolarDate} from "./solar-date";
 import {LunarDate} from "./lunar-date";
-import {SolarTerm, SolarTermName} from "./solar-term";
 
 export class JulianDate {
     /**
@@ -33,12 +32,6 @@ export class JulianDate {
      * @private
      */
     private lunarDate: LunarDate | undefined;
-
-    /**
-     * 当前节气对像
-     * @private
-     */
-    private solarTerm: SolarTerm | undefined;
 
     /**
      * 初始化儒略日期
@@ -175,12 +168,12 @@ export class JulianDate {
         this.lunarDate = value;
     }
 
-    getSolarTerm(solarTermName: SolarTermName) {
-        if (this.solarTerm === undefined) {
-            this.solarTerm = new SolarTerm(this.mjdTT());
-        }
-        return this.solarTerm.getSolarTerm(solarTermName);
-    }
+    // getSolarTerm(solarTermName: SolarTermName) {
+    //     if (this.solarTerm === undefined) {
+    //         this.solarTerm = new SolarTerm(this.mjdTT());
+    //     }
+    //     return this.solarTerm.getSolarTerm(solarTermName);
+    // }
 
     formatTime() {
         return JulianDate.timeStr(this.mjd);
@@ -323,8 +316,8 @@ export class JulianDate {
     }
 
     static DD2str(r: any) {
-        var Y = "     " + r.Y, M = "0" + r.M, D = "0" + r.D;
-        var h = r.h, m = r.m, s = Math.floor(r.s + .5);
+        let Y = "     " + r.Y, M = "0" + r.M, D = "0" + r.D;
+        let h = r.h, m = r.m, s = Math.floor(r.s + .5);
         if (s >= 60) s -= 60, m++;
         if (m >= 60) m -= 60, h++;
         h = "0" + h;

@@ -1,4 +1,4 @@
-import {LunarDate, JulianDate} from "../src";
+import {LunarDate, JulianDate, SolarTermName} from "../src";
 
 describe('LunarDate Class', () => {
     test('hasLeapMonth method', () => {
@@ -107,11 +107,11 @@ describe('LunarDate Class', () => {
 
     });
 
-    test('getFirstDogdays method', () => {
+    test('getFirstDogDays method', () => {
         let l1 = new LunarDate(1977,4,1);
         let l2 = new LunarDate(1075,4,1);
-        expect(l1.getFirstDogdays()).toBe(-8208);
-        expect(l2.getFirstDogdays()).toBe(-337648);
+        expect(l1.getFirstDogDays()).toBe(-8208);
+        expect(l2.getFirstDogDays()).toBe(-337648);
     });
 
 
@@ -148,6 +148,11 @@ describe('LunarDate Class', () => {
         let l2 = new LunarDate(1075,4,1);
         expect(l1.formatDate()).toBe('1977-04-01+0');
         expect(l2.formatDate()).toBe('1075-04-01+0');
+    });
+
+    test('getSolarTerm method', () => {
+        let julian = new JulianDate(2443282 - JulianDate.J2000); //阴历1977-04-01 12:00:00
+        expect(julian.getLunarDate().getSolarTerm(SolarTermName.WinterSolstice).mjdn()).toBe(-8045);
     });
 
 

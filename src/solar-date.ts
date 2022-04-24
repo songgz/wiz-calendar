@@ -13,6 +13,11 @@ export class SolarDate {
     firsDay = 0;
     private julianDate: JulianDate | undefined;
     private lunarDate: LunarDate | undefined;
+    /**
+     * 当前节气对像
+     * @private
+     */
+    private solarTerm: SolarTerm | undefined;
 
     constructor(year: number, month: number, day: number, hr?: number, min?: number, sec?: number);
     constructor(...options: any[]) {
@@ -73,7 +78,10 @@ export class SolarDate {
     }
 
     getSolarTerm(solarTermName: SolarTermName) {
-        return this.getJulianDate().getSolarTerm(solarTermName);
+        if (this.solarTerm === undefined) {
+            this.solarTerm = new SolarTerm(this.getJulianDate().mjdTT());
+        }
+        return this.solarTerm.getSolarTerm(solarTermName);
     }
 
     fromJDE(jde: number){

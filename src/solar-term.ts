@@ -28,11 +28,11 @@ export class SolarTerm {
         return this.solarTerms[solarTermName];
     }
 
-    getSolarTerm2(solarTermName: SolarTermName) {
-
-        return  new JulianDate(Sun.mjd((this.getSpringEquinoxes() + solarTermName / 24) * Angle.PI2));
-
-    }
+    // getSolarTerm2(solarTermName: SolarTermName) {
+    //
+    //     return  new JulianDate(Sun.mjd((this.getSpringEquinoxes() + solarTermName / 24) * Angle.PI2));
+    //
+    // }
 
     /**
      * 求某时刻临近的节气，返回东八区的儒略日时间

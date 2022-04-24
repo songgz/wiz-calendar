@@ -19,10 +19,10 @@ describe('SolarTerm Class', () => {
 
     });
 
-    test('getSolarTerm2 method', () => {
+    test('getSolarTerm method', () => {
         let l1 = new LunarDate(1977,4,1);
         let s1 = new SolarTerm(l1.getFirstOfMonth());
-        let term = s1.getSolarTerm2(SolarTermName.WinterSolstice);
+        let term = s1.getSolarTerm(SolarTermName.WinterSolstice);
         expect(term.mjdn()).toBe(-8045);
         expect(term.jdn()).toBe(2443500);
         expect(term.formatTime()).toBe('07:23:08');

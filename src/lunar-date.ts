@@ -409,18 +409,25 @@ export class LunarDate {
     }
 
     getSolarTerm(solarTermName: SolarTermName) {
-        return this.getJulianDate().getSolarTerm(solarTermName);
+        if (this.solarTerm === undefined) {
+            this.solarTerm = new SolarTerm(this.getJulianDate().mjdTT());
+        }
+        return this.solarTerm.getSolarTerm(solarTermName);
     }
 
-    getSolarTerm222(term: SolarTermName) {
-        if(this.solarTerm === undefined) {
-            this.solarTerm = new SolarTerm(this.getFirstOfMonth());
-        }
-        return this.solarTerm.getSolarTerm(term);
+    getSolarTerm33(solarTermName: SolarTermName) {
+        //return this.getJulianDate().getSolarTerm(solarTermName);
     }
+
+    // getSolarTerm222(term: SolarTermName) {
+    //     if(this.solarTerm === undefined) {
+    //         this.solarTerm = new SolarTerm(this.getFirstOfMonth());
+    //     }
+    //     return this.solarTerm.getSolarTerm(term);
+    // }
 
     //初伏，从夏至后的第三个庚日这天算初伏的第一天
-    getFirstDogdays() {
+    getFirstDogDays() {
         if(this.firstDogDays === undefined) {
             this.firstDogDays = Math.floor((this.getSolarTerm(SolarTermName.SummerSolstice).mjdn() + 7.5) / 10) * 10 + 22;
         }
