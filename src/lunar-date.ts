@@ -19,8 +19,8 @@ export class LunarDate {
     private sixtyYearCycle: number | undefined;
     moonPhases: { [key: number]: any } = {};
     pentads: { [key: number]: any } = {};
-    private firstDogdays: number | undefined;
-    private lastDogdays: number | undefined;
+    private firstDogDays: number | undefined;
+    private lastDogDays: number | undefined;
     private intoPlum: number | undefined;
     private outPlum: number | undefined;
     private solarTerm: SolarTerm | undefined;
@@ -32,7 +32,6 @@ export class LunarDate {
         switch (options.length) {
             case 1:
                 this.julianDate = new JulianDate(options[0]);
-                //this.calcLunar();
                 break;
             case 3:
             case 4:
@@ -123,10 +122,6 @@ export class LunarDate {
 
     /**
      * 农历转儒略日
-     * @param year
-     * @param month
-     * @param isLeap
-     * @param day
      */
     calcMJD() {
         let w = (this.year - 2000 + (this.month + 10) / 12) * Angle.PI2; //中气的太阳视黄经
@@ -341,14 +336,14 @@ export class LunarDate {
     }
 
     calcMoonPhase111() {
-        let ms = SunMoon.aLongD((this.getFirstOfMonth() - JulianDate.J2000) / 36525, 10, 3);
+        let ms = SunMoon.aLongD((this.getFirstOfMonth() ) / 36525, 10, 3);
         ms = Math.floor((ms + 2) / Angle.PI2) * Angle.PI2; //定朔计算月初
         let phaseRad = Angle.PI2 / 4.0;
         let signs = ['●', '☽', '○', '☾'];
         let phase = 0;
         for (let j = 0; j < 4; j++) {
             phase = SunMoon.mjd(ms + phaseRad * j);
-            this.moonPhases[Math.floor(phase + 0.5 + JulianDate.J2000) - this.getFirstOfMonth() + 1] = {
+            this.moonPhases[Math.floor(phase + 0.5) - this.getFirstOfMonth() + 1] = {
                 mjd: phase,
                 phase: j + 1,
                 sign: signs[j],
@@ -371,11 +366,11 @@ export class LunarDate {
 
     calcPentads() {
         let first = this.getFirstOfMonth();
-        let w = Sun.aLong((first - JulianDate.J2000) / 36525, 3);
+        let w = Sun.aLong((first) / 36525, 3);
         //nCF = int2(w / pi2 + 0.01);
         let pentadRad = Angle.PI2 / 72;
         w = Math.floor(w / pentadRad) * pentadRad;
-        while (Math.floor(Sun.mjd(w) + JulianDate.J2000 + 0.5) < Math.floor(first + 0.5)) {
+        while (Math.floor(Sun.mjd(w) + 0.5) < Math.floor(first + 0.5)) {
             w += pentadRad;
         }
         let wn = (Math.floor((w + 0.02) / pentadRad) % 72 + 72) % 72;
@@ -408,7 +403,7 @@ export class LunarDate {
                     pentad.sign = '▲';
                     break;
             }
-            this.pentads[Math.floor(pentad.mjd + JulianDate.J2000 + 0.5) - first + 1] = pentad;
+            this.pentads[Math.floor(pentad.mjd + 0.5) - first + 1] = pentad;
         }
         return this.pentads;
     }
@@ -426,18 +421,18 @@ export class LunarDate {
 
     //初伏，从夏至后的第三个庚日这天算初伏的第一天
     getFirstDogdays() {
-        if(this.firstDogdays === undefined) {
-            this.firstDogdays = Math.floor((this.getSolarTerm(SolarTermName.SummerSolstice).mjdn() + 7.5) / 10) * 10 + 22;
+        if(this.firstDogDays === undefined) {
+            this.firstDogDays = Math.floor((this.getSolarTerm(SolarTermName.SummerSolstice).mjdn() + 7.5) / 10) * 10 + 22;
         }
-        return this.firstDogdays;
+        return this.firstDogDays;
     }
 
     //末伏，立秋后的第一个庚日这天算是末伏的第一天
-    getLastDogdays() {
-        if(this.lastDogdays === undefined) {
-            this.lastDogdays = Math.floor((this.getSolarTerm(SolarTermName.StartOfAutumn).mjdn() + 7.5) / 10) * 10 + 2;
+    getLastDogDays() {
+        if(this.lastDogDays === undefined) {
+            this.lastDogDays = Math.floor((this.getSolarTerm(SolarTermName.StartOfAutumn).mjdn() + 7.5) / 10) * 10 + 2;
         }
-        return this.lastDogdays;
+        return this.lastDogDays;
     }
 
     //入梅，芒种后的第一个丙日是入梅的日期，约在6月中上旬。

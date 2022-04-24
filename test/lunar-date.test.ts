@@ -1,6 +1,4 @@
-import {LunarDate} from "../src/lunar-date";
-import {JulianDate} from "../src";
-
+import {LunarDate, JulianDate} from "../src";
 
 describe('LunarDate Class', () => {
     test('hasLeapMonth method', () => {
@@ -104,9 +102,8 @@ describe('LunarDate Class', () => {
     test('calcPentads method', () => {
         let l1 = new LunarDate(1977,4,1);
         let l2 = new LunarDate(1075,4,1);
-        console.log(l1.calcPentads());
-        //expect(l1.calcPentads()).toStrictEqual({"14": {"idx": 14, "mjd": -8249.574844103354, "name": "三候", "sign": "▲", "style": 3, "time": "22:12:13"}, "20": {"idx": 15, "mjd": -8244.352768111572, "name": "芒种", "sign": "◆", "style": 1, "time": "03:32:01"}, "25": {"idx": 16, "mjd": -8239.125074069498, "name": "二候", "sign": "▲", "style": 2, "time": "08:59:54"}, "30": {"idx": 17, "mjd": -8233.893316933369, "name": "三候", "sign": "▲", "style": 3, "time": "14:33:37"}, "35": {"idx": 18, "mjd": -8228.657127700872, "name": "夏至", "sign": "◆", "style": 0, "time": "20:13:44"}, "4": {"idx": 12, "mjd": -8259.990049679236, "name": "小满", "sign": "◆", "style": 0, "time": "12:14:20"}, "9": {"idx": 13, "mjd": -8254.78819516463, "name": "二候", "sign": "▲", "style": 2, "time": "17:05:00"}});
-        //expect(l2.calcPentads()).toStrictEqual({"13": {"idx": 9, "mjd": -337723.72590414487, "name": "立夏", "sign": "◆", "style": 1, "time": "18:34:42"}, "18": {"idx": 10, "mjd": -337718.5175525063, "name": "二候", "sign": "▲", "style": 2, "time": "23:34:43"}, "24": {"idx": 11, "mjd": -337713.3009869755, "name": "三候", "sign": "▲", "style": 3, "time": "04:46:35"}, "29": {"idx": 12, "mjd": -337708.07782516006, "name": "小满", "sign": "◆", "style": 0, "time": "10:07:56"}, "3": {"idx": 7, "mjd": -337734.10560091044, "name": "二候", "sign": "▲", "style": 2, "time": "09:27:56"}, "34": {"idx": 13, "mjd": -337702.8482978428, "name": "二候", "sign": "▲", "style": 2, "time": "15:38:27"}, "8": {"idx": 8, "mjd": -337728.9225275461, "name": "三候", "sign": "▲", "style": 3, "time": "13:51:34"}});
+        expect(l1.calcPentads()).toStrictEqual({"14": {"idx": 14, "mjd": -8249.574844103354, "name": "三候", "sign": "▲", "style": 3, "time": "22:12:13"}, "20": {"idx": 15, "mjd": -8244.352768111572, "name": "芒种", "sign": "◆", "style": 1, "time": "03:32:01"}, "25": {"idx": 16, "mjd": -8239.125074069498, "name": "二候", "sign": "▲", "style": 2, "time": "08:59:54"}, "30": {"idx": 17, "mjd": -8233.893316933369, "name": "三候", "sign": "▲", "style": 3, "time": "14:33:37"}, "35": {"idx": 18, "mjd": -8228.657127700872, "name": "夏至", "sign": "◆", "style": 0, "time": "20:13:44"}, "4": {"idx": 12, "mjd": -8259.990049679236, "name": "小满", "sign": "◆", "style": 0, "time": "12:14:20"}, "9": {"idx": 13, "mjd": -8254.78819516463, "name": "二候", "sign": "▲", "style": 2, "time": "17:05:00"}});
+        expect(l2.calcPentads()).toStrictEqual({"13": {"idx": 9, "mjd": -337723.72590414487, "name": "立夏", "sign": "◆", "style": 1, "time": "18:34:42"}, "18": {"idx": 10, "mjd": -337718.5175525063, "name": "二候", "sign": "▲", "style": 2, "time": "23:34:43"}, "24": {"idx": 11, "mjd": -337713.3009869755, "name": "三候", "sign": "▲", "style": 3, "time": "04:46:35"}, "29": {"idx": 12, "mjd": -337708.07782516006, "name": "小满", "sign": "◆", "style": 0, "time": "10:07:56"}, "3": {"idx": 7, "mjd": -337734.10560091044, "name": "二候", "sign": "▲", "style": 2, "time": "09:27:56"}, "34": {"idx": 13, "mjd": -337702.8482978428, "name": "二候", "sign": "▲", "style": 2, "time": "15:38:27"}, "8": {"idx": 8, "mjd": -337728.9225275461, "name": "三候", "sign": "▲", "style": 3, "time": "13:51:34"}});
 
     });
 
@@ -118,11 +115,11 @@ describe('LunarDate Class', () => {
     });
 
 
-    test('getLastDogdays method', () => {
+    test('getLastDogDays method', () => {
         let l1 = new LunarDate(1977,4,1);
         let l2 = new LunarDate(1075,4,1);
-        expect(l1.getLastDogdays()).toBe(-8178);
-        expect(l2.getLastDogdays()).toBe(-337628);
+        expect(l1.getLastDogDays()).toBe(-8178);
+        expect(l2.getLastDogDays()).toBe(-337628);
     });
 
     test('getIntoPlum method', () => {
