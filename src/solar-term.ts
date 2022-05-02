@@ -13,10 +13,6 @@ export class SolarTerm {
         return new JulianDate(this.mjd);
     }
 
-    getMJDN() {
-        return Math.floor(this.mjd + 0.5);
-    }
-
 
 
     // getSolarTerm2(solarTermName: SolarTermName) {

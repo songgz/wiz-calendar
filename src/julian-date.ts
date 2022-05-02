@@ -64,6 +64,10 @@ export class JulianDate {
         return Math.floor(this.getJD() + 0.5);
     }
 
+    getTime() {
+        return JulianDate.timeStr(this.mjd);
+    }
+
     getDeltaT(): number {
         if (this.deltaT === undefined) {
             this.deltaT = JulianDate.dt_T(this.mjd);

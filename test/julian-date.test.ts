@@ -3,11 +3,11 @@ import {SolarDate} from "../src/solar-date";
 import {LunarDate} from "../src/lunar-date";
 
 describe('JulianDate Class', () => {
-    // test('fromUTC method', () => {
-    //     expect(JulianDate.fromUTC(1977, 4, 26.4).valueOf()).toBe(2443259.9);
-    //     expect(JulianDate.fromUTC(2000, 1, 1.5).valueOf()).toBe(2451545.0);
-    //     expect(JulianDate.fromUTC(1987, 1, 27.0).valueOf()).toBe(2446822.5);
-    // });
+    test('fromUTC method', () => {
+        expect(new SolarDate(1977, 4, 26.4).valueOf()).toBe(2443259.9);
+        expect(new SolarDate(2000, 1, 1.5).valueOf()).toBe(2451545.0);
+        expect(new SolarDate(1987, 1, 27.0).valueOf()).toBe(2446822.5);
+    });
 
     test("test gd2jd", () => {
         //dj = 2456770.942824074 //2014-4-23 10:37:40   //甲午年 戊辰月 甲子日 己巳时 真太阳 10:24:48

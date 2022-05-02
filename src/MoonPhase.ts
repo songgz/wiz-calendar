@@ -12,11 +12,8 @@ export enum MoonPhaseName {
 }
 
 export class MoonPhase {
-    mjd = 0;
-    phase = 0;
-    sign = '';
-    time = '';
-    day = 0;
+    private readonly mjd: number;
+    private readonly phase: number;
 
     constructor(mjd: number, phase: number) {
         this.mjd = mjd;
@@ -31,12 +28,8 @@ export class MoonPhase {
         return MoonPhase.Signs[this.phase];
     }
 
-    getTime() {
-        return JulianDate.timeStr(this.mjd);
-    }
-
-    getMjdn() {
-        return Math.floor(this.mjd + 0.5);
+    getJulianDate() {
+        return new JulianDate(this.mjd);
     }
 
     static Signs = ['●', '☽', '○', '☾'];

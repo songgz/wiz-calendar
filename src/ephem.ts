@@ -245,14 +245,14 @@ export class Moon {
         return this.nextNewMoon;
     }
 
-    getMoonPhase(moonphaseName: MoonPhaseName) {
-        if (this.moonPhases[moonphaseName] === undefined) {
-            let mjd = SunMoon.mjd(this.getNewMoonALongD() + (moonphaseName / 4.0) * Angle.PI2);
-            let phase = new MoonPhase(mjd, moonphaseName);
+    getMoonPhase(moonPhaseName: MoonPhaseName): MoonPhase {
+        if (this.moonPhases[moonPhaseName] === undefined) {
+            let mjd = SunMoon.mjd(this.getNewMoonALongD() + (moonPhaseName / 4.0) * Angle.PI2);
+            let phase = new MoonPhase(mjd, moonPhaseName);
 
-            this.moonPhases[moonphaseName] = phase;
+            this.moonPhases[moonPhaseName] = phase;
         }
-        return this.moonPhases[moonphaseName];
+        return this.moonPhases[moonPhaseName];
     }
 
 
