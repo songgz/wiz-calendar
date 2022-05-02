@@ -34,10 +34,11 @@ export class EightChar {
         this.long = (long || 116.383333) * Angle.D2R
         this.timezone = timezone || (new Date()).getTimezoneOffset() / 60;
         this.mjd = mjd + this.timezone / 24;
-        this.mjde = this.mjd + JulianDate.dt_T(this.mjd);
+        this.mjde = this.mjd + JulianDate.dt_T(this.mjd);// 力学时
+        // 本地真太阳时(使用低精度算法计算时差)
         this.apparentSolarTime = this.mjd + JulianDate.apparentSolarTime(this.mjde / 36525) + this.long / Angle.PI2;
 
-        let w = Sun.aLong( this.mjde / 36525, -1 );
+        let w = Sun.aLong( this.mjde / 36525, -1 );// 此刻太阳视黄经
         let k = Math.floor((w / (2 * Math.PI) * 360 + 45 + 15 * 360) / 30); //1984年立春起算的节气数(不含中气)
         this.yearStem = Math.floor(k / 12 + 6000000) % 10;
         this.yearBranch = Math.floor(k / 12 + 6000000) % 12;

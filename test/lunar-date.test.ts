@@ -11,8 +11,8 @@ describe('LunarDate Class', () => {
     test('getJulianDate method', () => {
         let l1 = new LunarDate(1977,4,1);
         let l2 = new LunarDate(2009,5,1,true);
-        expect(l1.getJulianDate().jd()).toBe(2443281.5); //2443281.5
-        expect(l2.getJulianDate().jd()).toBe(2455005.5);
+        expect(l1.getJulianDate().getJD()).toBe(2443281.5); //2443281.5
+        expect(l2.getJulianDate().getJD()).toBe(2455005.5);
     });
 
     test('calcLunar method', () => {
@@ -152,7 +152,7 @@ describe('LunarDate Class', () => {
 
     test('getSolarTerm method', () => {
         let julian = new JulianDate(2443282 - JulianDate.J2000); //阴历1977-04-01 12:00:00
-        expect(julian.getLunarDate().getSolarTerm(SolarTermName.WinterSolstice).mjdn()).toBe(-8045);
+        expect(julian.getLunarDate().getSolarTerm(SolarTermName.WinterSolstice).getJulianDate().getMJDN()).toBe(-8045);
     });
 
 

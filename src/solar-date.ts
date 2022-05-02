@@ -1,6 +1,7 @@
 import {LunarDate} from "./lunar-date";
 import {JulianDate} from "./julian-date";
-import {SolarTerm, SolarTermName} from "./solar-term";
+import { SolarTermName} from "./solar-term";
+import {Sun} from "./ephem";
 
 export class SolarDate {
     private jde: number | undefined;
@@ -17,7 +18,7 @@ export class SolarDate {
      * 当前节气对像
      * @private
      */
-    private solarTerm: SolarTerm | undefined;
+    private solarTerm: Sun | undefined;
 
     constructor(year: number, month: number, day: number, hr?: number, min?: number, sec?: number);
     constructor(...options: any[]) {
@@ -55,7 +56,7 @@ export class SolarDate {
     }
 
     getJD() {
-        return this.getJulianDate().jd();
+        return this.getJulianDate().getJD();
     }
 
     getJulianDate() {
@@ -79,7 +80,7 @@ export class SolarDate {
 
     getSolarTerm(solarTermName: SolarTermName) {
         if (this.solarTerm === undefined) {
-            this.solarTerm = new SolarTerm(this.getJulianDate().mjdTT());
+            this.solarTerm = new Sun(this.getJulianDate().getMJD());
         }
         return this.solarTerm.getSolarTerm(solarTermName);
     }

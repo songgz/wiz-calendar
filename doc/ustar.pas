@@ -38,7 +38,7 @@ type
   end;
   TYmd=class(TObject)
     year,month,day:integer;
-    fday,jd,DeltaT:extended;
+    fday,getJD,DeltaT:extended;
     procedure DateToJd;
     procedure JdToDate;
     procedure StrToDate(s:string;var w:integer);overload;
@@ -193,14 +193,14 @@ function SolarMeanT(const L:extended):extended;
 function SolarMeanT1(const D:extended):extended;
 function SolarTrueT(const SolarK:integer):extended;
 function PhaseT(const PhaseK:integer):extended;
-function GetSolarK(jd:extended):integer;
-function GetPhaseK(jd:extended):integer;
+function GetSolarK(getJD:extended):integer;
+function GetPhaseK(getJD:extended):integer;
 function GeodeticCoord(const x:TVector;var rou,lambda,phi,h:extended):extended;
 //function GeodeticCoord_new(const x:TVector;var rou,lambda,phi,h:extended):extended;
 function GeocentrCoord(const lambda,phi,h:extended):TVector;
 function Refraction(const alt:extended):extended;
-function SunHrzCoord(jd,lambda,fei,height:extended):TVector;
-function RTS(jd,lambda,fei:extended;Nb:integer):TVector;
+function SunHrzCoord(getJD,lambda,fei,height:extended):TVector;
+function RTS(getJD,lambda,fei:extended;Nb:integer):TVector;
 
 implementation
 const
@@ -328,7 +328,7 @@ begin
     u:=floor(365.25*year) +floor(30.6*(month+1)) + day
        +w +1720994.5;
     // 返回儒略日，包括日的小数
-    jd:=u+fday;
+    getJD:=u+fday;
     // 恢复自然年月序数
     if month>12 then begin
       month:=month-12;
@@ -344,20 +344,20 @@ var
 begin
 //  with t do begin
     // 分离出日的小数部分,儒略日的小数部分为0.5
-    w:=Floor(jd)+0.5;
+    w:=Floor(getJD)+0.5;
     // 调整日小数非负
-    fday:=jd-w;
+    fday:=getJD-w;
     if fday<0.0 then begin
       fday:=fday+1.0;
       w:=w-1.0;
     end;
-//    jd:=w;
+//    getJD:=w;
     s:=w-1721116.5;
     w:=0;
     year:=Floor(s/365.25);
     repeat
       y1:=year;
-      if jd>=2299160.5 then w:=-Floor(year/100)+Floor(year/400)+2;
+      if getJD>=2299160.5 then w:=-Floor(year/100)+Floor(year/400)+2;
       year:=Floor((s-w)/365.25);
     until year=y1;
     s:=s-w;
@@ -800,7 +800,7 @@ var
 begin
   // 计算年数
   with Date do begin
-    jd:=tt;
+    getJD:=tt;
     JDToDate;
     y:=year+month/12.0+day/365.25; // ;
   end;
@@ -982,12 +982,12 @@ begin
   TableB.Active:=False;
   ymd:=TYmd.Create;	// 创建日期类对象
   with ymd do begin
-    jd:=t;
+    getJD:=t;
     JdToDate;
     Month:=1;
     Day:=0;
     DateToJd;	// 计算年首儒略日
-    y:=year+(t-jd-fday)/365.2425;	// 计算插值变量
+    y:=year+(t-getJD-fday)/365.2425;	// 计算插值变量
     free;	// 释放日期类对象
   end;
   // 读取始末记录日期
@@ -1567,13 +1567,13 @@ function SolarTrueT(const SolarK:integer):extended;
    // 返回的时刻为力学时                                        //
    //***********************************************************//                                                          ///
 var
-  jd:extended;
+  getJD:extended;
   k:integer;
 begin
   k:=SolarK mod 24;
   if k<0 then k:=k+24;
-  jd:=SolarMeanT(15.0*SolarK);
-  result:=FindRoot(SolarLong,15.0*k,jd-0.1,jd+0.1,1.0e-9);
+  getJD:=SolarMeanT(15.0*SolarK);
+  result:=FindRoot(SolarLong,15.0*k,getJD-0.1,getJD+0.1,1.0e-9);
 end;
 //****************************//
 // 计算日月视角距             //
@@ -1598,24 +1598,24 @@ function PhaseT(const PhaseK:integer):extended;
    // 返回值：  力学时                                          //
    //***********************************************************//
 var
-  jd:extended;
+  getJD:extended;
   k:integer;
 begin
   k:=PhaseK mod 4;
   if k<0 then k:=k+4;
-  jd:=J0+(90*PhaseK-D0+360.0)/DD;
-  result:=FindRoot(SMAngularDis,90.0*k,jd-1.0,jd+1.0,1.0e-7);
+  getJD:=J0+(90*PhaseK-D0+360.0)/DD;
+  result:=FindRoot(SMAngularDis,90.0*k,getJD-1.0,getJD+1.0,1.0e-7);
 end;
 //************************************//
-// 粗略计算力学时 jd 后邻节气的序数   //
-// 入口参数： jd 力学时               //
+// 粗略计算力学时 getJD 后邻节气的序数   //
+// 入口参数： getJD 力学时               //
 // 返回值：后邻节气序数               //
 //************************************//
-function GetSolarK(jd:extended):integer;
+function GetSolarK(getJD:extended):integer;
 begin
   Result:=round((L0+DL*(JD-J0))/15.0);
 end;
-function GetPhaseK(jd:extended):integer;
+function GetPhaseK(getJD:extended):integer;
 var
   t:extended;
   D:extended;
@@ -2192,7 +2192,7 @@ begin
 end;
 //******************************************//
 // 计算太阳地平高度和方位角                 //
-// 入口参数：jd  世界时儒略日               //
+// 入口参数：getJD  世界时儒略日               //
 //           long 测站大地经度，度          //
 //           lat  测站大地纬度              //
 //           height 测站海拔高度，米        //
@@ -2200,7 +2200,7 @@ end;
 //           太阳地平方位角，从南向西度量   //
 //           太阳地平高度                   //
 //******************************************//
-function SunHrzCoord(jd,lambda,fei,height:extended):TVector;
+function SunHrzCoord(getJD,lambda,fei,height:extended):TVector;
 var
   DT,tt,tao:extended;
   theta,dis,azimuth,altitude:extended;
@@ -2208,11 +2208,11 @@ var
   j:integer;
   BPN,QR:TMatrix;
 begin
-  //  jd:=jd0-1.0/3.0;
+  //  getJD:=jd0-1.0/3.0;
   // 测站地心坐标，不做极移变换
-  Dt:=DeltaT(jd)/secondperday;
+  Dt:=DeltaT(getJD)/secondperday;
   // 力学时
-  tt:=jd+Dt;
+  tt:=getJD+Dt;
   // 测站地心向径
   rs:=GeocentrCoord(DegToRad(lambda),DegToRad(fei),height);
   // 读太阳地心坐标
@@ -2252,13 +2252,13 @@ begin
 end;
 //****************************************************//
 // 计算天体升起、中天和落下的时刻                     //
-// 入口参数：jd 北京时儒略日                          //
+// 入口参数：getJD 北京时儒略日                          //
 //           lambda 测站大地经度（度）                //
 //           fei    测站大地纬度                      //
 //           Nb     天体序数，Nb=1，2，3 对应月日火   //
 // 返回值：向量的三个坐标依次为中天、升起和落下北京时 //
 //****************************************************//
-function RTS(jd,lambda,fei:extended;Nb:integer):TVector;
+function RTS(getJD,lambda,fei:extended;Nb:integer):TVector;
 const
   TwoPI=2.0*PI;
   StToUt=0.997269566;
@@ -2284,7 +2284,7 @@ begin
     gst:=gst0+TwoPI*s;
     gst:=remain(gst,TwoPI,k);
     // 世界时
-    t:=jd+s*StToUt;
+    t:=getJD+s*StToUt;
     // 天体视位置
     r:=ApparentPosition(t+Dt,Nb);
     // 时角
@@ -2301,17 +2301,17 @@ begin
 end;
 begin
   // TT-UT1，单位为日
-  Dt:=DeltaT(jd)/secondperday;    
-  Dt:=DeltaT(jd+Dt)/secondperday;
+  Dt:=DeltaT(getJD)/secondperday;
+  Dt:=DeltaT(getJD+Dt)/secondperday;
   // 天体视位置初值，取北京时正午
-  r:=ApparentPosition(jd+0.5+Dt,Nb);
+  r:=ApparentPosition(getJD+0.5+Dt,Nb);
   // 地平高度初值，角分
   if Nb=2 then alt0:=-50 else alt0:=-34;
   alt0:=DegToRad(alt0/60);
   // 对月亮的修正
   if Nb=1 then alt0:=alt0+(REarth-RMoon)/r[1];
   // 北京时0时的恒星时
-  gst0:=CoorTrans.GST2000(jd,true);
+  gst0:=CoorTrans.GST2000(getJD,true);
   // 时角初值
   ch0:=(sin(DegToRad(alt0))-sin(fei)*sin(r[3]))/cos(fei)/cos(r[3]);
   h0:=arccos(ch0);

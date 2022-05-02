@@ -1,10 +1,9 @@
 import {JulianDate} from "./julian-date";
-import {SunMoon, Sun} from "./ephem";
+import {SunMoon, Sun, Moon} from "./ephem";
 import {Angle} from "./angle";
-import {SolarTerm, SolarTermName} from "./solar-term";
+import { SolarTermName} from "./solar-term";
 import {SolarDate} from "./solar-date";
 import {MoonPhase, MoonPhaseName} from "./MoonPhase";
-import {MonthlyCycle} from "./monthly-cycle";
 
 export class LunarDate {
     year = 0;
@@ -23,10 +22,10 @@ export class LunarDate {
     private lastDogDays: number | undefined;
     private intoPlum: number | undefined;
     private outPlum: number | undefined;
-    private solarTerm: SolarTerm | undefined;
+    private sun: Sun | undefined;
     private solarDate: SolarDate | undefined;
     private julianDate: JulianDate | undefined;
-    private moonPhase: MoonPhase | undefined;
+    private moon: Moon | undefined;
 
     constructor(...options: any[]) {
         switch (options.length) {
@@ -103,15 +102,17 @@ export class LunarDate {
         let w = (this.year - 2000 + (this.month + 10.5) / 12) * Angle.PI2; //节气的太阳视黄经
         let majorSolarTerm = Sun.mjd(w); //节气的时间
         let solarTermRad24 = Angle.PI2 / 24;
-        let cycle = new MonthlyCycle(majorSolarTerm);
+        //let cycle = new MonthlyCycle(majorSolarTerm);
+        let moon = new Moon(majorSolarTerm);
+        let ms = moon.getNewMoonALongD();
 
-        if (Math.floor(cycle.newMoon + 0.5) > Math.floor(Sun.mjd(w - solarTermRad24) + 0.5) && Math.floor(cycle.nextNewMoon + 0.5) <= Math.floor(Sun.mjd(w + solarTermRad24) + 0.5)) {
+        if (Math.floor(moon.getNewMoon() + 0.5) > Math.floor(Sun.mjd(w - solarTermRad24) + 0.5) && Math.floor(moon.getNextNewMoon() + 0.5) <= Math.floor(Sun.mjd(w + solarTermRad24) + 0.5)) {
             let solarTermRad12 = Angle.PI2 / 12;
             w += solarTermRad24;
             for (let j = 0; j <= 5; j++) {
                 w += solarTermRad12; //下一个中气
-                cycle.ms += Angle.PI2; //下一个朔日
-                if (Math.floor(SunMoon.mjd(cycle.ms) + 0.5) > Math.floor(Sun.mjd(w) + 0.5)) {
+                ms += Angle.PI2; //下一个朔日
+                if (Math.floor(SunMoon.mjd(ms) + 0.5) > Math.floor(Sun.mjd(w) + 0.5)) {
                     return this.leap = false;
                 }
             }
@@ -126,16 +127,19 @@ export class LunarDate {
     calcMJD() {
         let w = (this.year - 2000 + (this.month + 10) / 12) * Angle.PI2; //中气的太阳视黄经
         let minorSolarTerm = Sun.mjd(w); //中气的时间
-        let cycle = new MonthlyCycle(minorSolarTerm);
+        let moon = new Moon(minorSolarTerm);
+        let newMoon = moon.getNewMoon();
+        let nextNewMoon = moon.getNextNewMoon();
+        let ms = moon.getNewMoonALongD();
 
         let solarTermRad24 = Angle.PI2 / 24;
         let solarTermRad12 = Angle.PI2 / 12;
-        if (Math.floor(cycle.newMoon + 0.5) > Math.floor(Sun.mjd(w - solarTermRad24) + 0.5) && Math.floor(cycle.nextNewMoon + 0.5) > Math.floor(Sun.mjd(w + solarTermRad24) + 0.5)) {
+        if (Math.floor(newMoon + 0.5) > Math.floor(Sun.mjd(w - solarTermRad24) + 0.5) && Math.floor(newMoon + 0.5) > Math.floor(Sun.mjd(w + solarTermRad24) + 0.5)) {
             w += solarTermRad12;
             for (let j = 0; j <= 5; j++) {
-                if (Math.floor(SunMoon.mjd(cycle.ms + j * Angle.PI2) + 0.5) > Math.floor(Sun.mjd(w + j * solarTermRad12) + 0.5)) {
-                    cycle.nextNewMoon = cycle.newMoon;
-                    cycle.newMoon = SunMoon.mjd(cycle.ms - 2 * Angle.PI2);
+                if (Math.floor(SunMoon.mjd(ms + j * Angle.PI2) + 0.5) > Math.floor(Sun.mjd(w + j * solarTermRad12) + 0.5)) {
+                    nextNewMoon =newMoon;
+                    newMoon = SunMoon.mjd(ms - 2 * Angle.PI2);
                     break;
                 }
             }
@@ -144,9 +148,9 @@ export class LunarDate {
             this.leap = this.hasLeapMonth();
         }
         if (!this.leap) {
-            return  Math.floor(cycle.newMoon + this.day - 1 + 0.5);
+            return  Math.floor(newMoon + this.day - 1 + 0.5);
         } else {
-            return  Math.floor(cycle.nextNewMoon + this.day - 1 + 0.5);
+            return  Math.floor(nextNewMoon + this.day - 1 + 0.5);
         }
     }
 
@@ -304,21 +308,21 @@ export class LunarDate {
      * 获取日干
      */
     getDayStem() {
-        return LunarDate.Stems[(this.getJulianDate().jdn() % 10 + 19) % 10];
+        return LunarDate.Stems[(this.getJulianDate().getJDN() % 10 + 19) % 10];
     }
 
     /**
      * 获取日支
      */
     getDayBranch() {
-        return LunarDate.Branches[(this.getJulianDate().jdn() % 12 + 13) % 12];
+        return LunarDate.Branches[(this.getJulianDate().getJDN() % 12 + 13) % 12];
     }
 
     /**
      * 获取时干
      */
     getHourStem(hour?: number) {
-        return LunarDate.Stems[((this.getJulianDate().jdn() % 5 + 7) % 5 * 2 + 4 + Math.floor(((hour || this.hour) + 1) % 24 / 2)) % 10];
+        return LunarDate.Stems[((this.getJulianDate().getJDN() % 5 + 7) % 5 * 2 + 4 + Math.floor(((hour || this.hour) + 1) % 24 / 2)) % 10];
     }
 
     /**
@@ -328,11 +332,15 @@ export class LunarDate {
         return LunarDate.Branches[Math.floor(((hour || this.hour) + 1) % 24 / 2)];
     }
 
-    getMoonPhase(moonPhaseName: MoonPhaseName): JulianDate {
-        if (this.moonPhase === undefined) {
-            this.moonPhase = new MoonPhase(this.getFirstOfMonth());
+    getMoon() {
+        if (this.moon === undefined) {
+            this.moon = new Moon(this.getJulianDate().getMJD());
         }
-        return this.moonPhase.getMoonPhase(moonPhaseName);
+        return this.moon;
+    }
+
+    getMoonPhase(moonPhaseName: MoonPhaseName): MoonPhase {
+       return this.getMoon().getMoonPhase(moonPhaseName);
     }
 
     calcMoonPhase111() {
@@ -354,14 +362,22 @@ export class LunarDate {
     }
 
     //返回jdnUTC
-    getFirstOfMonth(): number {
-        return this.getJulianDate().mjdn() - this.day + 1;
+    getFirstOfMonth2(): number {
+        return this.getJulianDate().getMJDN() - this.day + 1;
     }
 
-    getLastOfMonth() {
+    getFirstOfMonth(): number {
+        return Math.floor(this.getMoon().getNewMoon() + 0.5);
+    }
+
+    getLastOfMonth2() {
         let ms = SunMoon.aLongD((this.getFirstOfMonth()) / 36525, 10, 3);
         ms = Math.floor((ms + 2) / Angle.PI2) * Angle.PI2;
         return Math.floor(SunMoon.mjd(ms + Angle.PI2) + 0.5) - 1;
+    }
+
+    getLastOfMonth() {
+        return Math.floor(this.getMoon().getNextNewMoon() + 0.5) - 1;
     }
 
     calcPentads() {
@@ -409,10 +425,10 @@ export class LunarDate {
     }
 
     getSolarTerm(solarTermName: SolarTermName) {
-        if (this.solarTerm === undefined) {
-            this.solarTerm = new SolarTerm(this.getJulianDate().mjdTT());
+        if (this.sun === undefined) {
+            this.sun = new Sun(this.getJulianDate().getMJD());
         }
-        return this.solarTerm.getSolarTerm(solarTermName);
+        return this.sun.getSolarTerm(solarTermName);
     }
 
     // getSolarTerm33(solarTermName: SolarTermName) {
@@ -429,7 +445,7 @@ export class LunarDate {
     //初伏，从夏至后的第三个庚日这天算初伏的第一天
     getFirstDogDays() {
         if(this.firstDogDays === undefined) {
-            this.firstDogDays = Math.floor((this.getSolarTerm(SolarTermName.SummerSolstice).mjdn() + 7.5) / 10) * 10 + 22;
+            this.firstDogDays = Math.floor((this.getSolarTerm(SolarTermName.SummerSolstice).getJulianDate().getMJDN() + 7.5) / 10) * 10 + 22;
         }
         return this.firstDogDays;
     }
@@ -437,7 +453,7 @@ export class LunarDate {
     //末伏，立秋后的第一个庚日这天算是末伏的第一天
     getLastDogDays() {
         if(this.lastDogDays === undefined) {
-            this.lastDogDays = Math.floor((this.getSolarTerm(SolarTermName.StartOfAutumn).mjdn() + 7.5) / 10) * 10 + 2;
+            this.lastDogDays = Math.floor((this.getSolarTerm(SolarTermName.StartOfAutumn).getJulianDate().getMJDN() + 7.5) / 10) * 10 + 2;
         }
         return this.lastDogDays;
     }
@@ -445,7 +461,7 @@ export class LunarDate {
     //入梅，芒种后的第一个丙日是入梅的日期，约在6月中上旬。
     getIntoPlum() {
         if(this.intoPlum === undefined) {
-            this.intoPlum = Math.floor((this.getSolarTerm(SolarTermName.GrainInEar).mjdn() + 1.5) / 10) * 10 + 8;
+            this.intoPlum = Math.floor((this.getSolarTerm(SolarTermName.GrainInEar).getJulianDate().getMJDN() + 1.5) / 10) * 10 + 8;
         }
         return this.intoPlum;
     }
@@ -453,7 +469,7 @@ export class LunarDate {
     //出梅，小暑后的第一个末日是出梅的日期，约在7月中下旬。
     getOutPlum() {
         if(this.outPlum === undefined) {
-            this.outPlum = Math.floor((this.getSolarTerm(SolarTermName.SlightHeat).mjdn() + 10.5) / 12) * 12 + 1;
+            this.outPlum = Math.floor((this.getSolarTerm(SolarTermName.SlightHeat).getJulianDate().getMJDN() + 10.5) / 12) * 12 + 1;
         }
         return this.outPlum;
     }

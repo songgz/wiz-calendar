@@ -217,14 +217,14 @@ function TrueT(const MoonK:integer):extended;
    // 返回的时刻为力学时                                    //
    ///////////////////////////////////////////////////////////
 var
-  jd,jd1,L:extended;
+  getJD,jd1,L:extended;
   k,i:integer;
 begin
-  jd:=MeanT(0.25*moonK);
+  getJD:=MeanT(0.25*moonK);
   k:=MoonK mod 4;
   if k<0 then k:=k+4;
-  Result:=FindRoot(DiffSMLong,90.0*k,jd-1.0,jd+1.0,1.0e-11); // eps取1.0e-11 时计算2446692.31的望时刻时不收敛
-  writeln(tf,floattostr(result-jd));
+  Result:=FindRoot(DiffSMLong,90.0*k,getJD-1.0,getJD+1.0,1.0e-11); // eps取1.0e-11 时计算2446692.31的望时刻时不收敛
+  writeln(tf,floattostr(result-getJD));
 end;
 
 
@@ -281,13 +281,13 @@ function SolarTrueT(const SolarT:integer):extended;
    // 返回值：力学时                                        //
    //***********************************************//                                                        ///
 var
-  jd:extended;
+  getJD:extended;
   k:integer;
 begin
   k:=SolarT mod 24;
   if k<0 then k:=k+24;
-  jd:=SolarMeanT(15.0*SolarT);
-  result:=FindRoot(SolarLong,15.0*k,jd-0.1,jd+0.1,1.0e-9);
+  getJD:=SolarMeanT(15.0*SolarT);
+  result:=FindRoot(SolarLong,15.0*k,getJD-0.1,getJD+0.1,1.0e-9);
 end;
 
 function ShadowCenterDis(const t:extended):extended;
@@ -444,7 +444,7 @@ begin
   end;
   ch:=true;
   Date.DateToJd;
-  jd0:=Date.jd;             // 换算儒略日
+  jd0:=Date.getJD;             // 换算儒略日
   PhaseK:=GetPhaseK(jd0);               // 计算节气序数
   SolarK:=GetSolarK(jd0);           // 计算月相序数
   s:=FloatToStr(jd0);
@@ -678,11 +678,11 @@ end;
   //********************************************//
 function TForm1.CheckDate:boolean;
 var
-  jd:real;
+  getJD:real;
 begin
-  jd:=jd0+365.25*(TL+0.03);
+  getJD:=jd0+365.25*(TL+0.03);
   Result:=true;
-  if (jd<2415020.5)or(jd>2488076.5) then begin
+  if (getJD<2415020.5)or(getJD>2488076.5) then begin
     showmessage('所给日期越界，请重新输入。');
     Result:=false;
   end;
@@ -708,13 +708,13 @@ begin
   Repeat
     while MoonK mod 4<>0 do if forwd then Inc(MoonK) else Dec(MoonK);
     repeat
-      jd:=PhaseT(MoonK);                      //朔时刻
-      ec:=JudgeSolarEclipse(jd,fec);         // 检查日食及其类型
+      getJD:=PhaseT(MoonK);                      //朔时刻
+      ec:=JudgeSolarEclipse(getJD,fec);         // 检查日食及其类型
       if forwd then MoonK:=MoonK+4 else MoonK:=MoonK-4;
     until ec>0;
-    jdu:=TDBToUT(jd);
+    jdu:=TDBToUT(getJD);
     ymd:=JDToYmd(jdu+1/3);     //东经120度标准时
-    jd1:=jd;
+    jd1:=getJD;
     if L<>0 then with TableEclipse do begin
       append;
       FieldByName('ECL').asstring:=ecName[ec-1];
@@ -749,7 +749,7 @@ end;
 procedure TForm1.tbLunarEclipseClick(Sender: TObject);
   // 处理月食计算
 var
-  jd,jd0,jdu,jd1,fec:extended;
+  getJD,jd0,jdu,jd1,fec:extended;
   ymd:TYMD;
   k,ec:integer;
   mr,sr:TVector;
@@ -765,11 +765,11 @@ begin
   Repeat
     while (MoonK-2) mod 4<>0 do if forwd then Inc(MoonK) else Dec(MoonK);
     repeat
-      jd:=TrueT(MoonK);         //望时刻
-      ec:=JudgeLunarEclipse(jd,fec);
+      getJD:=TrueT(MoonK);         //望时刻
+      ec:=JudgeLunarEclipse(getJD,fec);
       if forwd then MoonK:=MoonK+4 else MoonK:=MoonK-4;
     until ec>0;
-    jdu:=TDBToUT(jd);
+    jdu:=TDBToUT(getJD);
     ymd:=JDToYmd(jdu+1/3);     //东经120度标准时
     if L<>0 then with TableEclipse do begin
       append;
@@ -823,7 +823,7 @@ begin
     // 计算序数为PhaseK的月相
     d:=PhaseT(PhaseK);
     // 化为东经120度标准时
-    Date.jd:=TTToUTC(d,dt)+1.0/3.0;
+    Date.getJD:=TTToUTC(d,dt)+1.0/3.0;
     // 化为年月日
     Date.JDToDate;
     // 计算月相序数主值
@@ -850,7 +850,7 @@ begin
     // 修改月相序数
     if TL>=0 then PhaseK:=PhaseK+1 else PhaseK:=PhaseK-1;
     // 结束循环的条件：1. 离散模式，2. 日期越出时间区间
-  until (TL=0)or(abs(Date.jd-jd0)>365.25*(abs(TL)+0.03));
+  until (TL=0)or(abs(Date.getJD-jd0)>365.25*(abs(TL)+0.03));
   if TL<>0 then begin
     // 连续模式时更新meData和cbJD框的日期数字
     s:=meDate.Text;
@@ -883,7 +883,7 @@ begin
     // 计算序数为SolarK的节气
     d:=SolarTrueT(SolarK);
     // 化为东经120度标准时
-    Date.jd:=TTToUTC(d,dt)+1/3;
+    Date.getJD:=TTToUTC(d,dt)+1/3;
     // 化为年月日
     Date.JDToDate;
     // 计算节气序数主值
@@ -945,9 +945,9 @@ begin
   Date.StrToDate(meDate.text,w);
   // 转换为儒略日并输出到儒略日编辑框
   Date.DateToJd;
-  cbJd.text:=FloatToStr(Date.jd);
+  cbJd.text:=FloatToStr(Date.getJD);
   if pos('.',cbJd.text)=0 then cbJd.text:=cbJd.text+'.0';
-  jd0:=Date.jd;
+  jd0:=Date.getJD;
   SolarK:=GetSolarK(jd0);
   PhaseK:=GetPhaseK(jd0);
 end;
@@ -1041,7 +1041,7 @@ end.
 procedure TForm1.tbSolarTermClick(Sender: TObject);
   // 处理节气计算
 var
-  jd,jd0,jdu,jd1:extended;
+  getJD,jd0,jdu,jd1:extended;
   ymd:TYMD;
   k:integer;
   mr,sr:TVector;
@@ -1055,8 +1055,8 @@ begin
     jd0:=De.Ett;
   end;
   Repeat
-    jd:=SolarTrueT(SolarK);
-    jdu:=TDBToUT(jd);
+    getJD:=SolarTrueT(SolarK);
+    jdu:=TDBToUT(getJD);
     ymd:=JDToYmd(jdu+1/3);     //东经120度标准时
     k:=SolarK mod 24;
     if k<0 then k:=k+24 else k:=k;

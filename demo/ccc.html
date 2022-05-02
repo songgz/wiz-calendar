@@ -134,7 +134,7 @@
                 n +=((this.s/60+this.m)/60+this.h)/24 - 1524.5;
                 return n;
             },
-            setFromJD:function(getJD){ //儒略日数转公历
+            setFromJD:function(jd){ //儒略日数转公历
                 jd+=0.5;
                 var A=int2(jd), F=jd-A, D; //取得日数的整数部份A及小数部分F
                 if(A>=2299161) D=int2((A-1867216.25)/36524.25),A+=1+D-int2(D/4);
@@ -161,8 +161,8 @@
                 h=h.substr(h.length-2,2); m=m.substr(m.length-2,2); s=s.substr(s.length-2,2);
                 return Y+"-"+M+"-"+D+" "+h+":"+m+":"+s;
             },
-            setFromJD_str:function(getJD){ this.setFromJD(jd); return this.toStr(); },
-            timeStr:function(getJD){ //提取jd中的时间(去除日期)
+            setFromJD_str:function(jd){ this.setFromJD(jd); return this.toStr(); },
+            timeStr:function(jd){ //提取jd中的时间(去除日期)
                 var h,m,s;
                 jd+=0.5; jd = (jd - int2(jd));
                 jd*=24; h = int2(jd); jd-=h;
@@ -747,13 +747,13 @@
                 return Math.acos(c);
             },
 
-            Mcoord:function(getJD,H0,z){ //章动同时影响恒星时和天体坐标,所以不计算章动。返回时角及赤经纬
+            Mcoord:function(jd,H0,z){ //章动同时影响恒星时和天体坐标,所以不计算章动。返回时角及赤经纬
                 XL.M_coord( (jd+this.dt)/36525, z, 30,20,8 ); //低精度月亮赤经纬
                 ZB.llrConv( z, this.E ); //转为赤道坐标
                 z.H = rad2mrad(ZB.gst(jd,this.dt) - this.L - z[0]);   if( z.H>Math.PI ) z.H -= pi2; //得到此刻天体时角
                 if(H0) z.H0 = this.getH( 0.7275*6378.14/z[2]-34*60/rad, z[1] ); //升起对应的时角
             },
-            Mt : function(getJD){ //月亮到中升降时刻计算,传入jd含义与St()函数相同
+            Mt : function(jd){ //月亮到中升降时刻计算,传入jd含义与St()函数相同
                 this.dt = JD.deltatT2(jd);
                 this.E  = ZB.hcjj(jd/36525);
                 jd -= mod2(0.1726222 + 0.966136808032357*jd - 0.0366*this.dt - this.L/pi2, 1); //查找最靠近当日中午的月上中天,mod2的第1参数为本地时角近似值
@@ -770,7 +770,7 @@
                 return r;
             },
 
-            Scoord:function(getJD,H0,H1,z){ //章动同时影响恒星时和天体坐标,所以不计算章动。返回时角及赤经纬
+            Scoord:function(jd,H0,H1,z){ //章动同时影响恒星时和天体坐标,所以不计算章动。返回时角及赤经纬
                 z[0] = XL.E_Lon( (jd+this.dt)/36525, 5 ) + Math.PI - 20.5/rad; //太阳坐标(修正了光行差)
                 z[1] = 0; z[2]=1;
                 ZB.llrConv( z, this.E ); //转为赤道坐标
@@ -778,7 +778,7 @@
                 if(H0) z.H0 = this.getH(-50*60/rad,z[1]); //地平以下50分
                 if(H1) z.H1 = this.getH(-Math.PI/30,z[1]); //地平以下6度
             },
-            St : function(getJD){ //太阳到中升降时刻计算,传入jd是当地中午12点时间对应的2000年首起算的格林尼治时间UT
+            St : function(jd){ //太阳到中升降时刻计算,传入jd是当地中午12点时间对应的2000年首起算的格林尼治时间UT
                 this.dt = JD.deltatT2(jd);
                 this.E  = ZB.hcjj(jd/36525);
                 jd -= mod2(jd - this.L/pi2, 1); //查找最靠近当日中午的日上中天,mod2的第1参数为本地时角近似值
@@ -800,7 +800,7 @@
             },
 
             rts:new Array(),//多天的升中降
-            calcRTS:function(getJD,n,Jdl,Wdl,sq){ //多天升中降计算,jd是当地起始略日(中午时刻),sq是时区
+            calcRTS:function(jd,n,Jdl,Wdl,sq){ //多天升中降计算,jd是当地起始略日(中午时刻),sq是时区
                 var i,c,r;
                 if(!this.rts.length) { for(var i=0;i<31;i++) this.rts[i] = new Array(); }
                 this.L = Jdl, this.fa = Wdl, sq/=24; //设置站点参数
@@ -952,7 +952,7 @@
 
          使用条件：事先引用eph.js、JN.js、kwb.js三个文件
 
-         一、 calc:function(getJD,jing)方法
+         一、 calc:function(jd,jing)方法
          ·功能：
          农历排月序计算,可定出农历基本信息(如大小月、闰月、合朔等)
          ·入口参数：
@@ -1224,7 +1224,7 @@
             if(v<600 || v >86400-600) t = XL.MS_aLon_t(W)*36525 - JD.deltatT2(t);
             return  t + 8/24;
         }
-        function getQS1(getJD,qs){ //jd应靠近所要取得的气朔日,qs='气'时，算节气的儒略日
+        function getQS1(jd,qs){ //jd应靠近所要取得的气朔日,qs='气'时，算节气的儒略日
             jd += 2451545;
             var i,D,n;
             var B=suoKB,pc=14; if(qs=='气') B=qiKB,pc=7;
@@ -1260,8 +1260,8 @@
         //===============气朔时刻精算=======================
         function qi_accurate(W)  { var t=XL.S_aLon_t(W)*36525;  return t - JD.deltatT2(t) + 8/24; } //精气
         function suo_accurate(W) { var t=XL.MS_aLon_t(W)*36525; return t - JD.deltatT2(t) + 8/24; } //精朔
-        function qi_accurate2(getJD)  { return qi_accurate  ( Math.floor((jd+293)/365.2422*24) * Math.PI/12 ); } //精气
-        function suo_accurate2(getJD) { return suo_accurate ( Math.floor((jd+8)/29.5306) * Math.PI*2 ); } //精朔
+        function qi_accurate2(jd)  { return qi_accurate  ( Math.floor((jd+293)/365.2422*24) * Math.PI/12 ); } //精气
+        function suo_accurate2(jd) { return suo_accurate ( Math.floor((jd+8)/29.5306) * Math.PI*2 ); } //精朔
 
         Lunar={
             Gan:new Array("甲","乙","丙","丁","戊","己","庚","辛","壬","癸"),
@@ -1284,7 +1284,7 @@
 
             lun:new Array(),//月历数组,在调用calc2()之後得到
 
-            calc:function(getJD){ //农历排月序计算,可定出农历,有效范围：两个冬至之间(冬至一 <= d < 冬至二)
+            calc:function(jd){ //农历排月序计算,可定出农历,有效范围：两个冬至之间(冬至一 <= d < 冬至二)
                 var A=this.ZQ, B=this.HS; //中气表,日月合朔表(整日)
                 var i, k, W, w;
 
@@ -1943,7 +1943,7 @@
         if(L>Math.PI) L-=pi2;
         return L;
     }
-    function taiYangShi(getJD,L,c){ //转入格林尼治时间UT及本地经度及时差，c=0返回本地平太阳时，c=时差就返回真太阳时,返回的单位是弧度
+    function taiYangShi(jd,L,c){ //转入格林尼治时间UT及本地经度及时差，c=0返回本地平太阳时，c=时差就返回真太阳时,返回的单位是弧度
         var t=jd-L/pi2+c/pi2;
         JD.setFromJD(t+J2000);
         return JD.toStr().substr(12,8);
@@ -1952,7 +1952,7 @@
     function zb_calc(T,L,fa){ //T是力学时,站点经纬L,fa
         var s,z=new Array(),z2=new Array(),z3=new Array();
         var dt  = JD.deltatT2(T); //TD-UT
-        var getJD  = T-dt; //得到J2000起算的的儒略数
+        var jd  = T-dt; //得到J2000起算的的儒略数
         T/=36525; ZB.nutation(T); //章动计算
         var E  = ZB.hcjj(T)+ZB.dE; //真黄赤交角
         var dL = ZB.dL; //黄经章动
@@ -2024,7 +2024,7 @@
 
         return s;
     }
-    function RTS1(getJD,vJ,vW){
+    function RTS1(jd,vJ,vW){
         SZJ.calcRTS(jd, 1, vJ, vW, -8); //升降计算,使用北时时间,-8指东8区
         var s, ob = SZJ.rts[0];
         JD.setFromJD(jd+J2000);
@@ -2095,7 +2095,7 @@
         Clock2_dq.innerHTML = '['+v.substr(6,v.length-6)+']';
         Sel_dq.v = v;
     }
-    function change_dq_time(getJD){
+    function change_dq_time(jd){
         var v = Sel_dq.v, h=(v.substr(1,2)-0) + v.substr(3,2)/60;
         if(v.substr(0,1)=='-') h = -h;
         JD.setFromJD(jd+J2000);
@@ -2325,7 +2325,7 @@
 
     function tick() { //即时坐标计算
         var now = new Date();
-        var getJD = now/86400000-10957.5; //J2000起算的儒略日数
+        var jd = now/86400000-10957.5; //J2000起算的儒略日数
         Clock1.innerHTML = now.toLocaleString();
         change_dq_time(jd);
         if(!Cal_pause.checked){

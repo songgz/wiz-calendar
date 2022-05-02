@@ -457,7 +457,7 @@ function showHXK(ind){ //显示恒星库
 showHXK0();
 showHXK(0);
 function aCalc(){ //恒星计算
- var jd = JD.JD( year2Ayear(Cf_y.value), Cf_m.value-0, (Cf_d.value-0)+timeStr2hour(Cf_t.value)/24 ) - J2000;  //取屏幕时间
+ var getJD = JD.JD( year2Ayear(Cf_y.value), Cf_m.value-0, (Cf_d.value-0)+timeStr2hour(Cf_t.value)/24 ) - J2000;  //取屏幕时间
  if(Cf_ut.checked) jd += curTZ/24+dt_T(jd); //转为力学时
 
  var dt = Cf_dt.value-0, n = Cf_n.value-0;
@@ -480,7 +480,7 @@ function txFormatT(t){ //天象时间格式化输出
        + JD.JD2str(t2).substr(9,11) +' UT ';
 }
 function tianXiang(xm,xm2){
- var jd = JD.JD( year2Ayear(Ce_y.value), Ce_m.value-0, (Ce_d.value-0) ) - J2000;  //取屏幕时间
+ var getJD = JD.JD( year2Ayear(Ce_y.value), Ce_m.value-0, (Ce_d.value-0) ) - J2000;  //取屏幕时间
  var n=Ce_n.value-0;
  var s='',i,re;
  jd /= 36525;
@@ -552,7 +552,7 @@ function tianXiang(xm,xm2){
 }
 
 function pCalc(xm){ //行星星历计算
- var jd = JD.JD( year2Ayear(Cd_y.value), Cd_m.value-0, (Cd_d.value-0)+timeStr2hour(Cd_t.value)/24 ) - J2000;  //取屏幕时间
+ var getJD = JD.JD( year2Ayear(Cd_y.value), Cd_m.value-0, (Cd_d.value-0)+timeStr2hour(Cd_t.value)/24 ) - J2000;  //取屏幕时间
  if(Cd_ut.checked) jd += curTZ/24+dt_T(jd); //转为力学时
  var xt = Cd_xt.options[Cd_xt.selectedIndex].value;
  var dt = Cd_dt.value-0, n = Cd_n.value-0;
@@ -574,7 +574,7 @@ function zb_calc(){ //即时坐标计算
   if(Cal_pause.checked) return;
 
   var now = new Date();
-  var jd = now/86400000-10957.5; //J2000起算的儒略日数
+  var getJD = now/86400000-10957.5; //J2000起算的儒略日数
   jd += dt_T(jd);
   msc.calc(jd, Cb_J.value/radd, Cb_W.value/radd,0); //传入力学时间(J2000.0起算)
   Cal_zb.innerHTML = msc.toHTML(0);
@@ -587,7 +587,7 @@ function zxsCopy(J,W){ //复制某时刻中心食地标，并计算该处日食
 }
 function tu_calc(ly){ //ly是取时间的方式,xm是计算的项目
  tu1.init(Can1); //画布初始化
- var jd; //J2000起算的儒略日数(当地时间)
+ var getJD; //J2000起算的儒略日数(当地时间)
  var vJ = Cb_J.value/radd;
  var vW = Cb_W.value/radd;
  //取时间
@@ -729,7 +729,7 @@ function tu_cls_path(){
 
 //==================日食概略图=================
 function tu2_jxb(){ //显示界线表
- var jd = Cp10_jd.value-J2000; //取屏幕时间
+ var getJD = Cp10_jd.value-J2000; //取屏幕时间
  jd = XL.MS_aLon_t2( int2((jd+8)/29.5306)*Math.PI*2 )*36525; //归朔
  rsGS.init(jd,7);
  Cp10_tz.innerHTML=rsGS.jieX3(jd);
@@ -741,7 +741,7 @@ function tu2_cls_path(){ //清除图2及特征表
   tu2.dbj.style.display='none';
   Cp10_tz.innerHTML='';
 }
-function tu2_xx(jd){ //转到详细日食图表页面
+function tu2_xx(getJD){ //转到详细日食图表页面
  //置时间
  var ts=JD.JD2str(jd+J2000);
  Cb_y.value = ts.substr(0,5)-0;
@@ -753,7 +753,7 @@ function tu2_xx(jd){ //转到详细日食图表页面
 }
 function tuGL_search(fs){ //查找日食
   var i,k,r,s='',s2='', n=Cp10_an.value-0;
-  var jd = JD.JD( year2Ayear(Cp10_y.value), Cp10_m.value-0, 0) - J2000;  //取屏幕时间
+  var getJD = JD.JD( year2Ayear(Cp10_y.value), Cp10_m.value-0, 0) - J2000;  //取屏幕时间
   jd = XL.MS_aLon_t2( int2((jd+8)/29.5306)*Math.PI*2 )*36525; //定朔
   for(i=0,k=0;i<n;i++){
    r=ecFast(jd); //低精度高速搜索
@@ -781,7 +781,7 @@ function tu2_calc(fs,jd0){
  if(fs==0) return;
 
  var step = Cp10_step.value-0;
- var jd = Cp10_jd.value-J2000; //取屏幕时间
+ var getJD = Cp10_jd.value-J2000; //取屏幕时间
  if(fs==1) jd = jd0;
  if(fs==2) ; //保持时间不变
  if(fs==3) jd -= step;
@@ -878,7 +878,7 @@ function tu3_xz(xm){ //旋转图3
 }
 
 function tu3_yingzi(xm){ //显示影子
- var jd = Cp10_jd2.value-J2000; //取屏幕时间
+ var getJD = Cp10_jd2.value-J2000; //取屏幕时间
  if(xm==1) jd -= Cp10_step2.value/86400;
  if(xm==2) jd += Cp10_step2.value/86400;
  Cp10_jd2.value = (jd+J2000).toFixed(4);
@@ -889,7 +889,7 @@ function tu3_yingzi(xm){ //显示影子
 }
 
 function dfRS(ly){ //地方日食表生成
- var jd = JD.JD( year2Ayear(Cc_y.value), Cc_m.value-0, (Cc_d.value-0) ) - J2000;  //取屏幕时间
+ var getJD = JD.JD( year2Ayear(Cc_y.value), Cc_m.value-0, (Cc_d.value-0) ) - J2000;  //取屏幕时间
  if(ly==1) jd -=29.53;
  if(ly==2) jd +=29.53;
  jd = XL.MS_aLon_t2( Math.floor((jd+8)/29.5306)*pi2 )*36525;
@@ -930,7 +930,7 @@ function dfRS(ly){ //地方日食表生成
 function shengjiang(){
   SZJ.L  = Cp9_J.value/radd; //设置站点参数
   SZJ.fa = Cp9_W.value/radd;
-  var jd = JD.JD( year2Ayear(Cp9_y.value), Cp9_m.value-0, (Cp9_d.value-0)+0.5 ) - J2000;  //取屏幕时间
+  var getJD = JD.JD( year2Ayear(Cp9_y.value), Cp9_m.value-0, (Cp9_d.value-0)+0.5 ) - J2000;  //取屏幕时间
   var sq = SZJ.L/pi2*24;
 
   var s="<font color=red>北京时间(转为格林尼治时间请减8小时)：</font><br>", r, c=J2000+8/24;
@@ -951,7 +951,7 @@ function shengjiang(){
 function shengjiang2(){ //太阳升降快算
   var L  = Cp9_J.value/radd; //设置站点参数
   var fa = Cp9_W.value/radd;
-  var jd = JD.JD( year2Ayear(Cp9_y.value), 1, 1.5 ) - J2000;  //取屏幕时间
+  var getJD = JD.JD( year2Ayear(Cp9_y.value), 1, 1.5 ) - J2000;  //取屏幕时间
   var i,t, s='',s2='';
   for(i=0;i<368;i++){
     t=sunShengJ(jd+i,L,fa,-1)+J2000+8/24; s2+='<font color=red>'+JD.JD2str(t).substr(6,14)+'</font>，';
@@ -962,7 +962,7 @@ function shengjiang2(){ //太阳升降快算
   Cp9_out.innerHTML='<center><b>太阳年度升降表</b><table><tr>'+s+s2+'</tr></table></center>';
 }
 function shengjiang3(){ //年度时差
-  var jd = JD.JD( year2Ayear(Cp9_y.value), 1, 1.5 );  //取屏幕时间
+  var getJD = JD.JD( year2Ayear(Cp9_y.value), 1, 1.5 );  //取屏幕时间
   var i,t,D, s='',s2='';
   for(i=0;i<368;i++){
     D=jd+i-8/24-J2000, D+=dt_T(D);
@@ -1099,7 +1099,7 @@ change_zhou();
 function show_clock(t){ //显示时钟,传入日期对象
   var h  = Sel_dq.v-0, rg='';
   var v  = Sel_dq.rg;
-  var jd = t/86400000-10957.5 + h/24; //J2000起算的儒略日数(当地时间)
+  var getJD = t/86400000-10957.5 + h/24; //J2000起算的儒略日数(当地时间)
 
   Clock1.innerHTML = t.toLocaleString();
 
@@ -1153,7 +1153,7 @@ Sel2.selectedIndex = seI2; change2();
 function ML_calc(){
  var ob=new Object();
  var t = timeStr2hour(Cml_his.value);
- var jd=JD.JD(year2Ayear(Cml_y.value), Cml_m.value-0, Cml_d.value-0+t/24)
+ var getJD=JD.JD(year2Ayear(Cml_y.value), Cml_m.value-0, Cml_d.value-0+t/24)
 
  obb.mingLiBaZi( jd+curTZ/24-J2000, Cp11_J.value/radd, ob ); //八字计算
  Cal6.innerHTML =
@@ -1206,10 +1206,10 @@ function changeMonth(ud){ //跳到上(或下)下月
 升降计算等
 *********************/
 
-function RTS1(jd,vJ,vW,tz){
- SZJ.calcRTS(jd, 1, vJ, vW, tz); //升降计算,使用北时时间,tz=-8指东8区,jd+tz应在当地正午左右(误差数小时不要紧)
+function RTS1(getJD,vJ,vW,tz){
+ SZJ.calcRTS(jd, 1, vJ, vW, tz); //升降计算,使用北时时间,tz=-8指东8区,getJD+tz应在当地正午左右(误差数小时不要紧)
  var s, ob = SZJ.rts[0];
-// JD.setFromJD(jd+J2000);
+// JD.setFromJD(getJD+J2000);
  s  = '日出 <font color=red>'+ob.s + '</font> 日落 '+ob.j +' 中天 '+ob.z +'<br>';
  s += '月出 '+ob.Ms+ ' 月落 '+ob.Mj+' 月中 '+ob.Mz+'<br>';
  s += '晨起天亮 '+ob.c + ' 晚上天黑 '+ob.h +'<br>';

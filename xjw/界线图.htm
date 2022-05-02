@@ -57,7 +57,7 @@ function createPL(L,k,co){ //创建折线
 
 <script type="text/javascript">
 function C1_show(xm){
- var jd = JD.JD( year2Ayear(C1_y.value), C1_m.value-0, (C1_d.value-0) ) - J2000;
+ var getJD = JD.JD( year2Ayear(C1_y.value), C1_m.value-0, (C1_d.value-0) ) - J2000;
  rsGS.init(jd,7);
  var bu = rsGS.jieX(jd,0); //取界线
  createPL(bu.L0,0,'red');

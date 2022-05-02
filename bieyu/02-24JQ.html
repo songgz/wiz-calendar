@@ -35,7 +35,7 @@
         if (yr < -1000 || yr > 3000) {
             alert("适用于西元-1000年至西元3000年，超出此范围误差较大");
         }
-        var jd = VE(yr);
+        var getJD = VE(yr);
         var ty = VE(yr + 1) - jd;
         var out = "";
         if (MeanJQJD(yr, jd, ty, ini, num) == true) {
@@ -214,7 +214,7 @@
         return DeltaT
     }
 
-    function Jtime(op, jd) {//将儒略日转换为年月日时分秒
+    function Jtime(op, getJD) {//将儒略日转换为年月日时分秒
         if (jd >= 2299160.5 || op) {
             var y4h = 146097;
             var init = 1721119.5;

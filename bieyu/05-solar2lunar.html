@@ -297,7 +297,7 @@
         var jdm = mp * 30 + Math.floor((mp + 1) * 34 / 57);
         var jdd = dy - 1;
         var jdh = hr / 24;
-        var jd = jdy + jdm + jdd + jdh + init;
+        var getJD = jdy + jdm + jdd + jdh + init;
         return jd;
     }
 
@@ -333,7 +333,7 @@
     }
 
     //副程式功能：對於指定日期時刻所屬的朔望月，求出其均值新月點的月序數
-    function MeanNewMoon(jd) {
+    function MeanNewMoon(getJD) {
         var t, thejd, jdt;
 //k為從2000年1月6日14時20分36秒起至指定年月日之陰曆月數,以synodic month為單位
         var k = Math.floor((jd - 2451550.09765) / synmonth); //2451550.09765為2000年1月6日14時20分36秒之JD值。

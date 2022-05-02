@@ -45,6 +45,11 @@ describe('JulianDate Class', () => {
         let j2 = s11.getJulianDate();
         let s21 = j2.getLunarDate();
         expect(s21.toHash()).toStrictEqual(s11.toHash());
+
+        let s111 = new LunarDate(1949, 7, 23, true);
+        let j21 = JulianDate.fromJDN(2433175);
+        let s211 = j21.getLunarDate();
+        expect(s211.toHash()).toStrictEqual(s111.toHash());
     });
 
 

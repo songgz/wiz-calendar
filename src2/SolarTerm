@@ -108,30 +108,30 @@ var ST = (function () {
     };
 
     return {
-        qi: function (jd) {
-            jd += 2451545; //JD2000
+        qi: function (getJD) {
+            getJD += 2451545; //JD2000
             var i, D, n;
             var B = qiKB, pc = 7;
             var f1 = B[0] - pc, f2 = B[B.length - 1] - pc, f3 = 2436935; // 2436935是1960.1.1
 
-            if (jd < f1 || jd >= f3) { //平气朔表中首个之前，使用现代天文算法。1960.1.1以后，使用现代天文算法 (这一部分调用了qi_high和so_high,所以需星历表支持)
-                D = Math.floor(qi_high(Math.floor((jd + pc - 2451259) / 365.2422 * 24) * Math.PI / 12) + 0.5);   //2451259是1999.3.21,太阳视黄经为0,春分.定气计算  spring equinox
+            if (getJD < f1 || getJD >= f3) { //平气朔表中首个之前，使用现代天文算法。1960.1.1以后，使用现代天文算法 (这一部分调用了qi_high和so_high,所以需星历表支持)
+                D = Math.floor(qi_high(Math.floor((getJD + pc - 2451259) / 365.2422 * 24) * Math.PI / 12) + 0.5);   //2451259是1999.3.21,太阳视黄经为0,春分.定气计算  spring equinox
             }
 
-            if (jd >= f1 && jd < f2) { //平气或平朔
+            if (getJD >= f1 && getJD < f2) { //平气或平朔
                 for (i = 0; i < B.length; i += 2) {
-                    if (jd + pc < B[i + 2]) break
+                    if (getJD + pc < B[i + 2]) break
                 }
                 ;
-                D = B[i] + B[i + 1] * Math.floor((jd + pc - B[i]) / B[i + 1]);
+                D = B[i] + B[i + 1] * Math.floor((getJD + pc - B[i]) / B[i + 1]);
                 D = Math.floor(D + 0.5);
                 if (D == 1683460) D++; //如果使用太初历计算-103年1月24日的朔日,结果得到的是23日,这里修正为24日(实历)。修正后仍不影响-103的无中置闰。如果使用秦汉历，得到的是24日，本行D不会被执行。
                 D = D - 2451545;
             }
 
-            if (jd >= f2 && jd < f3) { //定气或定朔
-                D = Math.floor(qi_low(Math.floor((jd + pc - 2451259) / 365.2422 * 24) * Math.PI / 12) + 0.5); //2451259是1999.3.21,太阳视黄经为0,春分.定气计算
-                n = QB.substr(Math.floor((jd - f2) / 365.2422 * 24), 1); //找定气修正值
+            if (getJD >= f2 && getJD < f3) { //定气或定朔
+                D = Math.floor(qi_low(Math.floor((getJD + pc - 2451259) / 365.2422 * 24) * Math.PI / 12) + 0.5); //2451259是1999.3.21,太阳视黄经为0,春分.定气计算
+                n = QB.substr(Math.floor((getJD - f2) / 365.2422 * 24), 1); //找定气修正值
                 if (n == "1") D = D + 1;
                 if (n == "2") D = D - 1;
             }
@@ -140,10 +140,10 @@ var ST = (function () {
 
         },
 
-        Solar: function(jd){
+        Solar: function(getJD){
             //该年的气
-            var W = int2((jd - 355 + 183) / 365.2422) * 365.2422 + 355;  //355是2000.12冬至,得到较靠近jd的冬至估计值
-            if (this.qi(W) > jd) W -= 365.2422;
+            var W = int2((getJD - 355 + 183) / 365.2422) * 365.2422 + 355;  //355是2000.12冬至,得到较靠近jd的冬至估计值
+            if (this.qi(W) > getJD) W -= 365.2422;
             var me = this;
             return {
                 term: function(n){

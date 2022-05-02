@@ -2,6 +2,8 @@ import {Vsop87} from "./vsop-87";
 import {JulianDate} from "./julian-date";
 import {Mpp02} from "./mpp-02";
 import {Angle} from "./angle";
+import {MoonPhase, MoonPhaseName} from "./MoonPhase";
+import {SolarTerm, SolarTermName} from "./solar-term";
 
 export class Nutation {
     /**
@@ -50,7 +52,33 @@ export class Earth {
     }
 }
 
+
 export class Sun {
+    mjd = 0;
+    private springEquinoxes: number | undefined;
+    private solarTerms: {[key: number]: SolarTerm} = {};
+
+    constructor(mjd: number) {
+        this.mjd = mjd;
+    }
+
+    //春分周期数，春分太阳位于黄经0度
+    getSpringEquinoxes() {
+        if(this.springEquinoxes === undefined){
+            let w = Sun.aLong((this.mjd) / 36525.0, 3);
+            this.springEquinoxes = Math.floor(w / Angle.PI2 + 0.01);
+        }
+        return this.springEquinoxes;
+    }
+
+    getSolarTerm(solarTermName: SolarTermName): SolarTerm {
+        if(this.solarTerms[solarTermName] === undefined) {
+            this.solarTerms[solarTermName] = new SolarTerm(Sun.mjd((this.getSpringEquinoxes() + solarTermName / 24) * Angle.PI2), solarTermName);
+        }
+        return this.solarTerms[solarTermName];
+    }
+
+
     /**
      * 太阳黄经平速度，单位为弧度/儒略世纪
      */
@@ -162,9 +190,75 @@ export class Sun {
         t -= (L / 10000000 - W ) / 628.332 + (32 * (t + 1.8) * (t + 1.8) - 20) / 86400 / 36525;
         return t * 36525 + 8 / 24;
     }
+
+    /**
+     * 求某时刻临近的节气，返回东八区的儒略日时间
+     * 高精度
+     * @param mjd - J2000.0算起的儒略日时间
+     * @return - 东八区儒略日
+     */
+    static closestSolarTerm(mjd: number) { //精气
+        const d = Math.PI / 12;
+        const w = Math.floor((mjd + 293) / 365.2422 * 24) * d;
+        const a = Sun.mjd(w);
+        if (a - mjd > 5) return Sun.mjd(w - d);
+        if (a - mjd < -5) return Sun.mjd(w + d);
+        return a;
+    }
 }
 
 export class Moon {
+    mjd = 0;
+    private moonPhases: {[key: number]: MoonPhase} = {};
+    private newMoonALongD: number | undefined;
+    private newMoon: number | undefined;
+    private nextNewMoon: number | undefined;
+
+    constructor(mjd: number) {
+        this.mjd = mjd;
+    }
+
+    getNewMoonALongD(): number {
+        if(this.newMoonALongD === undefined) {
+            let ms = SunMoon.aLongD((this.mjd) / 36525, 10, 3);
+            this.newMoonALongD = Math.floor((ms + 2) / Angle.PI2) * Angle.PI2; //朔日
+
+            let newMoon = SunMoon.mjd(this.newMoonALongD);
+            if (Math.floor(newMoon + 0.5) > Math.floor(this.mjd + 0.5)) {
+                this.newMoonALongD -= Angle.PI2;
+            }
+        }
+        return this.newMoonALongD;
+    }
+
+    getNewMoon() {
+        if(this.newMoon === undefined) {
+            this.newMoon = SunMoon.mjd(this.getNewMoonALongD());
+        }
+        return this.newMoon;
+    }
+
+    getNextNewMoon() {
+        if (this.nextNewMoon === undefined) {
+            this.nextNewMoon = SunMoon.mjd(this.getNewMoonALongD() + Angle.PI2);
+        }
+        return this.nextNewMoon;
+    }
+
+    getMoonPhase(moonphaseName: MoonPhaseName) {
+        if (this.moonPhases[moonphaseName] === undefined) {
+            let mjd = SunMoon.mjd(this.getNewMoonALongD() + (moonphaseName / 4.0) * Angle.PI2);
+            let phase = new MoonPhase(mjd, moonphaseName);
+
+            this.moonPhases[moonphaseName] = phase;
+        }
+        return this.moonPhases[moonphaseName];
+    }
+
+
+
+
+
     /**
      * 根据时间，计算月球黄经
      * @param jc - 儒略世纪数

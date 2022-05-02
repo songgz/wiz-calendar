@@ -1,5 +1,5 @@
 import {Angle} from "./angle";
-import {SunMoon, Sun} from "./ephem";
+import {SunMoon, Sun, Moon} from "./ephem";
 import {SolarDate} from "./solar-date";
 import {LunarDate} from "./lunar-date";
 
@@ -45,20 +45,23 @@ export class JulianDate {
         return this.mjd;
     }
 
-    mjdTT() {
+    /*
+    力学时TT
+     */
+    getMJD() {
         return this.mjd;
     }
 
-    jd() {
+    getJD() {
         return this.mjd + JulianDate.J2000;
     }
 
-    mjdn() {
+    getMJDN() {
         return Math.floor(this.mjd + 0.5);
     }
 
-    jdn() {
-        return Math.floor(this.jd() + 0.5);
+    getJDN() {
+        return Math.floor(this.getJD() + 0.5);
     }
 
     getDeltaT(): number {
@@ -78,7 +81,7 @@ export class JulianDate {
 
     getSolarDate() {
         if (this.solarDate === undefined){
-            let d = JulianDate.DD(this.jd());
+            let d = JulianDate.DD(this.getJD());
             this.solarDate = new SolarDate(d.Y, d.M, d.D, d.h, d.m, d.s);
             this.solarDate.setJulianDate(this);
         }
@@ -92,23 +95,32 @@ export class JulianDate {
     getLunarDate() {
         if (this.lunarDate === undefined) {
             let nextNewMoon, w1, w2, wn, y, m, d, n, fd, ry;
-            let jd = this.jd();
+            let newMoon;
+            let jd = this.getJD();
             let F = jd + 0.5 - Math.floor(jd + 0.5);
-            let mjd = Math.floor(jd + 0.5) - JulianDate.J2000;
-            let ms = SunMoon.aLongD(mjd / 36525, 10, 3);
-            ms = Math.floor((ms + 2) / Angle.PI2) * Angle.PI2; //合朔
-            let newMoon = SunMoon.mjd(ms);
+            let mjdn = Math.floor(jd + 0.5) - JulianDate.J2000;
+            // let ms = SunMoon.aLongD(mjdn / 36525, 10, 3);
+            // ms = Math.floor((ms + 2) / Angle.PI2) * Angle.PI2; //合朔
+            // newMoon = SunMoon.mjd(ms);
+            //
+            //
+            // if (Math.floor(newMoon + 0.5) > mjdn) {
+            //     nextNewMoon = newMoon;
+            //     newMoon = SunMoon.mjd(ms - Angle.PI2);
+            // } else {
+            //     ms += Angle.PI2;
+            //     nextNewMoon = SunMoon.mjd(ms);
+            // }
 
-            if (Math.floor(newMoon + 0.5) > mjd) {
-                nextNewMoon = newMoon;
-                newMoon = SunMoon.mjd(ms - Angle.PI2);
-            } else {
-                ms += Angle.PI2;
-                nextNewMoon = SunMoon.mjd(ms);
-            }
+            // let mjdn = this.mjdn();
+            let moon = new Moon(this.mjd);
+            newMoon = moon.getNewMoon();
+            nextNewMoon = moon.getNextNewMoon();
+            let ms = moon.getNewMoonALongD() + Angle.PI2;
 
             let solarTermRad24 = Angle.PI2 / 24;
             let solarTermRad12 = Angle.PI2 / 12;
+
 
             w1 = Sun.aLong(newMoon / 36525, 3);
             w1 = Math.floor(w1 / solarTermRad24) * solarTermRad24; //节气
@@ -120,10 +132,10 @@ export class JulianDate {
                 w2 += solarTermRad24;
             }
             wn = Math.floor((w2 + 0.1) / solarTermRad24) + 4; //节气数
-            y = Math.floor(wn / 24) + 2000 - 1;
+            y = Math.floor(wn / 24) + 1999; //1999年春分对应W=0
             wn = (wn % 24 + 24) % 24;
             m = Math.floor(wn / 2);
-            d = mjd - Math.floor(newMoon + 0.5) + 1;
+            d = mjdn - Math.floor(newMoon + 0.5) + 1;
             n = Math.floor(nextNewMoon + 0.5) - Math.floor(newMoon + 0.5);
             fd = w2 - w1 < Angle.PI2 / 20 ? wn % 2 : 0;
             ry = w2 == w1 ? fd : 0;
@@ -396,6 +408,10 @@ export class JulianDate {
 
     static fromJD(jd: number) {
         return new JulianDate(jd - JulianDate.J2000);
+    }
+
+    static fromJDN(jdn: number): JulianDate {
+        return new JulianDate(jdn - JulianDate.J2000 - 0.5);
     }
 
 

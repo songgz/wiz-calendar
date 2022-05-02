@@ -1,35 +1,4 @@
-import {SunMoon} from "./ephem";
 import {JulianDate} from "./julian-date";
-import {Angle} from "./angle";
-
-export class MoonPhase {
-    private readonly mjd: number;
-    private newMoons: number | undefined;
-    private moonPhases: {[key: number]: JulianDate} = {};
-
-    constructor(mjd: number) {
-        this.mjd = mjd;
-    }
-
-    getNewMoons(): number {
-        if(this.newMoons === undefined) {
-            let ms = SunMoon.aLongD((this.mjd) / 36525, 10, 3);
-            this.newMoons = Math.floor((ms + 2) / Angle.PI2);
-        }
-        return this.newMoons;
-    }
-
-    getMoonPhase(moonphaseName: MoonPhaseName) {
-        if (this.moonPhases[moonphaseName] === undefined) {
-            let mjd = SunMoon.mjd((this.getNewMoons() + moonphaseName / 4.0) * Angle.PI2);
-            this.moonPhases[moonphaseName] = new JulianDate(mjd);
-        }
-        return this.moonPhases[moonphaseName];
-    }
-
-    static Signs = ['●', '☽', '○', '☾'];
-}
-
 
 export enum MoonPhaseName {
     //朔，新月
@@ -41,3 +10,37 @@ export enum MoonPhaseName {
     //下弦
     LastQuarter = 3,
 }
+
+export class MoonPhase {
+    mjd = 0;
+    phase = 0;
+    sign = '';
+    time = '';
+    day = 0;
+
+    constructor(mjd: number, phase: number) {
+        this.mjd = mjd;
+        this.phase = phase;
+    }
+
+    getPhase() {
+        return this.phase;
+    }
+
+    getSign() {
+        return MoonPhase.Signs[this.phase];
+    }
+
+    getTime() {
+        return JulianDate.timeStr(this.mjd);
+    }
+
+    getMjdn() {
+        return Math.floor(this.mjd + 0.5);
+    }
+
+    static Signs = ['●', '☽', '○', '☾'];
+}
+
+
+
