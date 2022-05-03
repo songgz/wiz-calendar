@@ -94,7 +94,7 @@ WizCalendar（巫师万年历）
     ```typescript
     let lunar = WizCalendar.lunarDate(1977,4,1);
     let phase = lunar.getMoonPhase(MoonPhaseName.NewMoon);
-    phase.getMJDN(); //-8263
+    phase.getJulianDate().getMJDN(); //-8263
     ```
 11. 获取24节气
     ```typescript
