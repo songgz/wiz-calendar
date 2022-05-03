@@ -3,7 +3,7 @@ import {SunMoon, Sun, Moon} from "./ephem";
 import {Angle} from "./angle";
 import { SolarTermName} from "./solar-term";
 import {SolarDate} from "./solar-date";
-import {MoonPhase, MoonPhaseName} from "./MoonPhase";
+import {MoonPhase, MoonPhaseName} from "./moon-phase";
 
 export class LunarDate {
     year = 0;
@@ -102,7 +102,7 @@ export class LunarDate {
         let w = (this.year - 2000 + (this.month + 10.5) / 12) * Angle.PI2; //节气的太阳视黄经
         let majorSolarTerm = Sun.mjd(w); //节气的时间
         let solarTermRad24 = Angle.PI2 / 24;
-        //let cycle = new MonthlyCycle(majorSolarTerm);
+
         let moon = new Moon(majorSolarTerm);
         let ms = moon.getNewMoonALongD();
 

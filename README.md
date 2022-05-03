@@ -13,12 +13,12 @@ WizCalendar（巫师万年历）
 
    javascript导入方式：
    ```typescript
-   const {WizCalendar, SolarDate, LunarDate, JulianDate} = require("wiz-calendar");
+   const {WizCalendar, SolarDate, LunarDate, JulianDate, MoonPhase,MoonPhaseName} = require("wiz-calendar");
    ```
    
    typescript导入方式：
    ```typescript
-   import {WizCalendar, SolarDate, LunarDate, JulianDate} from 'wiz-calendar';
+   import {WizCalendar, SolarDate, LunarDate, JulianDate, MoonPhase,MoonPhaseName} from 'wiz-calendar';
    ```
 ### 基本用法：
 1. 阳历转阴历
@@ -90,7 +90,7 @@ WizCalendar（巫师万年历）
    eight.getDay(); //甲子
    eight.getHour(); //己巳
 
-10. 获取月相
+10. 获取月相(朔望)
    ```typescript
    let lunar = WizCalendar.lunarDate(1977,4,1);
    let phase = lunar.getMoonPhase(MoonPhaseName.NewMoon);
@@ -98,7 +98,6 @@ WizCalendar（巫师万年历）
    ```
 11. 获取24节气
    ```typescript
-import {MoonPhase,MoonPhaseName} from "./MoonPhase"; import {SolarTermName} from "./solar-term";
     let lunar = WizCalendar.lunarDate(1977,4,1);
     let term = lunar.getSolarTerm(SolarTermName.WinterSolstice);
     term.getJulianDate().getMJDN(); //-8045

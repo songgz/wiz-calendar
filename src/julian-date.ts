@@ -125,7 +125,6 @@ export class JulianDate {
             let solarTermRad24 = Angle.PI2 / 24;
             let solarTermRad12 = Angle.PI2 / 12;
 
-
             w1 = Sun.aLong(newMoon / 36525, 3);
             w1 = Math.floor(w1 / solarTermRad24) * solarTermRad24; //节气
             while (Math.floor(Sun.mjd(w1) + 0.5) < Math.floor(newMoon + 0.5)) {
@@ -194,6 +193,8 @@ export class JulianDate {
     formatTime() {
         return JulianDate.timeStr(this.mjd);
     }
+
+
 
 
     /**

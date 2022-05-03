@@ -2,7 +2,7 @@ import {Vsop87} from "./vsop-87";
 import {JulianDate} from "./julian-date";
 import {Mpp02} from "./mpp-02";
 import {Angle} from "./angle";
-import {MoonPhase, MoonPhaseName} from "./MoonPhase";
+import {MoonPhase, MoonPhaseName} from "./moon-phase";
 import {SolarTerm, SolarTermName} from "./solar-term";
 
 export class Nutation {
@@ -62,11 +62,37 @@ export class Sun {
         this.mjd = mjd;
     }
 
+    getALong() {
+        return Sun.aLong(this.mjd / 36525.0, 3);
+    }
+
+    getPrevSolarTermALong() {
+        //let w = Sun.aLong(this.mjd / 36525.0, 3);
+        return Math.floor(this.getALong() / Sun.SolarTermRad24) * Sun.SolarTermRad24; //节气视黄经
+    }
+
+    getSolarTerms() {
+        return  Math.floor((this.getPrevSolarTermALong() + 0.1) / Sun.SolarTermRad24); //节气序数，从春分开始;
+    }
+
+    getTerm() {
+        return (this.getSolarTerms() % 24 + 24) % 24;
+    }
+
+    getPrevSolarTerm() {
+        return Sun.mjd(this.getPrevSolarTermALong());
+    }
+
+    getNextSolarTerm(offset: number = 0) {
+        return Sun.mjd(this.getPrevSolarTermALong() + (offset + 1) * Sun.SolarTermRad24);
+
+    }
+
     //春分周期数，春分太阳位于黄经0度
     getSpringEquinoxes() {
         if(this.springEquinoxes === undefined){
-            let w = Sun.aLong((this.mjd) / 36525.0, 3);
-            this.springEquinoxes = Math.floor(w / Angle.PI2 + 0.01);
+            //let w = Sun.aLong((this.mjd) / 36525.0, 3);
+            this.springEquinoxes = Math.floor(this.getALong() / Angle.PI2 + 0.01);
         }
         return this.springEquinoxes;
     }
@@ -79,6 +105,8 @@ export class Sun {
     }
 
 
+    static SolarTermRad24 = Angle.PI2 / 24;
+    static SolarTermRad12 = Angle.PI2 / 12;
     /**
      * 太阳黄经平速度，单位为弧度/儒略世纪
      */
@@ -231,7 +259,7 @@ export class Moon {
         return this.newMoonALongD;
     }
 
-    getNewMoon() {
+    getNewMoon(): number {
         if(this.newMoon === undefined) {
             this.newMoon = SunMoon.mjd(this.getNewMoonALongD());
         }

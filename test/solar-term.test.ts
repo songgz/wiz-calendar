@@ -25,4 +25,11 @@ describe('SolarTerm Class', () => {
         expect(term.getJulianDate().formatTime()).toBe('07:23:08');
     });
 
+    test('getSolarTerm method', () => {
+        let s1 = new Sun(2443296 - JulianDate.J2000);
+        console.log(s1.getPrevSolarTerm());
+        console.log(s1.getTerm());
+        console.log(s1.getNextSolarTerm());
+    });
+
 });
