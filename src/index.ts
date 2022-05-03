@@ -1,6 +1,7 @@
 export {Angle} from "./angle";
 export {Earth, Sun, Moon, SunMoon} from "./ephem";
 export {SolarTerm, SolarTermName} from "./solar-term";
+export {MoonPhase, MoonPhaseName} from "./moon-phase"
 export {JulianDate} from "./julian-date";
 export {SolarDate} from "./solar-date";
 export {LunarDate} from "./lunar-date";
