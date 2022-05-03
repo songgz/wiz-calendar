@@ -91,16 +91,16 @@ WizCalendar（巫师万年历）
    eight.getHour(); //己巳
 
 10. 获取月相(朔望)
-   ```typescript
-   let lunar = WizCalendar.lunarDate(1977,4,1);
-   let phase = lunar.getMoonPhase(MoonPhaseName.NewMoon);
-   phase.getMJDN(); //-8263
-   ```
+    ```typescript
+    let lunar = WizCalendar.lunarDate(1977,4,1);
+    let phase = lunar.getMoonPhase(MoonPhaseName.NewMoon);
+    phase.getMJDN(); //-8263
+    ```
 11. 获取24节气
-   ```typescript
+    ```typescript
     let lunar = WizCalendar.lunarDate(1977,4,1);
     let term = lunar.getSolarTerm(SolarTermName.WinterSolstice);
     term.getJulianDate().getMJDN(); //-8045
-   ```
+    ```
 12. 其它略
 
